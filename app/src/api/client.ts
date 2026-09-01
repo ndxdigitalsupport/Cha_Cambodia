@@ -81,16 +81,6 @@ export const authAPI = {
 };
 
 // Profile API
-// Donation API (PayWay)
-export const donationAPI = {
-  purchase: (amount: number, currency = 'USD') =>
-    apiClient.post('/payway/purchase', { amount, currency }),
-
-  check: (tranId: string) =>
-    apiClient.post('/payway/check', { tran_id: tranId }),
-};
-
-// Profile API
 export const profileAPI = {
   getProfile: (email: string) =>
     apiClient.get('/member/profile', { params: { email, _ts: Date.now() } }),
