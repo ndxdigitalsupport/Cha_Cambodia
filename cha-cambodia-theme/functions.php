@@ -36,8 +36,6 @@ if (!function_exists('cha_customizer_km_data')) {
             'help_heading', 'help_sub',
             'help_card_1_title', 'help_card_1_desc', 'help_card_2_title', 'help_card_2_desc',
             'help_card_3_title', 'help_card_3_desc', 'help_card_4_title', 'help_card_4_desc',
-            'news_heading', 'news_sub',
-            'news_1_title', 'news_1_desc', 'news_2_title', 'news_2_desc', 'news_3_title', 'news_3_desc',
             'cta_heading', 'cta_sub', 'cta_btn',
             'about_heading', 'about_lead', 'about_vision_label', 'about_vision_text',
             'about_mission_label', 'about_mission_text',
@@ -156,9 +154,9 @@ add_action('wp_head', 'cha_customizer_km_data');
 
 function cha_enqueue_assets() {
     wp_enqueue_style('cha-style', get_stylesheet_uri());
-    wp_enqueue_style('cha-custom-css', get_template_directory_uri() . '/style-cha.css', array(), '2.8');
+    wp_enqueue_style('cha-custom-css', get_template_directory_uri() . '/style-cha.css', array(), '4.8.5');
     wp_enqueue_style('cha-google-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Koulen:wght@400;700&family=Siemreap:wght@400&display=swap');
-    wp_enqueue_script('cha-custom-js', get_template_directory_uri() . '/script-cha.js', array(), '1.0.2', true);
+    wp_enqueue_script('cha-custom-js', get_template_directory_uri() . '/script-cha.js', array(), '1.3.1', true);
     wp_localize_script('cha-custom-js', 'chaApi', array(
         'rest_url' => rest_url('cha/v1/'),
         'nonce'    => wp_create_nonce('wp_rest'),
@@ -172,6 +170,94 @@ function cha_register_menus() {
     ));
 }
 add_action('init', 'cha_register_menus');
+
+/* ===== CHA NEWS & EVENTS CUSTOM POST TYPE ===== */
+
+function cha_register_news_cpt() {
+    register_post_type('cha_news', array(
+        'labels' => array(
+            'name'               => 'News & Events',
+            'singular_name'      => 'News Article',
+            'add_new'            => 'Add New',
+            'add_new_item'       => 'Add New Article',
+            'edit_item'          => 'Edit Article',
+            'all_items'          => 'All Articles',
+            'view_item'          => 'View Article',
+            'search_items'       => 'Search Articles',
+            'not_found'          => 'No articles found',
+            'not_found_in_trash' => 'No articles found in Trash',
+        ),
+        'public'       => true,
+        'has_archive'  => true,
+        'rewrite'      => array('slug' => 'news'),
+        'menu_icon'    => 'dashicons-welcome-view-site',
+        'supports'     => array('title', 'editor', 'thumbnail', 'excerpt'),
+        'show_in_rest' => true,
+    ));
+}
+add_action('init', 'cha_register_news_cpt');
+
+function cha_news_flush_rewrite() {
+    cha_register_news_cpt();
+    flush_rewrite_rules();
+}
+add_action('after_switch_theme', 'cha_news_flush_rewrite');
+
+function cha_news_meta_boxes() {
+    add_meta_box('cha_news_details', 'Article Details', 'cha_news_details_cb', 'cha_news', 'side', 'high');
+}
+add_action('add_meta_boxes', 'cha_news_meta_boxes');
+
+function cha_news_details_cb($post) {
+    wp_nonce_field('cha_news_details', 'cha_news_nonce');
+    $date_display = get_post_meta($post->ID, '_cha_news_date', true);
+    $badge = get_post_meta($post->ID, '_cha_news_badge', true);
+    ?>
+    <p><label for="cha_news_date"><strong>Display Date</strong><br><small>e.g. Apr 17, 2025</small></label>
+    <input type="text" id="cha_news_date" name="cha_news_date" value="<?php echo esc_attr($date_display); ?>" style="width:100%;margin-top:4px;" placeholder="Apr 17, 2025"></p>
+    <p><label for="cha_news_badge"><strong>Category Badge</strong></label>
+    <select id="cha_news_badge" name="cha_news_badge" style="width:100%;margin-top:4px;">
+        <option value="Event" <?php selected($badge, 'Event'); ?>>Event</option>
+        <option value="Update" <?php selected($badge, 'Update'); ?>>Update</option>
+        <option value="Workshop" <?php selected($badge, 'Workshop'); ?>>Workshop</option>
+        <option value="Announcement" <?php selected($badge, 'Announcement'); ?>>Announcement</option>
+    </select></p>
+    <?php
+}
+
+function cha_save_news_details($post_id) {
+    if (!isset($_POST['cha_news_nonce']) || !wp_verify_nonce($_POST['cha_news_nonce'], 'cha_news_details')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+    if (isset($_POST['cha_news_date'])) update_post_meta($post_id, '_cha_news_date', sanitize_text_field($_POST['cha_news_date']));
+    if (isset($_POST['cha_news_badge'])) update_post_meta($post_id, '_cha_news_badge', sanitize_text_field($_POST['cha_news_badge']));
+}
+add_action('save_post_cha_news', 'cha_save_news_details');
+
+function cha_news_admin_columns($columns) {
+    $new = array();
+    foreach ($columns as $key => $val) {
+        $new[$key] = $val;
+        if ($key === 'title') {
+            $new['cha_news_badge'] = 'Badge';
+            $new['cha_news_date'] = 'Display Date';
+        }
+    }
+    return $new;
+}
+add_filter('manage_cha_news_posts_columns', 'cha_news_admin_columns');
+
+function cha_news_admin_column_data($column, $post_id) {
+    if ($column === 'cha_news_badge') {
+        $badge = get_post_meta($post_id, '_cha_news_badge', true);
+        echo $badge ? esc_html($badge) : '—';
+    }
+    if ($column === 'cha_news_date') {
+        $date = get_post_meta($post_id, '_cha_news_date', true);
+        echo $date ? esc_html($date) : get_the_date('M j, Y', $post_id);
+    }
+}
+add_action('manage_cha_news_posts_custom_column', 'cha_news_admin_column_data', 10, 2);
 
 /* ===== CHA MEMBERSHIP BACKEND (Database) ===== */
 
@@ -420,6 +506,16 @@ function cha_rest_register($request) {
 
     if (empty($email) || empty($password)) {
         return new WP_Error('missing_fields', 'Email and password are required.', array('status' => 400));
+    }
+
+    if (!is_email($email)) {
+        return new WP_Error('invalid_email', 'Please provide a valid email address.', array('status' => 400));
+    }
+
+    $email_domain = strtolower(substr(strrchr($email, '@'), 1));
+    $allowed_domains = array('gmail.com','yahoo.com','outlook.com','hotmail.com','live.com','icloud.com','aol.com','protonmail.com','proton.me','mail.com','com.kh');
+    if (!in_array($email_domain, $allowed_domains, true)) {
+        return new WP_Error('invalid_email_domain', 'Please use a valid email address (gmail.com, yahoo.com, outlook.com, etc.).', array('status' => 400));
     }
 
     global $wpdb;
@@ -1580,10 +1676,14 @@ function cha_render_admin_page() {
         if (!isset($_POST['cha_edit_nonce']) || !wp_verify_nonce($_POST['cha_edit_nonce'], 'cha_edit_member')) {
             wp_die('Security check failed.');
         }
+        $edit_email = sanitize_email($_POST['email'] ?? '');
+        if (!is_email($edit_email)) {
+            echo '<div class="cha-notice cha-notice-error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Please enter a valid email address.</div>';
+        } else {
         $update_id = sanitize_text_field($_POST['member_id']);
         $data = array(
             'name'              => sanitize_text_field($_POST['name']),
-            'email'             => sanitize_email($_POST['email']),
+            'email'             => $edit_email,
             'province'          => sanitize_text_field($_POST['province']),
             'role'              => sanitize_text_field($_POST['role']),
             'blood_type'        => sanitize_text_field($_POST['bloodType'] ?? ''),
@@ -1608,6 +1708,7 @@ function cha_render_admin_page() {
             echo '<div class="cha-notice cha-notice-success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Member updated successfully.</div>';
         } else {
             echo '<div class="cha-notice cha-notice-error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Update failed. Please try again.</div>';
+        }
         }
     }
 
@@ -1644,6 +1745,8 @@ function cha_render_admin_page() {
         $add_pass     = trim($_POST['new_password'] ?? '');
         if (empty($add_name) || empty($add_email)) {
             echo '<div class="cha-notice cha-notice-error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Name and email are required.</div>';
+        } elseif (!is_email($add_email)) {
+            echo '<div class="cha-notice cha-notice-error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Please enter a valid email address.</div>';
         } elseif ($wpdb->get_var($wpdb->prepare("SELECT id FROM $table WHERE email = %s", $add_email))) {
             echo '<div class="cha-notice cha-notice-error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> A member with this email already exists.</div>';
         } else {
@@ -2130,7 +2233,14 @@ function cha_render_admin_page() {
             global $wpdb;
             cha_ensure_donations_table();
             $don_table = cha_get_donations_table();
-            $don_rows = $wpdb->get_results("SELECT * FROM $don_table ORDER BY created_at DESC LIMIT 200");
+            $per_page = 10;
+            $current_page = max(1, intval($_GET['don_page'] ?? 1));
+            $offset = ($current_page - 1) * $per_page;
+            $total_rows = $wpdb->get_var("SELECT COUNT(*) FROM $don_table");
+            $total_pages = max(1, ceil($total_rows / $per_page));
+            if ($current_page > $total_pages) $current_page = $total_pages;
+            $offset = ($current_page - 1) * $per_page;
+            $don_rows = $wpdb->get_results($wpdb->prepare("SELECT * FROM $don_table ORDER BY created_at DESC LIMIT %d OFFSET %d", $per_page, $offset));
             $totals = $wpdb->get_row("SELECT COUNT(*) AS total, COALESCE(SUM(CASE WHEN status='completed' THEN amount END),0) AS completed_sum, SUM(CASE WHEN status='completed' THEN 1 ELSE 0 END) AS completed_count FROM $don_table");
             ?>
             <div class="cha-edit-wrap" style="max-width:1100px;">
@@ -2189,6 +2299,31 @@ function cha_render_admin_page() {
                                 </tbody>
                             </table>
                         </div>
+                        <?php if ($total_pages > 1): ?>
+                        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;flex-wrap:wrap;">
+                            <?php if ($current_page > 1): ?>
+                                <a href="admin.php?page=cha-members&donations=1&don_page=<?php echo $current_page - 1; ?>" class="cha-btn" style="padding:6px 14px;font-size:0.8125rem;">← Prev</a>
+                            <?php endif; ?>
+                            <?php
+                            $start_page = max(1, $current_page - 2);
+                            $end_page = min($total_pages, $current_page + 2);
+                            if ($start_page > 1): ?>
+                                <a href="admin.php?page=cha-members&donations=1&don_page=1" class="cha-btn" style="padding:6px 12px;font-size:0.8125rem;<?php echo $current_page === 1 ? 'background:#0B1D6D;color:#fff;' : '' ?>">1</a>
+                                <?php if ($start_page > 2): ?><span style="color:#9CA3AF;padding:0 4px;">…</span><?php endif; ?>
+                            <?php endif; ?>
+                            <?php for ($p = $start_page; $p <= $end_page; $p++): ?>
+                                <a href="admin.php?page=cha-members&donations=1&don_page=<?php echo $p; ?>" class="cha-btn" style="padding:6px 12px;font-size:0.8125rem;<?php echo $p === $current_page ? 'background:#0B1D6D;color:#fff;' : '' ?>"><?php echo $p; ?></a>
+                            <?php endfor; ?>
+                            <?php if ($end_page < $total_pages): ?>
+                                <?php if ($end_page < $total_pages - 1): ?><span style="color:#9CA3AF;padding:0 4px;">…</span><?php endif; ?>
+                                <a href="admin.php?page=cha-members&donations=1&don_page=<?php echo $total_pages; ?>" class="cha-btn" style="padding:6px 12px;font-size:0.8125rem;<?php echo $current_page === $total_pages ? 'background:#0B1D6D;color:#fff;' : '' ?>"><?php echo $total_pages; ?></a>
+                            <?php endif; ?>
+                            <?php if ($current_page < $total_pages): ?>
+                                <a href="admin.php?page=cha-members&donations=1&don_page=<?php echo $current_page + 1; ?>" class="cha-btn" style="padding:6px 14px;font-size:0.8125rem;">Next →</a>
+                            <?php endif; ?>
+                        </div>
+                        <p style="text-align:center;font-size:0.75rem;color:#9CA3AF;margin-top:8px;">Page <?php echo $current_page; ?> of <?php echo $total_pages; ?> (<?php echo $total_rows; ?> total)</p>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>

@@ -118,53 +118,6 @@ function cha_customize_register($wp_customize) {
         $wp_customize->add_control("help_card_{$i}_desc_km", array('label' => "Card {$i} Description (KM)", 'section' => 'cha_help', 'type' => 'textarea'));
     }
 
-    /* ---- Section: News & Events ---- */
-    $wp_customize->add_section('cha_news', array(
-        'title' => 'News & Events',
-        'panel' => 'cha_homepage',
-    ));
-
-    $wp_customize->add_setting('news_heading', array('default' => 'Latest News & Events', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('news_heading', array('label' => 'Section Heading (EN)', 'section' => 'cha_news', 'type' => 'text'));
-
-    $wp_customize->add_setting('news_heading_km', array('default' => 'ព័ត៌មាន និងព្រឹត្តិការណ៍ថ្មីៗ', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('news_heading_km', array('label' => 'Section Heading (KM)', 'section' => 'cha_news', 'type' => 'text'));
-
-    $wp_customize->add_setting('news_sub', array('default' => 'Updates from our community awareness, treatment guidelines and training programs.', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('news_sub', array('label' => 'Section Subheading (EN)', 'section' => 'cha_news', 'type' => 'textarea'));
-
-    $wp_customize->add_setting('news_sub_km', array('default' => 'ព័ត៌មានថ្មីៗពីសកម្មភាពសហគមន៍ គោលនាំព្យាបាល និងកម្មវិធីបណ្តុះបណ្តាល។', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('news_sub_km', array('label' => 'Section Subheading (KM)', 'section' => 'cha_news', 'type' => 'textarea'));
-
-    $news_articles = array(
-        array('date' => 'Apr 17, 2025', 'badge' => 'Event', 'title' => 'World Haemophilia Day 2025 Community Awareness Event', 'title_km' => 'ទិវាភាពដឹងដល់ជំងឺហេម៉ូហ្វីលា ២០២៥', 'desc' => 'Join us for our annual awareness day in Phnom Penh.', 'desc_km' => 'ចូលរួមជាមួយយើងសម្រាប់ទិវាភាពដឹងប្រចាំឆ្នាំរបស់យើងនៅភ្នំពេញ។'),
-        array('date' => 'Apr 16, 2025', 'badge' => 'Update', 'title' => 'New Treatment Guidelines Now Available in Cambodia', 'title_km' => 'គោលនាំព្យាបាលថ្មីឥឡូវនេះមាននៅកម្ពុជា', 'desc' => 'Updated clinical guidelines for haemophilia management.', 'desc_km' => 'គោលនាំពេទ្យសម្រាប់ការគ្រប់គ្រងជំងឺហេម៉ូហ្វីលា។'),
-        array('date' => 'Apr 12, 2025', 'badge' => 'Workshop', 'title' => 'Training Workshop for Healthcare Professionals', 'title_km' => 'សិក្ខាសាលាបណ្តុះបណ្តាលសម្រាប់មន្ត្រីសុខភាព', 'desc' => 'Hands-on workshop covering diagnosis and treatment.', 'desc_km' => 'សិក្ខាសាលាបណ្តុះបណ្តាលជាក់ស្តែងស្តីពីការវិនិច្ឆ័យ និងការព្យាបាល។'),
-    );
-
-    for ($i = 1; $i <= 3; $i++) {
-        $wp_customize->add_setting("news_{$i}_img", array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
-        $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, "news_{$i}_img", array('label' => "Article {$i} Image", 'section' => 'cha_news')));
-
-        $wp_customize->add_setting("news_{$i}_date", array('default' => $news_articles[$i - 1]['date'], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("news_{$i}_date", array('label' => "Article {$i} Date", 'section' => 'cha_news', 'type' => 'text'));
-
-        $wp_customize->add_setting("news_{$i}_badge", array('default' => $news_articles[$i - 1]['badge'], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("news_{$i}_badge", array('label' => "Article {$i} Badge", 'section' => 'cha_news', 'type' => 'text'));
-
-        $wp_customize->add_setting("news_{$i}_title", array('default' => $news_articles[$i - 1]['title'], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("news_{$i}_title", array('label' => "Article {$i} Title (EN)", 'section' => 'cha_news', 'type' => 'text'));
-
-        $wp_customize->add_setting("news_{$i}_title_km", array('default' => $news_articles[$i - 1]['title_km'], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("news_{$i}_title_km", array('label' => "Article {$i} Title (KM)", 'section' => 'cha_news', 'type' => 'text'));
-
-        $wp_customize->add_setting("news_{$i}_desc", array('default' => $news_articles[$i - 1]['desc'], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("news_{$i}_desc", array('label' => "Article {$i} Description (EN)", 'section' => 'cha_news', 'type' => 'textarea'));
-
-        $wp_customize->add_setting("news_{$i}_desc_km", array('default' => $news_articles[$i - 1]['desc_km'], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("news_{$i}_desc_km", array('label' => "Article {$i} Description (KM)", 'section' => 'cha_news', 'type' => 'textarea'));
-    }
-
     /* ---- Section: CTA Banner ---- */
     $wp_customize->add_section('cha_cta', array(
         'title' => 'CTA Banner',
@@ -260,19 +213,19 @@ function cha_customize_register($wp_customize) {
     $wp_customize->add_setting('contact_sub_km', array('default' => 'មានសំណួរឬចង់ចូលរួម? យើងរីករាយស្តាប់ពីអ្នក។', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_sub_km', array('label' => 'Section Subheading (KM)', 'section' => 'cha_contact', 'type' => 'textarea'));
 
-    $wp_customize->add_setting('contact_address', array('default' => "#35, St. 121, Sangkat Tuel Tumpong 2, Khan Chamkarmon, Phnom Penh, Cambodia", 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('contact_address', array('default' => '#Building 100, Russia Blvd (114), Phnom Penh, Cambodia, P.O Box 700', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_address', array('label' => 'Address (EN)', 'section' => 'cha_contact', 'type' => 'textarea'));
 
-    $wp_customize->add_setting('contact_address_km', array('default' => 'ផ្ទះលេខ ៣៥ ផ្លូវ ១២១ សង្កាត់ទួលទំពូង ២ ខណ្ឌចំការមន ភ្នំពេញ', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('contact_address_km', array('default' => '#អាគារ ១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី (១១៤) រាជធានីភ្នំពេញ កម្ពុជា ប្រអប់សំបុត្រ ៧០០', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_address_km', array('label' => 'Address (KM)', 'section' => 'cha_contact', 'type' => 'textarea'));
 
-    $wp_customize->add_setting('contact_phone', array('default' => '(+855) 12 345 678', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('contact_phone', array('default' => '(+855) 96 260 5335', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_phone', array('label' => 'Phone (display)', 'section' => 'cha_contact', 'type' => 'text'));
 
-    $wp_customize->add_setting('contact_phone_digits', array('default' => '+85512345678', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('contact_phone_digits', array('default' => '+855962605335', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_phone_digits', array('label' => 'Phone (digits for tel link)', 'section' => 'cha_contact', 'type' => 'text'));
 
-    $wp_customize->add_setting('contact_email', array('default' => 'info@chacambodia.org', 'sanitize_callback' => 'sanitize_email'));
+    $wp_customize->add_setting('contact_email', array('default' => 'choryee.hun@gmail.com', 'sanitize_callback' => 'sanitize_email'));
     $wp_customize->add_control('contact_email', array('label' => 'Email', 'section' => 'cha_contact', 'type' => 'email'));
 
     $wp_customize->add_setting('contact_hours_mf', array('default' => '8:00 — 17:00', 'sanitize_callback' => 'sanitize_text_field'));
@@ -504,10 +457,10 @@ function cha_customize_register($wp_customize) {
     ));
 
     $leaders = array(
-        array('Chan Soveun Ly', 'ចាន់ សុវ៉ុន លី', 'President', 'ប្រធាន'),
-        array('Sok Sothea', 'សុខ សុធា', 'Vice President', 'អនុប្រធាន'),
-        array('Bory Kao', 'បុរី កៅ', 'Medical Advisor', 'ទីប្រឹក្សាពេទ្យ'),
-        array('Yordak Kim', 'យ៉ុដក គឹម', 'Executive Director', 'នាយកប្រតិបត្តិ'),
+        array('Mr. Run Chanthearithy', 'លោក រុន ច័ន្ទរិទ្ធី', 'President', 'ប្រធាន'),
+        array('Mr. Noeurn Syneang', 'លោក នឿន ស៊ីនាង', 'Vice President', 'អនុប្រធាន'),
+        array('Mrs. Soung Somaly', 'លោកស្រី ស៊ូង សោម៉ាលី', 'Treasurer', 'ហេរញ្ញិក'),
+        array('Mrs. Hun Choryee', 'លោកស្រី ហ៊ុន ជោរយី', 'Secretary General', 'អគ្គលេខាធិការ'),
     );
     $wp_customize->add_setting('leadership_heading', array('default' => 'Leadership Team', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('leadership_heading', array('label' => 'Heading (EN)', 'section' => 'cha_leadership', 'type' => 'text'));
@@ -630,8 +583,8 @@ function cha_customize_register($wp_customize) {
     $wp_customize->add_control('programs_view_map_km', array('label' => 'View on Map (KM)', 'section' => 'cha_programs_main', 'type' => 'text'));
 
     $hospitals = array(
-        array('National Paediatric Hospital — Haemophilia Clinic', 'មន្ទីរពេទ្យជាតិកុមារ — គ្លីនិចហេម៉ូហ្វីលា', 'Phnom Penh', 'ភ្នំពេញ', '012 751 728', 'Haemophilia A & B', 'ហេម៉ូហ្វីលា A & B', 'VWD', 'Consultation', 'ការពិគ្រោះយោបល់', 'Laboratory', 'មន្ទីរពិសោធន៍'),
-        array('Calmette Hospital — Haemophilia Unit', 'មន្ទីរពេទ្យកាល់ម៉ែត — អង្គភាពហេម៉ូហ្វីលា', 'Phnom Penh', 'ភ្នំពេញ', '012 794 685', 'Haemophilia A & B', 'ហេម៉ូហ្វីលា A & B', 'Factor Replacement', 'ការជំនួសកត្តា', 'Counselling', 'ការណែនាំ'),
+        array('National Pediatric Hospital (NPH) — Haemophilia Clinic', 'មន្ទីរពេទ្យគន្ធបុប្ផា/កុមារជាតិ — គ្លីនិកហេម៉ូហ្វីលា', 'Phnom Penh', 'ភ្នំពេញ', '012 751 728', 'Haemophilia A & B', 'ហេម៉ូហ្វីលា A & B', 'VWD', 'Consultation', 'ការពិគ្រោះយោបល់', 'Laboratory', 'មន្ទីរពិសោធន៍'),
+        array('Angkor Hospital for Children (AHC) — Haemophilia Unit', 'មន្ទីរពេទ្យកុមារអង្គរ — អង្គភាពហេម៉ូហ្វីលា', 'Siem Reap', 'សៀមរាប', '012 794 685', 'Haemophilia A & B', 'ហេម៉ូហ្វីលា A & B', 'Factor Replacement', 'ការជំនួសកត្តា', 'Counselling', 'ការណែនាំ'),
         array('Siem Reap Provincial Hospital', 'មន្ទីរពេទ្យខេត្តសៀមរាប', 'Siem Reap', 'សៀមរាប', '063 765 376', 'Haemophilia A & B', 'ហេម៉ូហ្វីលា A & B', 'Consultation', 'ការពិគ្រោះយោបល់', 'Emergency Care', 'ការថែទាំបន្ទាន់'),
     );
     for ($i = 1; $i <= 3; $i++) {
@@ -674,7 +627,7 @@ function cha_customize_register($wp_customize) {
     $wp_customize->add_control('emergency_text', array('label' => 'Text (EN)', 'section' => 'cha_emergency', 'type' => 'textarea'));
     $wp_customize->add_setting('emergency_text_km', array('default' => 'ប្រសិនបើអ្នកមានអាសន្នហូរឈាម សូមទាក់ទងមជ្ឈមណ្ឌលព្យាបាលដែលនៅជិតបំផុត ឬហៅទូរស័ព្ទមកកាន់ខ្សែទូរស័ព្ទជំនួយរបស់យើង។', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('emergency_text_km', array('label' => 'Text (KM)', 'section' => 'cha_emergency', 'type' => 'textarea'));
-    $wp_customize->add_setting('emergency_phone', array('default' => '012 345 678', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('emergency_phone', array('default' => '(+855) 96 260 5335', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('emergency_phone', array('label' => 'Phone Number', 'section' => 'cha_emergency', 'type' => 'text'));
 
     /* ---- Section: CSR ---- */
@@ -1058,8 +1011,9 @@ function cha_customize_register($wp_customize) {
         array('Access to Resources', 'ការចូលប្រើធនធាន', 'Exclusive guides, educational materials, and treatment information.', 'មគ្គុទ្ទេសក៍ផ្តាច់មុខ សម្ភារៈអប់រំ និងព័ត៌មានព្យាបាល។'),
         array('Events & Workshops', 'ព្រឹត្តិការណ៍ និងសិក្ខាសាលា', 'Participate in hands-on workshops, community events, and online learning sessions.', 'ចូលរួមសិក្ខាសាលាអនុវត្តជាក់ស្តែង ព្រឹត្តិការណ៍សហគមន៍ និងវគ្គសិក្សាតាមអនឡាញ។'),
         array('Advocacy & Awareness', 'ការតស៊ូមតិ និងការយល់ដឹង', 'Help raise awareness and advocate for better care nationwide.', 'ជួយលើកកម្ពស់ការយល់ដឹង និងតស៊ូមតិសម្រាប់ការថែទាំល្អប្រសើរទូទាំងប្រទេស។'),
+        array('Updates & Newsletters', 'ព័ត៌មាន និងព្រឹត្តិបត្រ', 'Stay informed with the latest news and CHA announcements.', 'ទទួលបានព័ត៌មានថ្មីៗ និងសេចក្តីប្រកាសរបស់ CHA។'),
     );
-    for ($i = 1; $i <= 4; $i++) {
+    for ($i = 1; $i <= 5; $i++) {
         $b = $benefits[$i-1];
         $wp_customize->add_setting("benefit_{$i}_title", array('default' => $b[0], 'sanitize_callback' => 'sanitize_text_field'));
         $wp_customize->add_control("benefit_{$i}_title", array('label' => "Benefit {$i} Title (EN)", 'section' => 'cha_membership_section', 'type' => 'text'));

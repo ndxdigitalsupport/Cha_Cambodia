@@ -36,18 +36,18 @@
                     <a href="<?php echo home_url('/haemophilia'); ?>#vwd" data-i18n="nav_haemophilia_vwd"><?php echo esc_html(cha_get_option('nav_haemophilia_vwd', 'About VWD')); ?></a>
                     <a href="<?php echo home_url('/haemophilia'); ?>#other-bleeding" data-i18n="nav_haemophilia_other"><?php echo esc_html(cha_get_option('nav_haemophilia_other', 'About other bleeding disorders')); ?></a>
                     <span class="nav-drop-divider"></span>
-                    <a href="<?php echo home_url('/programs'); ?>#treatment-centres"><?php echo esc_html(cha_get_option('nav_programs', 'Haemophilia Treatment Centres')); ?></a>
-                    <a href="<?php echo home_url('/programs'); ?>#csr" class="nav-drop-parent"><?php echo esc_html(cha_get_option('nav_csr', 'CSR Program')); ?></a>
-                    <a href="<?php echo home_url('/programs'); ?>#csr" class="nav-drop-sub"><?php echo esc_html(cha_get_option('nav_csr_fundraising', 'Fundraising')); ?></a>
-                    <a href="<?php echo home_url('/programs'); ?>#csr" class="nav-drop-sub"><?php echo esc_html(cha_get_option('nav_csr_donate', 'Online donation')); ?></a>
-                    <a href="<?php echo home_url('/programs'); ?>#csr" class="nav-drop-sub"><?php echo esc_html(cha_get_option('nav_csr_partners', 'Corporate Partners')); ?></a>
+                    <a href="<?php echo home_url('/programs'); ?>#treatment-centres" data-i18n="nav_programs"><?php echo esc_html(cha_get_option('nav_programs', 'Haemophilia Treatment Centres')); ?></a>
+                    <a href="<?php echo home_url('/programs'); ?>#csr" class="nav-drop-parent" data-i18n="nav_csr"><?php echo esc_html(cha_get_option('nav_csr', 'CSR Program')); ?></a>
+                    <a href="<?php echo home_url('/programs'); ?>#csr" class="nav-drop-sub" data-i18n="nav_csr_fundraising"><?php echo esc_html(cha_get_option('nav_csr_fundraising', 'Fundraising')); ?></a>
+                    <a href="<?php echo home_url('/programs'); ?>#csr" class="nav-drop-sub" data-i18n="nav_csr_donate"><?php echo esc_html(cha_get_option('nav_csr_donate', 'Online donation')); ?></a>
+                    <a href="<?php echo home_url('/programs'); ?>#csr" class="nav-drop-sub" data-i18n="nav_csr_partners"><?php echo esc_html(cha_get_option('nav_csr_partners', 'Corporate Partners')); ?></a>
                 </div>
             </div>
             <div class="nav-drop" data-nav-drop>
                 <button class="nav-drop-trigger" type="button" aria-expanded="false" aria-haspopup="true" data-i18n="nav_news"><?php echo esc_html(cha_get_option('nav_news', 'News')); ?><svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                 <div class="nav-drop-panel">
-                    <a href="<?php echo home_url(); ?>#news-events" data-i18n="nav_news_latest"><?php echo esc_html(cha_get_option('nav_news_latest', 'Latest News')); ?></a>
-                    <a href="#" data-coming-soon data-i18n="nav_news_events"><?php echo esc_html(cha_get_option('nav_news_events', 'Upcoming Events')); ?></a>
+                    <a href="<?php echo esc_url(get_post_type_archive_link('cha_news')); ?>" data-i18n="nav_news_latest"><?php echo esc_html(cha_get_option('nav_news_latest', 'Latest News')); ?></a>
+                    <a href="<?php echo esc_url(add_query_arg('cat', 'event', get_post_type_archive_link('cha_news'))); ?>" data-i18n="nav_news_events"><?php echo esc_html(cha_get_option('nav_news_events', 'Upcoming Events')); ?></a>
                 </div>
             </div>
             <a href="<?php echo home_url(); ?>#contact" data-i18n="nav_contact"><?php echo esc_html(cha_get_option('nav_contact', 'Contact')); ?></a>
@@ -92,18 +92,18 @@
                     <a href="<?php echo home_url('/haemophilia'); ?>#vwd" data-i18n="nav_haemophilia_vwd"><?php echo esc_html(cha_get_option('nav_haemophilia_vwd', 'About VWD')); ?></a>
                     <a href="<?php echo home_url('/haemophilia'); ?>#other-bleeding" data-i18n="nav_haemophilia_other"><?php echo esc_html(cha_get_option('nav_haemophilia_other', 'About other bleeding disorders')); ?></a>
                     <span class="drawer-sub-divider"></span>
-                    <a href="<?php echo home_url('/programs'); ?>#treatment-centres" class="drawer-sub-parent"><?php echo esc_html(cha_get_option('nav_programs', 'Haemophilia Treatment Centres')); ?></a>
-                    <a href="<?php echo home_url('/programs'); ?>#csr" class="drawer-sub-parent"><?php echo esc_html(cha_get_option('nav_csr', 'CSR Program')); ?></a>
-                    <a href="<?php echo home_url('/programs'); ?>#csr" class="drawer-sub-sub"><?php echo esc_html(cha_get_option('nav_csr_fundraising', 'Fundraising')); ?></a>
-                    <a href="<?php echo home_url('/programs'); ?>#csr" class="drawer-sub-sub"><?php echo esc_html(cha_get_option('nav_csr_donate', 'Online donation')); ?></a>
-                    <a href="<?php echo home_url('/programs'); ?>#csr" class="drawer-sub-sub"><?php echo esc_html(cha_get_option('nav_csr_partners', 'Corporate Partners')); ?></a>
+                    <a href="<?php echo home_url('/programs'); ?>#treatment-centres" class="drawer-sub-parent" data-i18n="nav_programs"><?php echo esc_html(cha_get_option('nav_programs', 'Haemophilia Treatment Centres')); ?></a>
+                    <a href="<?php echo home_url('/programs'); ?>#csr" class="drawer-sub-parent" data-i18n="nav_csr"><?php echo esc_html(cha_get_option('nav_csr', 'CSR Program')); ?></a>
+                    <a href="<?php echo home_url('/programs'); ?>#csr" class="drawer-sub-sub" data-i18n="nav_csr_fundraising"><?php echo esc_html(cha_get_option('nav_csr_fundraising', 'Fundraising')); ?></a>
+                    <a href="<?php echo home_url('/programs'); ?>#csr" class="drawer-sub-sub" data-i18n="nav_csr_donate"><?php echo esc_html(cha_get_option('nav_csr_donate', 'Online donation')); ?></a>
+                    <a href="<?php echo home_url('/programs'); ?>#csr" class="drawer-sub-sub" data-i18n="nav_csr_partners"><?php echo esc_html(cha_get_option('nav_csr_partners', 'Corporate Partners')); ?></a>
                 </div>
             </div>
             <div class="drawer-group">
                 <button class="drawer-sub-trigger" type="button" aria-expanded="false" data-i18n="nav_news"><?php echo esc_html(cha_get_option('nav_news', 'News')); ?><svg width="12" height="7" viewBox="0 0 12 7" fill="none" aria-hidden="true"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                 <div class="drawer-sub-items">
-                    <a href="<?php echo home_url(); ?>#news-events" data-i18n="nav_news_latest"><?php echo esc_html(cha_get_option('nav_news_latest', 'Latest News')); ?></a>
-                    <a href="#" data-coming-soon data-i18n="nav_news_events"><?php echo esc_html(cha_get_option('nav_news_events', 'Upcoming Events')); ?></a>
+                    <a href="<?php echo esc_url(get_post_type_archive_link('cha_news')); ?>" data-i18n="nav_news_latest"><?php echo esc_html(cha_get_option('nav_news_latest', 'Latest News')); ?></a>
+                    <a href="<?php echo esc_url(add_query_arg('cat', 'event', get_post_type_archive_link('cha_news'))); ?>" data-i18n="nav_news_events"><?php echo esc_html(cha_get_option('nav_news_events', 'Upcoming Events')); ?></a>
                 </div>
             </div>
             <a href="<?php echo home_url(); ?>#contact" data-i18n="nav_contact"><?php echo esc_html(cha_get_option('nav_contact', 'Contact')); ?></a>

@@ -11,84 +11,53 @@
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
           </div>
-          <span class="donate-modal-title" style="font-size: 1.0625rem; font-weight: 700; color: var(--c-blue);"><?php echo esc_html(cha_get_option('donate_modal_title', 'Make a Donation')); ?></span>
+          <span class="donate-modal-title" style="font-size: 1.0625rem; font-weight: 700; color: var(--c-blue);" data-i18n="donate_modal_title"><?php echo esc_html(cha_get_option('donate_modal_title', 'Make a Donation')); ?></span>
         </div>
         <button class="donate-modal-close" type="button" data-donate-close aria-label="Close donation form"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="donate-modal-body">
-        <div class="modal-acct-top">
-          <div>
-            <h3 class="modal-acct-welcome"><?php echo esc_html(cha_get_option('donate_modal_heading', 'Help Change Lives!')); ?> ❤️</h3>
-            <p class="modal-acct-sub"><?php echo esc_html(cha_get_option('donate_modal_sub', 'Your support provides treatment, education, and hope to people with bleeding disorders in Cambodia.')); ?></p>
-          </div>
-          <div class="modal-acct-shield">
-            <svg viewBox="0 0 80 80" fill="none">
-              <path d="M40 6C40 6 18 18 18 34c0 14 10 22 22 22s22-8 22-22C62 18 40 6 40 6z" fill="url(#donate-shield-grad)"/>
-              <path d="M32 38l6 6 12-12" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              <defs>
-                <linearGradient id="donate-shield-grad" x1="18" y1="6" x2="62" y2="56">
-                  <stop stop-color="#E31E24"/>
-                  <stop offset="1" stop-color="#0B1D6D"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-        </div>
-
-        <div class="modal-acct-header">
-          <div class="modal-acct-avatar" style="background: linear-gradient(135deg, #E31E24 0%, #9E171A 100%);">❤️</div>
-          <div class="modal-acct-info">
-            <p class="modal-acct-name">Donation</p>
-            <p class="modal-acct-email">Secure & encrypted</p>
-          </div>
-          <span class="modal-acct-status"><span class="dot" style="background: #22C55E;"></span> Safe</span>
-        </div>
+        <p class="modal-subtitle" data-i18n="donate_modal_sub"><?php echo esc_html(cha_get_option('donate_modal_sub', 'Your support provides treatment, education, and hope to people with bleeding disorders in Cambodia.')); ?></p>
 
         <form id="donate-modal-form" novalidate>
-          <div data-tabs>
-            <!-- One-time Amount -->
-            <div class="tab-panel is-active" data-tab-panel="modal-once">
-              <div class="amount-chips" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--s-3); margin-bottom: var(--s-4);">
-                <button type="button" class="amount-chip is-active" data-amount="10" style="padding: 16px 12px; font-size: 1.25rem; font-weight: 700; border-radius: var(--r-lg); border: 2px solid var(--c-border);">$10</button>
-                <button type="button" class="amount-chip" data-amount="25" style="padding: 16px 12px; font-size: 1.25rem; font-weight: 700; border-radius: var(--r-lg); border: 2px solid var(--c-border);">$25</button>
-                <button type="button" class="amount-chip" data-amount="50" style="padding: 16px 12px; font-size: 1.25rem; font-weight: 700; border-radius: var(--r-lg); border: 2px solid var(--c-border);">$50</button>
-                <button type="button" class="amount-chip" data-amount="100" style="padding: 16px 12px; font-size: 1.25rem; font-weight: 700; border-radius: var(--r-lg); border: 2px solid var(--c-border);">$100</button>
-                <button type="button" class="amount-chip" data-amount="other" style="padding: 16px 12px; font-size: 1.25rem; font-weight: 700; border-radius: var(--r-lg); border: 2px solid var(--c-border);">Other</button>
-              </div>
-              <input class="form-input" type="number" placeholder="Enter amount in USD" data-amount-other min="1" style="padding: 16px 18px; border-radius: var(--r-lg); font-size: 1.125rem;">
+          <div class="form-group">
+            <label class="form-label"><span data-i18n="donate_amount_label">Donation Amount</span> <span class="req">*</span></label>
+            <div class="amount-chips" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--s-3); margin-bottom: var(--s-3);">
+              <button type="button" class="amount-chip is-active" data-amount="10">$10</button>
+              <button type="button" class="amount-chip" data-amount="25">$25</button>
+              <button type="button" class="amount-chip" data-amount="50">$50</button>
+              <button type="button" class="amount-chip" data-amount="100">$100</button>
+              <button type="button" class="amount-chip" data-amount="other" data-i18n="donate_other">Other</button>
             </div>
+            <input class="form-input" type="number" placeholder="Enter amount in USD" data-amount-other min="1" style="display:none">
           </div>
 
-          <!-- PayWay Note -->
-          <h4 style="margin: var(--s-6) 0 var(--s-3); font-size: 1.125rem; font-weight: 700; color: var(--c-text); display: flex; align-items: center; gap: 10px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: var(--c-red);">
-              <rect x="2" y="5" width="20" height="14" rx="2"/>
-              <line x1="2" y1="10" x2="22" y2="10"/>
-            </svg>
-            Secure Payment
-          </h4>
-          <p class="text-muted" style="font-size:0.875rem; margin-bottom: var(--s-5);">Pay securely with credit/debit cards, ABA Pay, KHQR, WeChat Pay or Alipay via PayWay (ABA Bank).</p>
+          <div class="form-group">
+            <label class="form-label" data-i18n="donate_name_label">Full name (optional)</label>
+            <input class="form-input" type="text" id="doname" placeholder="Enter your name" data-i18n-placeholder="donate_name_ph">
+          </div>
 
-          <!-- Submit Button -->
-          <button type="submit" class="btn btn-donate btn-block btn-lg" style="padding: 18px 24px; border-radius: var(--r-full); font-size: 1.25rem; font-weight: 800; background: linear-gradient(135deg, var(--c-red) 0%, #9E171A 100%); box-shadow: 0 8px 24px rgba(227, 30, 36, 0.3); display: flex; align-items: center; justify-content: center; gap: 12px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            <?php echo esc_html(cha_get_option('donate_btn', 'Donate Now')); ?>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-          </button>
+          <div class="form-group">
+            <label class="form-label" data-i18n="donate_email_label">Email (optional)</label>
+            <input class="form-input" type="email" id="doemail" placeholder="Enter your email" data-i18n-placeholder="donate_email_ph">
+          </div>
 
-          <p class="secure-note" style="margin-top: var(--s-4); text-align: center; font-size: 1rem; color: var(--c-gray-500); display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: #22C55E;">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              <polyline points="9 12 11 14 15 10"/>
-            </svg>
-            <?php echo esc_html(cha_get_option('donate_footer_note', 'Secure & encrypted via PayWay (ABA Bank)')); ?>
-          </p>
+          <div class="form-group">
+            <label class="form-label" data-i18n="donate_phone_label">Phone (optional)</label>
+            <input class="form-input" type="tel" id="dophone" placeholder="Enter your phone" data-i18n-placeholder="donate_phone_ph">
+          </div>
+
+          <div class="modal-btn-row">
+            <button type="submit" class="btn btn-primary" data-i18n="donate_btn"><?php echo esc_html(cha_get_option('donate_btn', 'Donate Now')); ?></button>
+          </div>
         </form>
+
+        <p class="secure-note" style="margin-top: var(--s-4); text-align: center; font-size: 0.8125rem; color: var(--c-muted); display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: #22C55E;">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+          <?php echo esc_html(cha_get_option('donate_footer_note', 'Secure & encrypted via PayWay (ABA Bank)')); ?>
+        </p>
       </div>
     </div>
   </div>
@@ -100,68 +69,68 @@
       <div class="donate-modal-header">
         <div class="donate-modal-title-block">
           <div class="donate-modal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-          <span class="donate-modal-title" id="member-modal-title"><?php echo esc_html(cha_get_option('member_login_title', 'Member Login')); ?></span>
+          <span class="donate-modal-title" id="member-modal-title" data-i18n="member_login_title"><?php echo esc_html(cha_get_option('member_login_title', 'Member Login')); ?></span>
         </div>
         <button class="donate-modal-close" type="button" data-member-close aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="donate-modal-body">
         <div id="member-login-panel">
-          <p class="modal-subtitle"><?php echo esc_html(cha_get_option('member_login_sub', 'Sign in to access your account, resources, and community.')); ?></p>
+          <p class="modal-subtitle" data-i18n="member_login_sub"><?php echo esc_html(cha_get_option('member_login_sub', 'Sign in to access your account, resources, and community.')); ?></p>
           <form data-mock-form novalidate>
-            <div class="form-group"><label class="form-label" for="memail">Email <span class="req">*</span></label><input class="form-input" type="email" id="memail" placeholder="Enter your email" required></div>
-            <div class="form-group"><label class="form-label" for="mpass">Password <span class="req">*</span></label><div class="password-wrapper"><input class="form-input" type="password" id="mpass" placeholder="Enter your password" required><button type="button" class="password-toggle" onclick="togglePass(event)" aria-label="Toggle password visibility"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-open"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-closed" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button></div></div>
-            <div style="display:flex;justify-content:flex-end;margin-bottom:var(--s-4)"><a href="#" data-member-forgot style="font-size:0.8125rem;color:var(--c-muted)"><?php echo esc_html(cha_get_option('member_forgot', 'Forgot password?')); ?></a></div>
+            <div class="form-group"><label class="form-label" for="memail"><span data-i18n="form_email_label">Email</span> <span class="req">*</span></label><input class="form-input" type="email" id="memail" placeholder="Enter your email" data-i18n-placeholder="form_email_ph" required></div>
+            <div class="form-group"><label class="form-label" for="mpass"><span data-i18n="form_pass_label">Password</span> <span class="req">*</span></label><div class="password-wrapper"><input class="form-input" type="password" id="mpass" placeholder="Enter your password" data-i18n-placeholder="form_pass_ph" required><button type="button" class="password-toggle" onclick="togglePass(event)" aria-label="Toggle password visibility"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-open"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-closed" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button></div></div>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:var(--s-4)"><a href="#" data-member-forgot style="font-size:0.8125rem;color:var(--c-muted)" data-i18n="member_forgot"><?php echo esc_html(cha_get_option('member_forgot', 'Forgot password?')); ?></a></div>
             <div class="modal-btn-row">
-              <button type="submit" class="btn btn-primary"><?php echo esc_html(cha_get_option('member_signin_btn', 'Sign In')); ?></button>
+              <button type="submit" class="btn btn-primary" data-i18n="member_signin_btn"><?php echo esc_html(cha_get_option('member_signin_btn', 'Sign In')); ?></button>
             </div>
           </form>
-          <p style="text-align:center;margin-top:var(--s-5);font-size:0.875rem;color:var(--c-muted)"><a href="#" data-member-register style="color:var(--c-blue);font-weight:var(--fw-semibold)"><?php echo esc_html(cha_get_option('member_register_link', 'Register')); ?></a></p>
+          <p style="text-align:center;margin-top:var(--s-5);font-size:0.875rem;color:var(--c-muted)"><a href="#" data-member-register style="color:var(--c-blue);font-weight:var(--fw-semibold)" data-i18n="member_register_link"><?php echo esc_html(cha_get_option('member_register_link', 'Register')); ?></a></p>
         </div>
         <div id="member-register-panel" style="display:none">
-          <p class="modal-subtitle"><?php echo esc_html(cha_get_option('member_register_title', 'Join our community of patients, families, and supporters.')); ?></p>
+          <p class="modal-subtitle" data-i18n="member_register_title"><?php echo esc_html(cha_get_option('member_register_title', 'Join our community of patients, families, and supporters.')); ?></p>
           <form data-mock-form novalidate>
-            <div class="form-group"><label class="form-label" for="mregrole">I am a <span class="req">*</span></label>
+            <div class="form-group"><label class="form-label" for="mregrole"><span data-i18n="form_i_am_a">I am a</span> <span class="req">*</span></label>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3)">
                 <label class="role-option" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid var(--c-border);border-radius:var(--r-lg);cursor:pointer;transition:all 0.2s">
                   <input type="radio" name="mregrole" value="Supporter" checked style="display:none">
                   <span class="role-radio" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--c-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s"><span style="width:10px;height:10px;border-radius:50%;background:var(--c-blue);display:none"></span></span>
-                  <span><strong style="display:block;font-size:0.875rem">Member</strong><span style="font-size:0.75rem;color:var(--c-muted)">Supporter / Family</span></span>
+                  <span><strong style="display:block;font-size:0.875rem" data-i18n="role_member">Member</strong><span style="font-size:0.75rem;color:var(--c-muted)" data-i18n="role_member_desc">Supporter / Family</span></span>
                 </label>
                 <label class="role-option" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid var(--c-border);border-radius:var(--r-lg);cursor:pointer;transition:all 0.2s">
                   <input type="radio" name="mregrole" value="Patient" style="display:none">
                   <span class="role-radio" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--c-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s"><span style="width:10px;height:10px;border-radius:50%;background:var(--c-blue);display:none"></span></span>
-                  <span><strong style="display:block;font-size:0.875rem">Patient</strong><span style="font-size:0.75rem;color:var(--c-muted)">I have a bleeding disorder</span></span>
+                  <span><strong style="display:block;font-size:0.875rem" data-i18n="role_patient">Patient</strong><span style="font-size:0.75rem;color:var(--c-muted)" data-i18n="role_patient_desc">I have Haemophilia</span></span>
                 </label>
               </div>
             </div>
-            <div class="form-group"><label class="form-label" for="mregname">Full name <span class="req">*</span></label><input class="form-input" type="text" id="mregname" placeholder="Enter your full name" required></div>
-            <div class="form-group"><label class="form-label" for="mregemail">Email address <span class="req">*</span></label><input class="form-input" type="email" id="mregemail" placeholder="Enter your email" required></div>
-            <div class="form-group"><label class="form-label" for="mregpass">Password <span class="req">*</span></label><div class="password-wrapper"><input class="form-input" type="password" id="mregpass" placeholder="Create a password" required><button type="button" class="password-toggle" onclick="togglePass(event)" aria-label="Toggle password visibility"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-open"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-closed" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button></div></div>
-            <div class="form-group"><label class="form-label" for="mregphone">Phone number (optional)</label><input class="form-input" type="tel" id="mregphone" placeholder="Enter your phone number"></div>
-            <div class="form-group"><label class="form-label" for="mregaddress">Address (optional)</label><input class="form-input" type="text" id="mregaddress" placeholder="Enter your address"></div>
+            <div class="form-group"><label class="form-label" for="mregname"><span data-i18n="form_name_label">Full name</span> <span class="req">*</span></label><input class="form-input" type="text" id="mregname" placeholder="Enter your full name" data-i18n-placeholder="form_name_ph" required></div>
+            <div class="form-group"><label class="form-label" for="mregemail"><span data-i18n="form_email_label">Email address</span> <span class="req">*</span></label><input class="form-input" type="email" id="mregemail" placeholder="Enter your email" data-i18n-placeholder="form_email_ph" required></div>
+            <div class="form-group"><label class="form-label" for="mregpass"><span data-i18n="form_pass_label">Password</span> <span class="req">*</span></label><div class="password-wrapper"><input class="form-input" type="password" id="mregpass" placeholder="Create a password" data-i18n-placeholder="form_create_pass_ph" required><button type="button" class="password-toggle" onclick="togglePass(event)" aria-label="Toggle password visibility"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-open"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-closed" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button></div></div>
+            <div class="form-group"><label class="form-label" for="mregphone" data-i18n="form_phone_label">Phone number (optional)</label><input class="form-input" type="tel" id="mregphone" placeholder="Enter your phone number" data-i18n-placeholder="form_phone_ph"></div>
+            <div class="form-group"><label class="form-label" for="mregaddress" data-i18n="form_address_label">Address (optional)</label><input class="form-input" type="text" id="mregaddress" placeholder="Enter your address" data-i18n-placeholder="form_address_ph"></div>
 <div id="patient-fields" style="display:none">
-  <div class="form-group"><label class="form-label" for="mregdob">Date of birth</label><input class="form-input" type="text" id="mregdob" placeholder="dd/mm/yyyy"></div>
-              <div class="form-group"><label class="form-label" for="mregcondition">Hemophilia Type</label><select class="form-input" id="mregcondition"><option value="">Select type</option><option value="Hemophilia A">Hemophilia A</option><option value="Hemophilia B">Hemophilia B</option><option value="Other">Other</option></select><input class="form-input" type="text" id="mregcondition-other" placeholder="Specify your condition" style="display:none;margin-top:8px"></div>
-              <div class="form-group"><label class="form-label" for="mregblood">Blood type</label>
-                <select class="form-input" id="mregblood"><option value="">Select blood type</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select>
+  <div class="form-group"><label class="form-label" for="mregdob" data-i18n="dash_dob">Date of birth</label><input class="form-input" type="text" id="mregdob" placeholder="dd/mm/yyyy"></div>
+              <div class="form-group"><label class="form-label" for="mregcondition" data-i18n="form_hemophilia_type_lbl">Hemophilia Type</label><select class="form-input" id="mregcondition"><option value="" data-i18n="form_select_type">Select type</option><option value="Hemophilia A">Hemophilia A</option><option value="Hemophilia B">Hemophilia B</option><option value="Other" data-i18n="form_opt_other">Other</option></select><input class="form-input" type="text" id="mregcondition-other" placeholder="Specify your condition" data-i18n-placeholder="form_specify_cond_ph" style="display:none;margin-top:8px"></div>
+              <div class="form-group"><label class="form-label" for="mregblood" data-i18n="dash_blood_type">Blood type</label>
+                <select class="form-input" id="mregblood"><option value="" data-i18n="form_select_blood">Select blood type</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select>
               </div>
             </div>
-            <div class="form-group"><label class="form-check"><input type="checkbox" id="mregconsent"><span><?php echo esc_html(cha_get_option('member_register_terms', 'I agree to the')); ?> <a href="<?php echo esc_url(home_url('/terms')); ?>" target="_blank"><?php echo esc_html(cha_get_option('member_register_terms_link', 'Terms & Conditions')); ?></a>.</span></label></div>
+            <div class="form-group"><label class="form-check"><input type="checkbox" id="mregconsent"><span><span data-i18n="form_terms_agree"><?php echo esc_html(cha_get_option('member_register_terms', 'I agree to the')); ?></span> <a href="<?php echo esc_url(home_url('/terms')); ?>" target="_blank" data-i18n="form_terms_link"><?php echo esc_html(cha_get_option('member_register_terms_link', 'Terms & Conditions')); ?></a>.</span></label></div>
             <div class="modal-btn-row">
-              <button type="submit" class="btn btn-primary"><?php echo esc_html(cha_get_option('member_register_btn', 'Register')); ?></button>
+              <button type="submit" class="btn btn-primary" data-i18n="member_register_btn"><?php echo esc_html(cha_get_option('member_register_btn', 'Register')); ?></button>
             </div>
           </form>
-          <p style="text-align:center;margin-top:var(--s-5);font-size:0.875rem;color:var(--c-muted)"><?php echo esc_html(cha_get_option('member_register_login', 'Already have an account?')); ?> <a href="#" data-member-back-login style="color:var(--c-blue);font-weight:var(--fw-semibold)"><?php echo esc_html(cha_get_option('member_signin_btn', 'Sign In')); ?></a></p>
+          <p style="text-align:center;margin-top:var(--s-5);font-size:0.875rem;color:var(--c-muted)"><span data-i18n="member_already_account"><?php echo esc_html(cha_get_option('member_register_login', 'Already have an account?')); ?></span> <a href="#" data-member-back-login style="color:var(--c-blue);font-weight:var(--fw-semibold)" data-i18n="member_signin_btn"><?php echo esc_html(cha_get_option('member_signin_btn', 'Sign In')); ?></a></p>
         </div>
         <div id="member-forgot-panel" style="display:none">
-          <p class="modal-subtitle"><?php echo esc_html(cha_get_option('member_forgot_sub', 'Enter your email and we will send you a link to reset your password.')); ?></p>
+          <p class="modal-subtitle" data-i18n="member_forgot_sub"><?php echo esc_html(cha_get_option('member_forgot_sub', 'Enter your email and we will send you a link to reset your password.')); ?></p>
           <form data-mock-form novalidate>
-            <div class="form-group"><label class="form-label" for="mforgotemail"><?php echo esc_html(cha_get_option('member_email_label', 'Email')); ?> <span class="req">*</span></label><input class="form-input" type="email" id="mforgotemail" placeholder="<?php echo esc_attr(cha_get_option('member_email_placeholder', 'Enter your email')); ?>" required></div>
+            <div class="form-group"><label class="form-label" for="mforgotemail"><span data-i18n="form_email_label"><?php echo esc_html(cha_get_option('member_email_label', 'Email')); ?></span> <span class="req">*</span></label><input class="form-input" type="email" id="mforgotemail" placeholder="<?php echo esc_attr(cha_get_option('member_email_placeholder', 'Enter your email')); ?>" data-i18n-placeholder="form_email_ph" required></div>
             <div class="modal-btn-row">
-              <button type="submit" class="btn btn-primary"><?php echo esc_html(cha_get_option('member_forgot_btn', 'Send Reset Link')); ?></button>
+              <button type="submit" class="btn btn-primary" data-i18n="member_forgot_btn"><?php echo esc_html(cha_get_option('member_forgot_btn', 'Send Reset Link')); ?></button>
             </div>
           </form>
-          <p style="text-align:center;margin-top:var(--s-5);font-size:0.875rem;color:var(--c-muted)"><a href="#" data-member-back-login-forgot style="color:var(--c-blue);font-weight:var(--fw-semibold)"><?php echo esc_html(cha_get_option('member_signin_btn', 'Sign In')); ?></a></p>
+          <p style="text-align:center;margin-top:var(--s-5);font-size:0.875rem;color:var(--c-muted)"><a href="#" data-member-back-login-forgot style="color:var(--c-blue);font-weight:var(--fw-semibold)" data-i18n="member_signin_btn"><?php echo esc_html(cha_get_option('member_signin_btn', 'Sign In')); ?></a></p>
         </div>
       </div>
     </div>
@@ -288,47 +257,46 @@
             <a href="<?php echo home_url(); ?>" class="footer-brand">
                 <img src="<?php echo get_template_directory_uri(); ?>/cha-logo-left.png" alt="Cambodian Haemophilia Association" style="height:52px;width:auto;max-width:200px;object-fit:contain">
             </a>
-            <p class="footer-tagline"><?php echo esc_html(cha_get_option('footer_tagline', 'Supporting people living with bleeding disorders across Cambodia.')); ?></p>
+            <p class="footer-tagline" data-i18n="footer_tagline"><?php echo esc_html(cha_get_option('footer_tagline', 'Supporting people living with bleeding disorders across Cambodia.')); ?></p>
             <div class="footer-socials">
-                <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg></a>
-                <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
-                <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
-                <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.063 2.063 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+                <a href="https://www.facebook.com/hemophiliacambodian" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg></a>
+                <a href="https://www.youtube.com/@cambodiahemophiliaassociation" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+                <a href="https://t.me/Chacambodia_bot" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71l-4.16-3.07-2.01 1.93c-.23.23-.42.42-.84.42z"/></svg></a>
             </div>
         </div>
         <div class="footer-col">
-            <h4>Quick Links</h4>
-            <ul><li><a href="<?php echo home_url(); ?>">Home</a></li><li><a href="<?php echo home_url('/about'); ?>">About Us</a></li><li><a href="<?php echo home_url('/haemophilia'); ?>">About Haemophilia</a></li><li><a href="<?php echo home_url('/#contact'); ?>">Contact Us</a></li></ul>
+            <h4 data-i18n="footer_quick_links">Quick Links</h4>
+            <ul><li><a href="<?php echo home_url(); ?>" data-i18n="nav_home">Home</a></li><li><a href="<?php echo home_url('/about'); ?>" data-i18n="nav_about">About Us</a></li><li><a href="<?php echo home_url('/haemophilia'); ?>" data-i18n="nav_haemophilia">About Haemophilia</a></li><li><a href="<?php echo home_url('/#contact'); ?>" data-i18n="nav_contact">Contact Us</a></li></ul>
         </div>
         <div class="footer-col">
-            <h4>Resources</h4>
-            <ul><li><a href="<?php echo home_url('/programs'); ?>#treatment-centres">Treatment Centres</a></li><li><a href="<?php echo home_url('/#news-events'); ?>">News &amp; Events</a></li><li><a href="#" data-donate-trigger>Donation</a></li></ul>
+            <h4 data-i18n="footer_resources">Resources</h4>
+            <ul><li><a href="<?php echo home_url('/programs'); ?>#treatment-centres" data-i18n="nav_treatment_centres">Treatment Centres</a></li><li><a href="<?php echo esc_url(get_post_type_archive_link('cha_news')); ?>" data-i18n="footer_news_events">News &amp; Events</a></li><li><a href="#" data-donate-trigger data-i18n="nav_donate">Donation</a></li></ul>
         </div>
         <div class="footer-col">
-            <h4>Contact Us</h4>
+            <h4 data-i18n="footer_contact">Contact Us</h4>
             <div class="footer-contact">
                 <div class="item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    <span><?php echo esc_html(cha_get_option('contact_address', '#35, St. 121, Sangkat Tuel Tumpong 2, Khan Chamkarmon, Phnom Penh, Cambodia')); ?></span>
+                    <span data-i18n="contact_address_val"><?php echo esc_html(cha_get_option('contact_address', '#Building 100, Russia Blvd (114), Phnom Penh, Cambodia, P.O Box 700')); ?></span>
                 </div>
                 <div class="item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    <a href="tel:<?php echo esc_attr(cha_get_option('contact_phone_digits', '+85512345678')); ?>"><?php echo esc_html(cha_get_option('contact_phone', '(+855) 12 345 678')); ?></a>
+                    <a href="tel:<?php echo esc_attr(cha_get_option('contact_phone_digits', '+855962605335')); ?>"><?php echo esc_html(cha_get_option('contact_phone', '(+855) 96 260 5335')); ?></a>
                 </div>
                 <div class="item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                    <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'info@chacambodia.org')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'info@chacambodia.org')); ?></a>
+                    <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a>
                 </div>
             </div>
         </div>
     </div>
     <div class="footer-bottom">
-        <span>© <?php echo date('Y'); ?> <?php echo esc_html(cha_get_option('footer_copyright', 'Cambodian Haemophilia Association. All rights reserved.')); ?></span>
+        <span data-i18n="footer_copyright">© <?php echo date('Y'); ?> <?php echo esc_html(cha_get_option('footer_copyright', 'Cambodian Haemophilia Association. All rights reserved.')); ?></span>
         <div class="footer-bottom-links">
             <a href="<?php echo esc_url(home_url('/privacy')); ?>" data-i18n="footer_privacy"><?php echo esc_html(cha_get_option('footer_privacy', 'Privacy Policy')); ?></a>
             <a href="<?php echo esc_url(home_url('/disclaimer')); ?>" data-i18n="footer_disclaimer"><?php echo esc_html(cha_get_option('footer_disclaimer', 'Disclaimer')); ?></a>
             <a href="<?php echo esc_url(home_url('/terms')); ?>" data-i18n="footer_terms"><?php echo esc_html(cha_get_option('footer_terms', 'Terms of Service')); ?></a>
-            <a href="#" data-donate-trigger>Donation</a>
+            <a href="#" data-donate-trigger data-i18n="nav_donate">Donation</a>
             <a href="<?php echo home_url('/#contact'); ?>" data-i18n="footer_contact"><?php echo esc_html(cha_get_option('footer_contact_heading', 'Contact Us')); ?></a>
         </div>
     </div>
