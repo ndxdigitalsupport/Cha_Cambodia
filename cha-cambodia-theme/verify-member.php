@@ -27,11 +27,18 @@ $hotline_ahc = '063 963 409';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="light only">
+    <meta name="supported-color-schemes" content="light">
     <title><?php echo $member ? 'Official Verification — ' . esc_html($member->name ?: $member->member_id) : 'Member Verification'; ?> — <?php echo esc_html($site_name); ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Koulen&family=Poppins:wght@400;500;600;700&family=Siemreap&display=swap" rel="stylesheet">
     <style>
+        :root, html {
+            color-scheme: light only !important;
+            supported-color-schemes: light !important;
+        }
+
         :root {
             --c-blue: #0B1D6D;
             --c-blue-dark: #07134B;
@@ -56,8 +63,8 @@ $hotline_ahc = '063 963 409';
 
         body {
             font-family: var(--font-main);
-            background-color: var(--c-bg);
-            color: var(--c-text);
+            background-color: var(--c-bg) !important;
+            color: var(--c-text) !important;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -468,6 +475,55 @@ $hotline_ahc = '063 963 409';
             padding: 4px 10px;
             border-radius: 9999px;
             margin-top: 12px;
+        }
+
+        /* Enforce Light Mode on Mobile Browsers (iOS Safari, Brave, Chrome Dark Mode) */
+        @media (prefers-color-scheme: dark) {
+            html, body {
+                background-color: #F1F5F9 !important;
+                color: #1E293B !important;
+            }
+            .verify-card {
+                background-color: #ffffff !important;
+                border-color: rgba(226, 232, 240, 0.8) !important;
+                color: #1E293B !important;
+            }
+            .member-latin-name {
+                color: #0F172A !important;
+            }
+            .detail-val {
+                color: #0F172A !important;
+            }
+            .detail-title {
+                color: #64748B !important;
+            }
+            .highlight-box.primary-condition {
+                background-color: #FFF1F2 !important;
+                border-color: #FFE4E6 !important;
+            }
+            .highlight-box.blood-badge {
+                background-color: #FEF2F2 !important;
+                border-color: #FECACA !important;
+            }
+            .highlight-box.primary-condition .highlight-value {
+                color: #9F1239 !important;
+            }
+            .highlight-box.blood-badge .highlight-value {
+                color: #DC2626 !important;
+            }
+            .verify-home-btn {
+                background-color: #ffffff !important;
+                color: #0B1D6D !important;
+                border-color: #E2E8F0 !important;
+            }
+            .emergency-section {
+                background-color: #FFFBEB !important;
+                border-color: #FDE68A !important;
+            }
+            .hotline-call-btn {
+                background-color: #ffffff !important;
+                color: #78350F !important;
+            }
         }
     </style>
 </head>

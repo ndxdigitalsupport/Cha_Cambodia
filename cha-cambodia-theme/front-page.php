@@ -195,8 +195,8 @@
     <!-- ===== MEMBERSHIP & DONATE ===== -->
     <div class="section section-soft" id="membership"><div class="container" data-tabs>
       <div class="tabs-nav csr-tabs" style="margin-bottom:var(--s-8)">
-        <button class="tab-btn" type="button" data-tab-group data-tab-target="csr-member">Membership</button>
-        <button class="tab-btn is-active" type="button" data-tab-group data-tab-target="csr-donate">Donate</button>
+        <button class="tab-btn" type="button" data-tab-group data-tab-target="csr-member" data-i18n="tab_membership">Membership</button>
+        <button class="tab-btn is-active" type="button" data-tab-group data-tab-target="csr-donate" data-i18n="tab_donate">Donate</button>
       </div>
       <div class="tab-panel" data-tab-panel="csr-member" style="padding-top:0">
         <div class="section-heading" data-reveal><h2 data-i18n="membership_heading"><?php echo esc_html(cha_get_option('membership_benefits_heading', 'Membership Benefits')); ?></h2></div>
@@ -275,7 +275,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </div>
           <h3 data-i18n="donate_heading" style="font-size:1.35rem;font-weight:800;color:var(--c-blue);margin:0 0 6px">Make a Donation</h3>
-          <p class="text-muted" style="font-size:0.875rem;max-width:380px;margin:0 auto">Your support helps us provide treatment, education, and hope to people with bleeding disorders in Cambodia.</p>
+          <p class="text-muted" data-i18n="donate_sub" style="font-size:0.875rem;max-width:380px;margin:0 auto">Your support helps us provide treatment, education, and hope to people with bleeding disorders in Cambodia.</p>
         </div>
 
         <form id="donate-form-submit" novalidate>
@@ -288,19 +288,19 @@
               <button type="button" class="amount-chip" data-amount="100">$100</button>
               <button type="button" class="amount-chip" data-amount="other" data-i18n="donate_other">Other</button>
             </div>
-            <input class="form-input" type="number" placeholder="Enter amount in USD" data-amount-other min="1" style="display:none">
+            <input class="form-input" type="number" placeholder="Enter amount in USD" data-i18n-placeholder="donate_ph_amount" data-amount-other min="1" style="display:none">
           </div>
           <div class="form-group">
             <label class="form-label" data-i18n="donate_name_label">Full name (optional)</label>
-            <input class="form-input" type="text" id="doname-home" placeholder="Enter your name">
+            <input class="form-input" type="text" id="doname-home" placeholder="Enter your name" data-i18n-placeholder="donate_ph_name">
           </div>
           <div class="form-group">
             <label class="form-label" data-i18n="donate_email_label">Email (optional)</label>
-            <input class="form-input" type="email" id="doemail-home" placeholder="Enter your email">
+            <input class="form-input" type="email" id="doemail-home" placeholder="Enter your email" data-i18n-placeholder="donate_ph_email">
           </div>
           <div class="form-group">
             <label class="form-label" data-i18n="donate_phone_label">Phone (optional)</label>
-            <input class="form-input" type="tel" id="dophone-home" placeholder="Enter your phone">
+            <input class="form-input" type="tel" id="dophone-home" placeholder="Enter your phone" data-i18n-placeholder="donate_ph_phone">
           </div>
           <div class="modal-btn-row">
             <button type="submit" class="btn btn-primary btn-block" data-i18n="donate_btn"><?php echo esc_html(cha_get_option('donate_btn', 'Donate Now')); ?></button>
@@ -308,7 +308,7 @@
         </form>
         <p class="secure-note" style="margin-top:var(--s-4);text-align:center;font-size:0.8125rem;color:var(--c-muted);display:flex;align-items:center;justify-content:center;gap:6px">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#22C55E"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-          Secure &amp; encrypted via PayWay (ABA Bank)
+          <span data-i18n="donate_secure_note">Secure &amp; encrypted via PayWay (ABA Bank)</span>
         </p>
         <div class="form-success" data-form-success hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><h3>Thank You!</h3><p>Your generous donation will help change lives across Cambodia.</p></div>
       </div>
