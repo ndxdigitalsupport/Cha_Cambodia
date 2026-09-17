@@ -58,8 +58,8 @@ get_header(); ?>
       <h2>11. Contact us</h2>
       <p>If you have any questions about this disclaimer, please contact us:</p>
       <ul>
-        <li>Email: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a></li>
-        <li>Phone: <?php echo esc_html(cha_get_option('contact_phone', '+855 12 311 033')); ?></li>
+        <li>Email: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a></li>
+        <li>Phone: <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?></li>
         <li>Address: <?php echo esc_html(cha_get_option('contact_address', '#100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia')); ?></li>
       </ul>
     </section>
@@ -96,8 +96,8 @@ get_header(); ?>
 
       <h2>៩. ទាក់ទងមកយើង</h2>
       <ul>
-        <li>អ៊ីមែល: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a></li>
-        <li>ទូរស័ព្ទ: <?php echo esc_html(cha_get_option('contact_phone', '+855 12 311 033')); ?></li>
+        <li>អ៊ីមែល: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a></li>
+        <li>ទូរស័ព្ទ: <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?></li>
         <li>អាសយដ្ឋាន: <?php echo esc_html(cha_get_option('contact_address', '#១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី សង្កាត់ទឹកល្អក់១ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ កម្ពុជា')); ?></li>
       </ul>
     </section>

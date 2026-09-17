@@ -219,13 +219,13 @@ function cha_customize_register($wp_customize) {
     $wp_customize->add_setting('contact_address_km', array('default' => '#១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី សង្កាត់ទឹកល្អក់១ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ កម្ពុជា', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_address_km', array('label' => 'Address (KM)', 'section' => 'cha_contact', 'type' => 'textarea'));
 
-    $wp_customize->add_setting('contact_phone', array('default' => '+855 12 311 033', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('contact_phone', array('default' => '+855 96 260 5335', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_phone', array('label' => 'Phone (display)', 'section' => 'cha_contact', 'type' => 'text'));
 
-    $wp_customize->add_setting('contact_phone_digits', array('default' => '+85512311033', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('contact_phone_digits', array('default' => '+855962605335', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_phone_digits', array('label' => 'Phone (digits for tel link)', 'section' => 'cha_contact', 'type' => 'text'));
 
-    $wp_customize->add_setting('contact_email', array('default' => 'cha.rithy2016@gmail.com', 'sanitize_callback' => 'sanitize_email'));
+    $wp_customize->add_setting('contact_email', array('default' => 'choryee.hun@gmail.com', 'sanitize_callback' => 'sanitize_email'));
     $wp_customize->add_control('contact_email', array('label' => 'Email', 'section' => 'cha_contact', 'type' => 'email'));
 
     $wp_customize->add_setting('contact_hours_mf', array('default' => '8:00 — 17:00', 'sanitize_callback' => 'sanitize_text_field'));

@@ -50,7 +50,7 @@ get_header(); ?>
       <ul>
         <li>Donations are voluntary and processed securely by PayWay (Advanced Bank of Asia Limited - ABA Bank).</li>
         <li>Payments are subject to the terms and privacy conditions of PayWay. All card and KHQR transactions are encrypted and processed through ABA Bank's secure hosted payment gateway.</li>
-        <li><strong>Refund & Cancellation Policy:</strong> In accordance with PayWay Merchant Guidelines, if you believe a donation was processed in error or wish to cancel an unauthorized transaction, you may request a full refund within thirty (30) calendar days of the original transaction date by contacting CHA at <a href="mailto:cha.rithy2016@gmail.com">cha.rithy2016@gmail.com</a> or +855 12 311 033. Approved refunds will be reimbursed to the original payment method (Card, ABA account, or e-Wallet) through the PayWay Merchant Portal within 30 days. Refunds will not be provided in cash.</li>
+        <li><strong>Refund & Cancellation Policy:</strong> In accordance with PayWay Merchant Guidelines, if you believe a donation was processed in error or wish to cancel an unauthorized transaction, you may request a full refund within thirty (30) calendar days of the original transaction date by contacting CHA at <a href="mailto:choryee.hun@gmail.com">choryee.hun@gmail.com</a> or +855 96 260 5335. Approved refunds will be reimbursed to the original payment method (Card, ABA account, or e-Wallet) through the PayWay Merchant Portal within 30 days. Refunds will not be provided in cash.</li>
         <li><strong>Customer Support Notice:</strong> Please contact CHA Cambodia directly for all questions, transaction inquiries, or refund requests related to donations made through this website or app. Do not contact ABA Bank directly for website support or donation-related inquiries.</li>
       </ul>
 
@@ -75,8 +75,8 @@ get_header(); ?>
       <h2>12. Contact us</h2>
       <p>If you have any questions about these Terms of Service, please contact us:</p>
       <ul>
-        <li>Email: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a></li>
-        <li>Phone: <?php echo esc_html(cha_get_option('contact_phone', '+855 12 311 033')); ?></li>
+        <li>Email: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a></li>
+        <li>Phone: <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?></li>
         <li>Address: <?php echo esc_html(cha_get_option('contact_address', '#100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia')); ?></li>
       </ul>
     </section>
@@ -110,7 +110,7 @@ get_header(); ?>
       <ul>
         <li>ការបរិច្ចាគគឺស្ម័គ្រចិត្ត និងត្រូវបានដំណើរការដោយសុវត្ថិភាពតាមរយៈ PayWay (ធនាគារ វឌ្ឍនៈ អាស៊ី ចំកាត់ - ធនាគារ ABA)។</li>
         <li>ការទូទាត់ស្ថិតនៅក្រោមលក្ខខណ្ឌសុវត្ថិភាពរបស់ PayWay។ រាល់ប្រតិបត្តិការកាត និង KHQR ត្រូវបានអ៊ិនគ្រីប និងដំណើរការតាមច្រកទូទាត់សុវត្ថិភាពរបស់ធនាគារ ABA។</li>
-        <li><strong>គោលការណ៍បង្វិលសងប្រាក់ និងការលុបចោល៖</strong> អនុលោមតាមគោលការណ៍អាជីវករ PayWay ប្រសិនបើអ្នកយល់ថាមានការបរិច្ចាគដោយច្រឡំ ឬមានប្រតិបត្តិការដែលមិនមានការអនុញ្ញាត អ្នកអាចស្នើសុំការបង្វិលសងប្រាក់ពេញលេញក្នុងរយៈពេលសាមសិប (៣០) ថ្ងៃតាមប្រតិទិន គិតចាប់ពីថ្ងៃធ្វើប្រតិបត្តិការ ដោយទាក់ទងមកកាន់ CHA តាមរយៈ <a href="mailto:cha.rithy2016@gmail.com">cha.rithy2016@gmail.com</a> ឬទូរស័ព្ទ +855 12 311 033។ ការបង្វិលសងដែលបានអនុម័ត នឹងត្រូវផ្ញើត្រឡប់ទៅកាន់វិធីសាស្ត្រទូទាត់ដើមរបស់អ្នក (កាត, គណនី ABA ឬ e-Wallet) តាមរយៈ PayWay ក្នុងរយៈពេល ៣០ ថ្ងៃ។ ការបង្វិលសងជាប្រាក់សុទ្ធមិនត្រូវបានអនុញ្ញាតឡើយ។</li>
+        <li><strong>គោលការណ៍បង្វិលសងប្រាក់ និងការលុបចោល៖</strong> អនុលោមតាមគោលការណ៍អាជីវករ PayWay ប្រសិនបើអ្នកយល់ថាមានការបរិច្ចាគដោយច្រឡំ ឬមានប្រតិបត្តិការដែលមិនមានការអនុញ្ញាត អ្នកអាចស្នើសុំការបង្វិលសងប្រាក់ពេញលេញក្នុងរយៈពេលសាមសិប (៣០) ថ្ងៃតាមប្រតិទិន គិតចាប់ពីថ្ងៃធ្វើប្រតិបត្តិការ ដោយទាក់ទងមកកាន់ CHA តាមរយៈ <a href="mailto:choryee.hun@gmail.com">choryee.hun@gmail.com</a> ឬទូរស័ព្ទ +855 96 260 5335។ ការបង្វិលសងដែលបានអនុម័ត នឹងត្រូវផ្ញើត្រឡប់ទៅកាន់វិធីសាស្ត្រទូទាត់ដើមរបស់អ្នក (កាត, គណនី ABA ឬ e-Wallet) តាមរយៈ PayWay ក្នុងរយៈពេល ៣០ ថ្ងៃ។ ការបង្វិលសងជាប្រាក់សុទ្ធមិនត្រូវបានអនុញ្ញាតឡើយ។</li>
         <li><strong>សេចក្តីជូនដំណឹងអំពីការគាំទ្រអតិថិជន៖</strong> សូមទាក់ទងមកកាន់សមាគម CHA Cambodia ដោយផ្ទាល់ សម្រាប់រាល់ចម្ងល់ ការសាកសួរប្រតិបត្តិការ ឬសំណើសុំបង្វិលសងប្រាក់ទាក់ទងនឹងការបរិច្ចាគ។ សូមកុំទាក់ទងទៅកាន់ធនាគារ ABA ដោយផ្ទាល់សម្រាប់ការគាំទ្រគេហទំព័រ ឬសំណួរទាក់ទងនឹងការបរិច្ចាគឡើយ។</li>
       </ul>
 
@@ -128,8 +128,8 @@ get_header(); ?>
 
       <h2>១០. ទាក់ទងមកយើង</h2>
       <ul>
-        <li>អ៊ីមែល: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a></li>
-        <li>ទូរស័ព្ទ: <?php echo esc_html(cha_get_option('contact_phone', '+855 12 311 033')); ?></li>
+        <li>អ៊ីមែល: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a></li>
+        <li>ទូរស័ព្ទ: <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?></li>
         <li>អាសយដ្ឋាន: <?php echo esc_html(cha_get_option('contact_address', '#១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី សង្កាត់ទឹកល្អក់១ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ កម្ពុជា')); ?></li>
       </ul>
     </section>

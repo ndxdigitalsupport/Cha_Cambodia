@@ -24,7 +24,7 @@ get_header(); ?>
     <!-- ================= ENGLISH ================= -->
     <section class="legal-section" data-reveal>
       <h2>1. Who we are</h2>
-      <p>The Cambodian Haemophilia Association (CHA) is a patient-led, non-profit organisation supporting people with bleeding disorders across Cambodia. Our registered office is at #100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia. Throughout this policy, "we", "us", and "our" refer to CHA. You can contact us at <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a>.</p>
+      <p>The Cambodian Haemophilia Association (CHA) is a patient-led, non-profit organisation supporting people with bleeding disorders across Cambodia. Our registered office is at #100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia. Throughout this policy, "we", "us", and "our" refer to CHA. You can contact us at <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a>.</p>
 
       <h2>2. Information we collect</h2>
       <p>We collect only the information needed to provide our services. This may include:</p>
@@ -80,7 +80,7 @@ get_header(); ?>
         <li><strong>Withdraw consent</strong> — for health data and marketing communications, at any time.</li>
         <li><strong>Portability</strong> — request your data in a structured format.</li>
       </ul>
-      <p>To exercise these rights, contact <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a>. We will respond within a reasonable time.</p>
+      <p>To exercise these rights, contact <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a>. We will respond within a reasonable time.</p>
 
       <h2>9. Children</h2>
       <p>Our services support people of all ages, including children. We take extra care with information about minors and require consent from a parent or legal guardian before membership is approved for a child.</p>
@@ -97,8 +97,8 @@ get_header(); ?>
       <h2>13. Contact us</h2>
       <p>If you have any questions about this Privacy Policy or our handling of your data, please contact us:</p>
       <ul>
-        <li>Email: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a></li>
-        <li>Phone: <?php echo esc_html(cha_get_option('contact_phone', '+855 12 311 033')); ?></li>
+        <li>Email: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a></li>
+        <li>Phone: <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?></li>
         <li>Address: <?php echo esc_html(cha_get_option('contact_address', '#100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia')); ?></li>
       </ul>
     </section>
@@ -108,7 +108,7 @@ get_header(); ?>
       <h2>គោលនយោបាយឯកជនភាព</h2>
 
       <h2>១. អំពីពួកយើង</h2>
-      <p>សមាគមគាំទ្រជំងឺហេម៉ូហ្វីលាកម្ពុជា (CHA) គឺជាអង្គការមិនរកប្រាក់ចំណេញដឹកនាំដោយអ្នកជំងឺ ដែលគាំទ្រអ្នកមានជំងឺដំណក់ឈាមនៅទូទាំងប្រទេសកម្ពុជា។ ការិយាល័យចុះបញ្ជីរបស់យើងស្ថិតនៅ #១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី សង្កាត់ទឹកល្អក់១ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ កម្ពុជា។ យើងអាចទាក់ទងបានតាម <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a>។</p>
+      <p>សមាគមគាំទ្រជំងឺហេម៉ូហ្វីលាកម្ពុជា (CHA) គឺជាអង្គការមិនរកប្រាក់ចំណេញដឹកនាំដោយអ្នកជំងឺ ដែលគាំទ្រអ្នកមានជំងឺដំណក់ឈាមនៅទូទាំងប្រទេសកម្ពុជា។ ការិយាល័យចុះបញ្ជីរបស់យើងស្ថិតនៅ #១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី សង្កាត់ទឹកល្អក់១ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ កម្ពុជា។ យើងអាចទាក់ទងបានតាម <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a>។</p>
 
       <h2>២. ព័ត៌មានដែលយើងប្រមូល</h2>
       <p>យើងប្រមូលតែព័ត៌មានចាំបាច់សម្រាប់ការផ្តល់សេវា រួមមាន៖</p>
@@ -159,8 +159,8 @@ get_header(); ?>
 
       <h2>៩. ទាក់ទងមកយើង</h2>
       <ul>
-        <li>អ៊ីមែល: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a></li>
-        <li>ទូរស័ព្ទ: <?php echo esc_html(cha_get_option('contact_phone', '+855 12 311 033')); ?></li>
+        <li>អ៊ីមែល: <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a></li>
+        <li>ទូរស័ព្ទ: <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?></li>
         <li>អាសយដ្ឋាន: <?php echo esc_html(cha_get_option('contact_address', '#១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី សង្កាត់ទឹកល្អក់១ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ កម្ពុជា')); ?></li>
       </ul>
     </section>
