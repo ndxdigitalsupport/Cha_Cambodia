@@ -2071,9 +2071,12 @@ function cha_render_admin_page() {
         echo '<div class="cha-notice cha-notice-success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Member created successfully.</div>';
     }
     ?>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&family=Siemreap&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-    :root { --cha-blue: #0B1D6D; --cha-red: #E31E24; --cha-purple: #6A2C91; --cha-teal: #0D9488; --cha-amber: #92400E; --cha-green: #166534; --cha-border: #E5E8EE; --cha-bg: #F4F6FB; --cha-text: #1A1A1A; --cha-muted: #6B7280; }
-    .wrap.cha-page { max-width:1400px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,sans-serif; display:block !important; width:100% !important; margin:1.5em 20px 20px !important; background:none !important; padding:0 !important; border:none !important; box-shadow:none !important; }
+    :root { --cha-blue: #0B1D6D; --cha-red: #E31E24; --cha-purple: #6A2C91; --cha-teal: #0D9488; --cha-amber: #92400E; --cha-green: #166534; --cha-border: #E5E8EE; --cha-bg: #F4F6FB; --cha-text: #1A1A1A; --cha-muted: #6B7280; --font-km: 'Kantumruy Pro', 'Siemreap', 'Khmer OS', 'Hanuman', sans-serif; }
+    .wrap.cha-page { max-width:1400px; font-family:'Poppins', -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; display:block !important; width:100% !important; margin:1.5em 20px 20px !important; background:none !important; padding:0 !important; border:none !important; box-shadow:none !important; }
     #wpfooter { display: none !important; }
     .cha-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:24px; padding:20px 24px; background:linear-gradient(135deg,#0B1D6D 0%,#1a2e7a 100%); border-radius:16px; box-shadow:0 4px 20px rgba(11,29,109,0.15); }
     .cha-header-brand { display:flex; align-items:center; gap:16px; }
@@ -2162,9 +2165,16 @@ function cha_render_admin_page() {
     .cha-edit-field { display:flex; flex-direction:column; gap:6px; }
     .cha-edit-field label { font-size:0.8125rem; font-weight:600; color:#334155; display:flex; align-items:center; justify-content:space-between; }
     .cha-edit-field .field-hint { font-size:0.75rem; font-weight:400; color:#94A3B8; }
-    .cha-edit-field input,.cha-edit-field select { width:100%; padding:10px 14px; border:1.5px solid #CBD5E1; border-radius:10px; font-size:0.875rem; color:#1E293B; background:#fff; transition:all 0.15s ease; box-sizing:border-box; }
-    .cha-edit-field input:focus,.cha-edit-field select:focus { border-color:var(--cha-blue); outline:none; box-shadow:0 0 0 4px rgba(11,29,109,0.08); background:#fff; }
+    .cha-edit-field input, .cha-edit-field select { width:100%; height:44px; padding:0 14px; border:1.5px solid #CBD5E1; border-radius:10px; font-size:0.875rem; color:#1E293B; background:#fff; transition:all 0.15s ease; box-sizing:border-box; line-height:42px; }
+    .cha-edit-field select { -webkit-appearance:none; -moz-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; background-size:16px 16px; padding-right:38px; cursor:pointer; }
+    .cha-edit-field input:focus, .cha-edit-field select:focus { border-color:var(--cha-blue); outline:none; box-shadow:0 0 0 4px rgba(11,29,109,0.08); background:#fff; }
     .cha-edit-field input::placeholder { color:#94A3B8; }
+    
+    /* Khmer typography */
+    .km-text, .km-label, .km-input, [data-km] { font-family:var(--font-km) !important; }
+    .km-label { font-size:0.875rem !important; letter-spacing:0.01em; }
+    .km-input { font-size:0.9375rem !important; }
+    .cha-table .cha-name-km { font-family:var(--font-km); font-size:0.8125rem; color:#64748B; margin-top:2px; }
     
     .cha-edit-actions { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:32px; padding-top:24px; border-top:1px solid #F1F5F9; }
     .cha-btn-save-main { display:inline-flex; align-items:center; gap:8px; padding:12px 28px; border-radius:10px; font-size:0.875rem; font-weight:700; color:#fff !important; background:linear-gradient(135deg,#0B1D6D 0%,#183494 100%) !important; border:none !important; cursor:pointer; transition:all 0.2s ease; box-shadow:0 4px 14px rgba(11,29,109,0.25); text-decoration:none; }
@@ -2480,16 +2490,16 @@ function cha_render_admin_page() {
                                     <input type="text" id="name" name="name" value="<?php echo esc_attr($edit_member['name'] ?? ''); ?>" placeholder="e.g. John Doe" required>
                                 </div>
                                 <div class="cha-edit-field">
-                                    <label for="name_khmer">ឈ្មោះខ្មែរ (Khmer Name)</label>
-                                    <input type="text" id="name_khmer" name="name_khmer" value="<?php echo esc_attr($edit_member['nameKhmer'] ?? ''); ?>" placeholder="ឧ. ចន ដូ">
+                                    <label for="name_khmer" class="km-label">ឈ្មោះខ្មែរ (Khmer Name)</label>
+                                    <input type="text" id="name_khmer" name="name_khmer" class="km-input" value="<?php echo esc_attr($edit_member['nameKhmer'] ?? ''); ?>" placeholder="ឧ. ចន ដូ">
                                 </div>
                                 <div class="cha-edit-field">
                                     <label for="email">Email Address <span style="color:#DC2626">*</span></label>
                                     <input type="email" id="email" name="email" value="<?php echo esc_attr($edit_member['email'] ?? ''); ?>" placeholder="name@example.com" required>
                                 </div>
                                 <div class="cha-edit-field">
-                                    <label for="phone">Phone Number</label>
-                                    <input type="tel" id="phone" name="phone" value="<?php echo esc_attr($edit_member['phone'] ?? ''); ?>" placeholder="+855 12 345 678">
+                                    <label for="phone">Phone Number <span class="field-hint">Numbers only</span></label>
+                                    <input type="tel" id="phone" name="phone" value="<?php echo esc_attr($edit_member['phone'] ?? ''); ?>" placeholder="012345678" pattern="[0-9+ -]{7,20}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9+]/g, '');">
                                 </div>
                                 <div class="cha-edit-field cha-field-full">
                                     <label for="address">Address</label>
@@ -2626,16 +2636,16 @@ function cha_render_admin_page() {
                                     <input type="text" id="add-name" name="name" value="<?php echo esc_attr($add_form_name ?? ''); ?>" placeholder="e.g. John Doe" required>
                                 </div>
                                 <div class="cha-edit-field">
-                                    <label for="add-name_khmer">ឈ្មោះខ្មែរ (Khmer Name)</label>
-                                    <input type="text" id="add-name_khmer" name="name_khmer" placeholder="ឧ. ចន ដូ">
+                                    <label for="add-name_khmer" class="km-label">ឈ្មោះខ្មែរ (Khmer Name)</label>
+                                    <input type="text" id="add-name_khmer" name="name_khmer" class="km-input" placeholder="ឧ. ចន ដូ">
                                 </div>
                                 <div class="cha-edit-field">
                                     <label for="add-email">Email Address <span style="color:#DC2626">*</span></label>
                                     <input type="email" id="add-email" name="email" value="<?php echo esc_attr($add_form_email ?? ''); ?>" placeholder="name@example.com" required>
                                 </div>
                                 <div class="cha-edit-field">
-                                    <label for="add-phone">Phone Number</label>
-                                    <input type="tel" id="add-phone" name="phone" value="<?php echo esc_attr($add_form_phone ?? ''); ?>" placeholder="+855 12 345 678">
+                                    <label for="add-phone">Phone Number <span class="field-hint">Numbers only</span></label>
+                                    <input type="tel" id="add-phone" name="phone" value="<?php echo esc_attr($add_form_phone ?? ''); ?>" placeholder="012345678" pattern="[0-9+ -]{7,20}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9+]/g, '');">
                                 </div>
                                 <div class="cha-edit-field cha-field-full">
                                     <label for="add-address">Address</label>
@@ -2780,7 +2790,7 @@ function cha_render_admin_page() {
                                         <?php echo esc_html($rm['name'] ?? '—'); ?>
                                     </div>
                                     <?php if (!empty($rm['nameKhmer'])): ?>
-                                        <div class="cha-name" style="font-size:0.75rem;color:#64748B;margin-top:2px;"><?php echo esc_html($rm['nameKhmer']); ?></div>
+                                        <div class="cha-name-km"><?php echo esc_html($rm['nameKhmer']); ?></div>
                                     <?php endif; ?>
                                 </td>
                                 <td>
