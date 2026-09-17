@@ -167,13 +167,16 @@ Every completed phase = git tag `checkpoint-<name>-YYYY-MM-DD`, pushed to GitHub
 | `checkpoint-store-legal-2026-08-13` | `e3c6eb4` |
 | `checkpoint-app-restructure-2026-08-14` | `0564a0f` |
 | `checkpoint-news-cpt-2026-09-08` | `3074ae4` |
-| `checkpoint-payway-compliance-2026-09-17` | (pending commit) |
+| `checkpoint-payway-compliance-2026-09-17` | `1c67912` |
+| `checkpoint-ndx-github-2026-09-17` | `1c67912` |
 
 Rollback: `git checkout <tag> -- cha-cambodia-theme app`. All on GitHub
-`Not-Juicy/Cha_website` (branch `main`). `.gitignore` excludes junk/copy/backup folders,
+`ndxdigitalsupport/Cha_Cambodia` (branch `main`). `.gitignore` excludes junk/copy/backup folders,
 `node_modules`, `.expo`, `.vercel`, secrets.
 
-**Rule set by user**: after every phase done → save checkpoint tag + remind user in chat.
+**Rule set by user**:
+- **ALWAYS commit and push to GitHub (`ndxdigitalsupport/Cha_Cambodia` on `main`) after every change.**
+- After every completed phase/milestone → create a checkpoint git tag `checkpoint-<name>-YYYY-MM-DD` and push tags.
 
 ---
 
