@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.surface },
 
   hero: { width: '100%', height: 540 },
-  heroOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(11, 29, 109, 0.78)' },
+  heroOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(11, 29, 109, 0.78)' },
   heroContent: { flex: 1, justifyContent: 'center', paddingHorizontal: 22, paddingTop: 64, paddingBottom: 48 },
   tagBadge: {
     flexDirection: 'row',

@@ -1,25 +1,26 @@
 <?php get_header(); ?>
 
     <!-- ===== NEWS & EVENTS ARCHIVE ===== -->
-    <section class="section" id="news-archive" style="padding-top: 120px;">
+    <section class="section news-archive-section" id="news-archive">
       <div class="container">
         <div class="section-heading text-left" data-reveal>
-          <h1><?php esc_html_e('News & Events', 'cha-cambodia'); ?></h1>
-          <p><?php esc_html_e('Stay updated with the latest from the Cambodian Haemophilia Association.', 'cha-cambodia'); ?></p>
+          <h1 data-i18n="news_archive_heading"><?php esc_html_e('News & Events', 'cha-cambodia'); ?></h1>
+          <p data-i18n="news_archive_sub"><?php esc_html_e('Stay updated with the latest from the Cambodian Haemophilia Association.', 'cha-cambodia'); ?></p>
         </div>
 
         <!-- Category Filter -->
         <div class="tc-toolbar" data-reveal>
           <div class="tc-toolbar-filter">
             <a href="<?php echo esc_url(get_post_type_archive_link('cha_news')); ?>"
-               class="btn btn-sm <?php echo (!is_tax('news_category') && !isset($_GET['cat'])) ? 'btn-dark' : 'btn-outline'; ?>"><?php esc_html_e('All', 'cha-cambodia'); ?></a>
+               class="btn btn-sm <?php echo (!is_tax('news_category') && !isset($_GET['cat'])) ? 'btn-dark' : 'btn-outline'; ?>" data-i18n="news_filter_all"><?php esc_html_e('All', 'cha-cambodia'); ?></a>
             <?php
             $badge_types = array('Event', 'Update', 'Workshop', 'Announcement');
             foreach ($badge_types as $b) :
                 $current = (isset($_GET['cat']) && $_GET['cat'] === strtolower($b));
+                $filter_key = 'news_filter_' . strtolower($b);
                 ?>
                 <a href="<?php echo esc_url(add_query_arg('cat', strtolower($b), get_post_type_archive_link('cha_news'))); ?>"
-                   class="btn btn-sm <?php echo $current ? 'btn-dark' : 'btn-outline'; ?>"><?php echo esc_html($b); ?></a>
+                   class="btn btn-sm <?php echo $current ? 'btn-dark' : 'btn-outline'; ?>" data-i18n="<?php echo esc_attr($filter_key); ?>"><?php echo esc_html($b); ?></a>
             <?php endforeach; ?>
           </div>
         </div>
@@ -62,13 +63,20 @@
                       <?php endif; ?>
                       <div class="card-date">
                         <span><?php echo esc_html($date_display); ?></span>
-                        <span class="badge <?php echo esc_attr($badge_class); ?>"><?php echo esc_html($badge); ?></span>
+                        <span class="badge <?php echo esc_attr($badge_class); ?> auto-text" data-en="<?php echo esc_attr($badge); ?>" data-km="" data-i18n="news_badge_<?php echo esc_attr(strtolower($badge)); ?>"><?php echo esc_html($badge); ?></span>
                       </div>
                     </div>
                     <div class="card-body">
-                      <h3 class="card-title"><?php the_title(); ?></h3>
-                      <p class="card-text"><?php echo esc_html(get_the_excerpt()); ?></p>
-                      <a class="card-link" href="<?php the_permalink(); ?>"><?php esc_html_e('Read More', 'cha-cambodia'); ?> <span class="arrow">&rarr;</span></a>
+                      <?php
+                      $news_title = get_the_title();
+                      $news_km_title = get_post_meta(get_the_ID(), '_cha_news_title_km', true);
+                      $news_excerpt = get_the_excerpt();
+                      if (strlen($news_excerpt) > 120) $news_excerpt = wp_trim_words($news_excerpt, 18, '...');
+                      $news_km_excerpt = get_post_meta(get_the_ID(), '_cha_news_excerpt_km', true);
+                      ?>
+                      <h3 class="card-title auto-text" data-en="<?php echo esc_attr($news_title); ?>" data-km="<?php echo esc_attr($news_km_title); ?>"><?php the_title(); ?></h3>
+                      <p class="card-text auto-text" data-en="<?php echo esc_attr($news_excerpt); ?>" data-km="<?php echo esc_attr($news_km_excerpt); ?>"><?php echo esc_html($news_excerpt); ?></p>
+                      <a class="card-link" href="<?php the_permalink(); ?>" data-i18n="news_read_more"><?php esc_html_e('Read More', 'cha-cambodia'); ?> <span class="arrow">&rarr;</span></a>
                     </div>
                   </article>
               <?php endwhile;

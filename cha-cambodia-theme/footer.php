@@ -51,13 +51,19 @@
           </div>
         </form>
 
-        <p class="secure-note" style="margin-top: var(--s-4); text-align: center; font-size: 0.8125rem; color: var(--c-muted); display: flex; align-items: center; justify-content: center; gap: 6px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: #22C55E;">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <polyline points="9 12 11 14 15 10"/>
-          </svg>
-          <?php echo esc_html(cha_get_option('donate_footer_note', 'Secure & encrypted via PayWay (ABA Bank)')); ?>
-        </p>
+        <div class="donate-compliance-note" style="margin-top: var(--s-4); text-align: center; font-size: 0.8125rem; color: var(--c-muted); line-height: 1.5;">
+          <p class="secure-note" style="margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: #22C55E;">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+            <?php echo esc_html(cha_get_option('donate_footer_note', 'Secure & encrypted checkout powered by ABA PayWay (Cards / ABA / KHQR)')); ?>
+          </p>
+          <p style="margin: 0; font-size: 0.75rem; color: #64748b;">
+            By donating, you agree to our <a href="<?php echo esc_url(home_url('/terms')); ?>" target="_blank" style="color: var(--c-blue); text-decoration: underline;">Terms &amp; 30-Day Refund Policy</a>.
+            For transaction inquiries or refund requests, please contact CHA Cambodia directly.
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -92,9 +98,9 @@
             <div class="form-group"><label class="form-label" for="mregrole"><span data-i18n="form_i_am_a">I am a</span> <span class="req">*</span></label>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3)">
                 <label class="role-option" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid var(--c-border);border-radius:var(--r-lg);cursor:pointer;transition:all 0.2s">
-                  <input type="radio" name="mregrole" value="Supporter" checked style="display:none">
+                  <input type="radio" name="mregrole" value="Member" checked style="display:none">
                   <span class="role-radio" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--c-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s"><span style="width:10px;height:10px;border-radius:50%;background:var(--c-blue);display:none"></span></span>
-                  <span><strong style="display:block;font-size:0.875rem" data-i18n="role_member">Member</strong><span style="font-size:0.75rem;color:var(--c-muted)" data-i18n="role_member_desc">Supporter / Family</span></span>
+                  <span><strong style="display:block;font-size:0.875rem" data-i18n="role_member">Member</strong></span>
                 </label>
                 <label class="role-option" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid var(--c-border);border-radius:var(--r-lg);cursor:pointer;transition:all 0.2s">
                   <input type="radio" name="mregrole" value="Patient" style="display:none">
@@ -106,12 +112,12 @@
             <div class="form-group"><label class="form-label" for="mregname"><span data-i18n="form_name_label">Full name</span> <span class="req">*</span></label><input class="form-input" type="text" id="mregname" placeholder="Enter your full name" data-i18n-placeholder="form_name_ph" required></div>
             <div class="form-group"><label class="form-label" for="mregemail"><span data-i18n="form_email_label">Email address</span> <span class="req">*</span></label><input class="form-input" type="email" id="mregemail" placeholder="Enter your email" data-i18n-placeholder="form_email_ph" required></div>
             <div class="form-group"><label class="form-label" for="mregpass"><span data-i18n="form_pass_label">Password</span> <span class="req">*</span></label><div class="password-wrapper"><input class="form-input" type="password" id="mregpass" placeholder="Create a password" data-i18n-placeholder="form_create_pass_ph" required><button type="button" class="password-toggle" onclick="togglePass(event)" aria-label="Toggle password visibility"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-open"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-closed" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button></div></div>
-            <div class="form-group"><label class="form-label" for="mregphone" data-i18n="form_phone_label">Phone number (optional)</label><input class="form-input" type="tel" id="mregphone" placeholder="Enter your phone number" data-i18n-placeholder="form_phone_ph"></div>
-            <div class="form-group"><label class="form-label" for="mregaddress" data-i18n="form_address_label">Address (optional)</label><input class="form-input" type="text" id="mregaddress" placeholder="Enter your address" data-i18n-placeholder="form_address_ph"></div>
-<div id="patient-fields" style="display:none">
-  <div class="form-group"><label class="form-label" for="mregdob" data-i18n="dash_dob">Date of birth</label><input class="form-input" type="text" id="mregdob" placeholder="dd/mm/yyyy"></div>
-              <div class="form-group"><label class="form-label" for="mregcondition" data-i18n="form_hemophilia_type_lbl">Hemophilia Type</label><select class="form-input" id="mregcondition"><option value="" data-i18n="form_select_type">Select type</option><option value="Hemophilia A">Hemophilia A</option><option value="Hemophilia B">Hemophilia B</option><option value="Other" data-i18n="form_opt_other">Other</option></select><input class="form-input" type="text" id="mregcondition-other" placeholder="Specify your condition" data-i18n-placeholder="form_specify_cond_ph" style="display:none;margin-top:8px"></div>
-              <div class="form-group"><label class="form-label" for="mregblood" data-i18n="dash_blood_type">Blood type</label>
+            <div class="form-group"><label class="form-label" for="mregphone"><span data-i18n="form_phone_label">Phone number</span> <span class="req req-patient" style="display:none">*</span></label><input class="form-input" type="tel" id="mregphone" placeholder="Enter your phone number" data-i18n-placeholder="form_phone_ph"></div>
+            <div class="form-group"><label class="form-label" for="mregaddress"><span data-i18n="form_address_label">Address</span> <span class="req req-patient" style="display:none">*</span></label><input class="form-input" type="text" id="mregaddress" placeholder="Enter your address" data-i18n-placeholder="form_address_ph"></div>
+            <div id="patient-fields" style="display:none">
+              <div class="form-group"><label class="form-label" for="mregdob"><span data-i18n="dash_dob">Date of birth</span> <span class="req">*</span></label><input class="form-input" type="text" id="mregdob" placeholder="dd/mm/yyyy"></div>
+              <div class="form-group"><label class="form-label" for="mregcondition"><span data-i18n="form_hemophilia_type_lbl">Hemophilia Type</span> <span class="req">*</span></label><select class="form-input" id="mregcondition"><option value="" data-i18n="form_select_type">Select type</option><option value="Hemophilia A">Hemophilia A</option><option value="Hemophilia B">Hemophilia B</option><option value="Other" data-i18n="form_opt_other">Other</option></select><input class="form-input" type="text" id="mregcondition-other" placeholder="Specify your condition" data-i18n-placeholder="form_specify_cond_ph" style="display:none;margin-top:8px"></div>
+              <div class="form-group"><label class="form-label" for="mregblood"><span data-i18n="dash_blood_type">Blood type</span> <span class="req">*</span></label>
                 <select class="form-input" id="mregblood"><option value="" data-i18n="form_select_blood">Select blood type</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select>
               </div>
             </div>
@@ -148,21 +154,37 @@
         <button class="donate-modal-close" type="button" data-dashboard-close aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="donate-modal-body">
-        <!-- Member view (simple) -->
+        <!-- Member view (Redesigned) -->
         <div id="dash-member-view" style="display:none">
-          <div style="text-align:center;margin-bottom:var(--s-6)">
-            <div id="dash-member-avatar" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--c-blue) 0%,var(--c-red) 100%);display:flex;align-items:center;justify-content:center;margin:0 auto var(--s-3);color:#fff;font-size:2rem;font-weight:700"></div>
-            <h3 id="dash-member-name" style="color:var(--c-blue);margin-bottom:4px"></h3>
-            <p id="dash-member-role" style="font-size:0.8125rem;color:var(--c-muted);margin:0"></p>
+          <div class="dash-profile-header">
+            <div class="dash-avatar-wrapper">
+              <img id="dash-member-photo" src="" alt="Member photo" style="display:none">
+              <div id="dash-member-avatar" class="dash-avatar-fallback"></div>
+              <button type="button" id="dash-member-photo-delete" class="dash-avatar-delete-btn" title="Remove photo" style="display:none" aria-label="Remove photo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+              <label class="dash-avatar-upload-btn" for="member-photo-input" title="Upload photo" aria-label="Upload photo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </label>
+              <input type="file" id="member-photo-input" accept="image/*" style="display:none">
+            </div>
+            <h3 id="dash-member-name" class="dash-member-name"></h3>
+            <div class="dash-role-badge-wrap">
+              <span id="dash-member-role-badge" class="dash-role-badge">Member</span>
+            </div>
           </div>
-          <div style="background:var(--c-gray-100);border-radius:var(--r-lg);padding:var(--s-5)" id="dash-member-info">
-            <div class="dash-info-row"><span class="dash-info-label" data-i18n="dash_member_id">Member ID</span><span id="dash-member-id" class="dash-info-value"></span></div>
+          <div class="dash-info-card" id="dash-member-info">
+            <div class="dash-info-row"><span class="dash-info-label" data-i18n="dash_member_id">Member ID</span><span id="dash-member-id" class="dash-info-value dash-id-badge"></span></div>
+            <div class="dash-info-row"><span class="dash-info-label" data-i18n="dash_name">Full Name</span><span id="dash-member-name-val" class="dash-info-value"></span><input type="text" id="m-edit-name" class="form-input dash-edit-input" style="display:none" placeholder="Full name" data-i18n-placeholder="dash_ph_name"></div>
             <div class="dash-info-row"><span class="dash-info-label" data-i18n="dash_email">Email</span><span id="dash-member-email" class="dash-info-value"></span><input type="email" id="m-edit-email" class="form-input dash-edit-input" style="display:none" placeholder="Email" data-i18n-placeholder="dash_ph_email"></div>
             <div class="dash-info-row"><span class="dash-info-label" data-i18n="dash_phone">Phone</span><span id="dash-member-phone" class="dash-info-value"></span><input type="tel" id="m-edit-phone" class="form-input dash-edit-input" style="display:none" placeholder="Phone" data-i18n-placeholder="dash_ph_phone"></div>
             <div class="dash-info-row"><span class="dash-info-label" data-i18n="dash_address">Address</span><span id="dash-member-address" class="dash-info-value"></span><input type="text" id="m-edit-address" class="form-input dash-edit-input" style="display:none" placeholder="Address" data-i18n-placeholder="dash_ph_address"></div>
             <div class="dash-info-row"><span class="dash-info-label" data-i18n="dash_member_since">Member since</span><span id="dash-member-since" class="dash-info-value"></span></div>
             <div style="margin-top:var(--s-4)" id="dash-member-actions">
-              <button type="button" class="btn btn-outline" id="dash-member-edit-btn" style="width:100%" data-i18n="dash_edit_profile">Edit Profile</button>
+              <button type="button" class="btn btn-outline dash-btn-edit" id="dash-member-edit-btn" style="width:100%" data-i18n="dash_edit_profile">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <span>Edit Profile</span>
+              </button>
               <div id="dash-member-save-cancel" style="display:none;grid-template-columns:1fr 1fr;gap:var(--s-3)">
                 <button type="button" class="btn btn-primary" id="dash-member-save-btn" data-i18n="dash_save">Save</button>
                 <button type="button" class="btn btn-outline" id="dash-member-cancel-btn" data-i18n="dash_cancel">Cancel</button>
@@ -170,67 +192,197 @@
             </div>
           </div>
           <div style="margin-top:var(--s-5);text-align:center">
-            <button type="button" class="btn btn-primary" data-dashboard-logout style="width:100%" data-i18n="dash_sign_out">Sign Out</button>
+            <button type="button" class="btn btn-outline-danger dash-btn-logout" data-dashboard-logout style="width:100%" data-i18n="dash_sign_out">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span>Sign Out</span>
+            </button>
           </div>
         </div>
-        <!-- Patient view (ID card) -->
+
+        <!-- Patient view (Authentic Physical Card Layout with 3D Flip) -->
         <div id="dash-patient-view" style="display:none">
-          <div style="text-align:center;margin-bottom:var(--s-4)">
-            <h3 id="dash-patient-name" style="color:var(--c-blue);margin-bottom:4px;font-size:1.25rem"></h3>
+          <div style="text-align:center;margin-bottom:var(--s-3)">
+            <h3 id="dash-patient-name" style="color:var(--c-blue);margin-bottom:2px;font-size:1.25rem;font-weight:700"></h3>
             <p style="font-size:0.8125rem;color:var(--c-muted);margin:0;letter-spacing:0.02em" data-i18n="dash_card_subtitle">Patient Identification Card</p>
           </div>
-          <!-- ID Card Front -->
-          <div class="id-card-front">
-            <div class="id-card-front-inner">
-              <div class="id-card-photo-wrap">
-                <img id="dash-patient-photo" src="" alt="Patient photo" style="display:none">
-                <div id="dash-patient-photo-placeholder" style="width:100%;height:100%;background:var(--c-gray-200);display:flex;align-items:center;justify-content:center;color:var(--c-muted);font-size:0.75rem" data-i18n="dash_no_photo">No Photo</div>
-                <button type="button" id="dash-photo-delete" class="id-card-photo-delete" title="Remove photo" style="display:none">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-                <label class="id-card-photo-upload" for="patient-photo-input">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                </label>
-                <input type="file" id="patient-photo-input" accept="image/*" style="display:none">
-              </div>
-              <div class="id-card-details">
-                <div class="id-card-row"><span class="id-card-label" data-i18n="dash_member_id">Member ID</span><span class="id-card-dots"></span><span id="dash-patient-id" class="id-card-value"></span></div>
-                <div class="id-card-row"><span class="id-card-label" data-i18n="dash_name">Name</span><span class="id-card-dots"></span><span id="dash-patient-name-display" class="id-card-value"></span><input type="text" id="p-edit-name" class="id-card-edit-input" style="display:none" placeholder="Name" data-i18n-placeholder="dash_ph_name"></div>
-                <div class="id-card-row"><span class="id-card-label" data-i18n="dash_dob">Date of Birth</span><span class="id-card-dots"></span><span id="dash-patient-dob" class="id-card-value"></span><input type="text" id="p-edit-dob" class="id-card-edit-input" style="display:none" placeholder="dd/mm/yyyy"></div>
-                <div class="id-card-row"><span class="id-card-label" data-i18n="dash_condition">Condition</span><span class="id-card-dots"></span><span id="dash-patient-condition" class="id-card-value"></span><select id="p-edit-condition" class="id-card-edit-input" style="display:none"><option value="">Select type</option><option value="Hemophilia A">Hemophilia A</option><option value="Hemophilia B">Hemophilia B</option><option value="Other">Other</option></select><input type="text" id="p-edit-condition-other" class="id-card-edit-input" placeholder="Specify your condition" style="display:none"></div>
-                <div class="id-card-row"><span class="id-card-label" data-i18n="dash_blood_type">Blood Type</span><span class="id-card-dots"></span><span id="dash-patient-blood" class="id-card-value"></span><select id="p-edit-blood" class="id-card-edit-input" style="display:none"><option value="">Select</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
-                <div class="id-card-row"><span class="id-card-label" data-i18n="dash_phone">Phone</span><span class="id-card-dots"></span><span id="dash-patient-phone" class="id-card-value"></span><input type="tel" id="p-edit-phone" class="id-card-edit-input" style="display:none" placeholder="Phone" data-i18n-placeholder="dash_ph_phone"></div>
-                <div class="id-card-row"><span class="id-card-label" data-i18n="dash_created_at">Created At</span><span class="id-card-dots"></span><span id="dash-patient-created" class="id-card-value"></span></div>
-                <div class="id-card-row"><span class="id-card-label" data-i18n="dash_address">Address</span><span class="id-card-dots"></span><span id="dash-patient-address" class="id-card-value"></span><input type="text" id="p-edit-address" class="id-card-edit-input" style="display:none" placeholder="Address" data-i18n-placeholder="dash_ph_address"></div>
-              </div>
-            </div>
+
+          <!-- Flip Controls -->
+          <div class="dash-card-flip-bar">
+            <button type="button" class="btn btn-outline id-card-flip-btn" id="dash-card-flip-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right:6px"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span data-i18n="dash_flip_card">Flip Card</span>
+            </button>
+            <span class="id-card-side-indicator" id="dash-card-side-indicator" data-i18n="dash_side_back">Back Side</span>
           </div>
-          <!-- ID Card Back -->
-          <div class="id-card-back" style="margin-top:var(--s-4)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s-4)">
-              <img src="<?php echo get_template_directory_uri(); ?>/cha-logo-left.png" alt="CHA" style="height:36px">
-              <div style="font-size:0.75rem;font-weight:700;color:var(--c-red);margin-right:8px" data-i18n="dash_card_title_back">Patient Identification Card</div>
-            </div>
-            <div style="font-size:0.6875rem;line-height:1.6;color:var(--c-gray-600)">
-              <p style="margin:0 0 6px;font-weight:700;color:var(--c-blue)" data-i18n="dash_rules">Rules</p>
-              <ol style="margin:0;padding-left:16px">
-                <li data-i18n="dash_rule_1">This card is the property of the Cambodian Haemophilia Association.</li>
-                <li data-i18n="dash_rule_2">Please present this card when receiving treatment services.</li>
-                <li data-i18n="dash_rule_3">If lost, please contact the association immediately.</li>
-              </ol>
-            </div>
-            <div style="display:flex;justify-content:flex-end;align-items:flex-end;margin-top:var(--s-5)">
-              <div style="font-size:0.625rem;color:var(--c-muted);text-align:right">
-                <div style="font-weight:700;color:var(--c-blue)" data-i18n="dash_member_id">Member ID</div>
-                <div id="dash-patient-id-back"></div>
+
+          <!-- 3D Card Scene -->
+          <div class="id-card-scene">
+            <div class="id-card-flipper" id="dash-id-card-flipper">
+              <!-- ID Card Front -->
+              <div class="id-card-front">
+                <div class="id-card-front-header">
+                  <div class="id-card-header-left">
+                    <img src="<?php echo get_template_directory_uri(); ?>/cha-logo-left.png" alt="CHA Logo" class="id-card-header-logo">
+                  </div>
+                  <div class="id-card-header-right">
+                    <div class="id-card-khmer-header-title" data-i18n="card_title_front">ប័ណ្ណសម្គាល់អ្នកជំងឺ</div>
+                    <div class="id-card-eng-header-title" data-i18n="card_title_eng">Patient Identification Card</div>
+                  </div>
+                </div>
+
+                <div class="id-card-front-inner">
+                  <!-- Left Column: Photo + QR Code -->
+                  <div class="id-card-left-col">
+                    <div class="id-card-photo-wrap">
+                      <img id="dash-patient-photo" src="" alt="Patient photo" style="display:none">
+                      <div id="dash-patient-photo-placeholder" class="id-card-photo-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span data-i18n="dash_no_photo">No Photo</span>
+                      </div>
+                      <button type="button" id="dash-photo-delete" class="id-card-photo-delete" title="Remove photo" style="display:none">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                      <label class="id-card-photo-upload" for="patient-photo-input" title="Upload Photo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                      </label>
+                      <input type="file" id="patient-photo-input" accept="image/*" style="display:none">
+                    </div>
+
+                    <div class="id-card-qr-wrap">
+                      <div class="id-card-qr-box">
+                        <img id="dash-patient-qr" src="" alt="QR Code">
+                      </div>
+                      <div class="id-card-qr-label" data-i18n="card_qr_label">Scan Us</div>
+                    </div>
+                  </div>
+
+                  <!-- Right Column: Patient Details -->
+                  <div class="id-card-details">
+                    <div class="id-card-row">
+                      <span class="id-card-label-kh" data-i18n="card_label_id">Member ID</span>
+                      <span class="id-card-sep">:</span>
+                      <span id="dash-patient-id" class="id-card-val-bold"></span>
+                    </div>
+                    <div class="id-card-row">
+                      <span class="id-card-label-kh" data-i18n="card_label_name_khmer">Khmer Name</span>
+                      <span class="id-card-sep">:</span>
+                      <span id="dash-patient-name-khmer" class="id-card-val-bold">—</span>
+                      <input type="text" id="p-edit-name-khmer" class="id-card-edit-input" style="display:none" placeholder="ឈ្មោះខ្មែរ">
+                    </div>
+                    <div class="id-card-row">
+                      <span class="id-card-label-kh" data-i18n="card_label_name_latin">Latin Name</span>
+                      <span class="id-card-sep">:</span>
+                      <span id="dash-patient-name-display" class="id-card-val-bold"></span>
+                      <input type="text" id="p-edit-name" class="id-card-edit-input" style="display:none" placeholder="Name">
+                    </div>
+                    <div class="id-card-row">
+                      <span class="id-card-label-kh" data-i18n="card_label_dob">Date of Birth</span>
+                      <span class="id-card-sep">:</span>
+                      <span id="dash-patient-dob" class="id-card-val"></span>
+                      <input type="text" id="p-edit-dob" class="id-card-edit-input" style="display:none" placeholder="dd/mm/yyyy">
+                    </div>
+                    <div class="id-card-row">
+                      <span class="id-card-label-kh" data-i18n="card_label_condition">Hemophilia Type</span>
+                      <span class="id-card-sep">:</span>
+                      <span id="dash-patient-condition" class="id-card-val"></span>
+                      <select id="p-edit-condition" class="id-card-edit-input" style="display:none"><option value="">Select type</option><option value="Hemophilia A">Hemophilia A</option><option value="Hemophilia B">Hemophilia B</option><option value="Other">Other</option></select>
+                    </div>
+                    <div class="id-card-row">
+                      <span class="id-card-label-kh" data-i18n="card_label_blood">Blood Type</span>
+                      <span class="id-card-sep">:</span>
+                      <span id="dash-patient-blood" class="id-card-val"></span>
+                      <select id="p-edit-blood" class="id-card-edit-input" style="display:none"><option value="">Select</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select>
+                    </div>
+                    <div class="id-card-row">
+                      <span class="id-card-label-kh" data-i18n="card_label_issue_date">Issue Date</span>
+                      <span class="id-card-sep">:</span>
+                      <span id="dash-patient-created" class="id-card-val"></span>
+                    </div>
+                    <div class="id-card-row">
+                      <span class="id-card-label-kh" data-i18n="card_label_address">Address</span>
+                      <span class="id-card-sep">:</span>
+                      <span id="dash-patient-address" class="id-card-val"></span>
+                      <input type="text" id="p-edit-address" class="id-card-edit-input" style="display:none" placeholder="Address">
+                    </div>
+                    <div class="id-card-row">
+                      <span class="id-card-label-kh" data-i18n="card_label_phone">Phone</span>
+                      <span class="id-card-sep">:</span>
+                      <span id="dash-patient-phone" class="id-card-val"></span>
+                      <input type="tel" id="p-edit-phone" class="id-card-edit-input" style="display:none" placeholder="Phone">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Front Card Footer Hotlines -->
+                <div class="id-card-front-footer">
+                  <div class="id-card-emergency-line">
+                    <span data-i18n="card_hotline_nph">National Pediatric Hospital Hotline: <strong>012 751 728</strong></span>
+                    <span class="id-card-footer-space">|</span>
+                    <span data-i18n="card_hotline_ahc">Angkor Hospital for Children Hotline: <strong>063 963 409</strong></span>
+                  </div>
+                  <div class="id-card-keep-notice" data-i18n="card_keep_notice">Please keep this member ID card in good condition.</div>
+                </div>
+              </div>
+
+              <!-- ID Card Back -->
+              <div class="id-card-back">
+                <div class="id-card-front-header">
+                  <div class="id-card-header-left">
+                    <img src="<?php echo get_template_directory_uri(); ?>/cha-logo-left.png" alt="CHA Logo" class="id-card-header-logo">
+                  </div>
+                  <div class="id-card-header-right">
+                    <div class="id-card-khmer-header-title" data-i18n="card_title_back">ប័ណ្ណសម្គាល់អ្នកជំងឺ</div>
+                    <div class="id-card-eng-header-title" data-i18n="card_title_eng">Patient Identification Card</div>
+                  </div>
+                </div>
+
+                <div class="id-card-back-body">
+                  <div class="id-card-rules-col">
+                    <div class="id-card-rules-title" data-i18n="card_rules_heading">លក្ខខណ្ឌ៖</div>
+                    <ol class="id-card-rules-list">
+                      <li data-i18n="card_rule_1">ប័ណ្ណសម្គាល់អ្នកជំងឺ គឺនឹងប្រើប្រាស់តែនៅក្នុងសមាគមជំងឺហេម៉ូហ្វីលាកម្ពុជា តែប៉ុណ្ណោះ។</li>
+                      <li data-i18n="card_rule_2">ប័ណ្ណសម្គាល់អ្នកជំងឺ មានសុពលភាពប្រើប្រាស់ពេញមួយអាណត្តិទី៥ ឆ្នាំ២០២៦-២០៣០</li>
+                      <li data-i18n="card_rule_3">អ្នកជំងឺទាំងអស់ ត្រូវបន្តសុពលភាពប័ណ្ណសម្គាល់អ្នកជំងឺថ្មី ឱ្យបានមុនថ្ងៃទី១៧ ខែឧសភា ឆ្នាំ២០៣០</li>
+                    </ol>
+                  </div>
+
+                  <div class="id-card-signature-col">
+                    <div class="id-card-president-label" data-i18n="card_president_label">ប្រធានសមាគម</div>
+                    <div class="id-card-stamp-wrapper">
+                      <svg class="id-card-seal-svg" viewBox="0 0 140 140" width="85" height="85">
+                        <circle cx="70" cy="70" r="66" fill="none" stroke="#1d4ed8" stroke-width="2.5"/>
+                        <circle cx="70" cy="70" r="54" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-dasharray="3 3"/>
+                        <path id="seal-path-top" d="M 20,70 A 50,50 0 0,1 120,70" fill="none"/>
+                        <path id="seal-path-bottom" d="M 120,70 A 50,50 0 0,1 20,70" fill="none"/>
+                        <text fill="#1d4ed8" font-size="9.5" font-weight="bold">
+                          <textPath href="#seal-path-top" startOffset="50%" text-anchor="middle">ស.ហ.អ.ក</textPath>
+                        </text>
+                        <text fill="#1d4ed8" font-size="7.5" font-weight="bold">
+                          <textPath href="#seal-path-bottom" startOffset="50%" text-anchor="middle">Cambodian Hemophilia Association</textPath>
+                        </text>
+                        <text x="70" y="65" fill="#1d4ed8" font-size="15" font-weight="900" text-anchor="middle" font-family="sans-serif">C.H.A</text>
+                        <text x="70" y="80" fill="#dc2626" font-size="9.5" font-weight="bold" text-anchor="middle">REB</text>
+                      </svg>
+                      <div class="id-card-signature-img">
+                        <svg viewBox="0 0 120 40" width="80" height="30" style="color:#1e3a8a">
+                          <path d="M 10,25 Q 30,5 50,25 T 90,15 T 110,30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="id-card-signatory-name" data-i18n="card_president_name">រុន ច័ន្ទរិទ្ធី</div>
+                  </div>
+                </div>
+
+                <div class="id-card-back-footer" data-i18n="card_office_address">
+                  អាសយដ្ឋាន: លេខ១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី រាជធានីភ្នំពេញ ទូរស័ព្ទលេខ (+៨៥៥) ៩៦ ៦៦០ ៥៣៣៤
+                </div>
               </div>
             </div>
           </div>
           <div class="dash-actions" style="margin-top:var(--s-5);display:flex;flex-direction:column;align-items:center;gap:var(--s-3)">
-            <button type="button" class="btn btn-primary" id="dash-print-card" style="width:100%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg><span data-i18n="dash_print_card">Print Card</span></button>
             <div id="dash-patient-actions" style="width:100%">
               <button type="button" class="btn btn-outline" id="dash-patient-edit-btn" style="width:100%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span data-i18n="dash_edit_profile">Edit Profile</span></button>
-              <div id="dash-patient-save-cancel" style="display:none;width:100%;grid-template-columns:1fr 1fr;gap:var(--s-3)">
+              <div id="dash-patient-save-cancel" style="display:none;width:100%;grid-template-columns:1fr 1fr;gap:var(--s-3);margin-top:var(--s-4)">
                 <button type="button" class="btn btn-primary" id="dash-patient-save-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="dash_save">Save</span></button>
                 <button type="button" class="btn btn-outline" id="dash-patient-cancel-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span data-i18n="dash_cancel">Cancel</span></button>
               </div>
@@ -255,7 +407,7 @@
     <div class="footer-grid">
         <div class="footer-col footer-col-brand">
             <a href="<?php echo home_url(); ?>" class="footer-brand">
-                <img src="<?php echo get_template_directory_uri(); ?>/cha-logo-left.png" alt="Cambodian Haemophilia Association" style="height:52px;width:auto;max-width:200px;object-fit:contain">
+                <img src="<?php echo esc_url(cha_get_option('site_logo', get_template_directory_uri() . '/cha-logo-left.png')); ?>" alt="Cambodian Haemophilia Association" style="height:52px;width:auto;max-width:200px;object-fit:contain">
             </a>
             <p class="footer-tagline" data-i18n="footer_tagline"><?php echo esc_html(cha_get_option('footer_tagline', 'Supporting people living with bleeding disorders across Cambodia.')); ?></p>
             <div class="footer-socials">
@@ -277,15 +429,15 @@
             <div class="footer-contact">
                 <div class="item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    <span data-i18n="contact_address_val"><?php echo esc_html(cha_get_option('contact_address', '#Building 100, Russia Blvd (114), Phnom Penh, Cambodia, P.O Box 700')); ?></span>
+                    <span data-i18n="contact_address_val"><?php echo esc_html(cha_get_option('contact_address', '#100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia')); ?></span>
                 </div>
                 <div class="item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    <a href="tel:<?php echo esc_attr(cha_get_option('contact_phone_digits', '+855962605335')); ?>"><?php echo esc_html(cha_get_option('contact_phone', '(+855) 96 260 5335')); ?></a>
+                    <a href="tel:<?php echo esc_attr(cha_get_option('contact_phone_digits', '+85512311033')); ?>"><?php echo esc_html(cha_get_option('contact_phone', '+855 12 311 033')); ?></a>
                 </div>
                 <div class="item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                    <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a>
+                    <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a>
                 </div>
             </div>
         </div>
@@ -331,8 +483,10 @@
     observer.observe(document.body, { childList: true, subtree: true });
   </script>
 
-  <!-- Botpress Chat Widget -->
-  <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
-  <script src="https://files.bpcontent.cloud/2026/07/21/02/20260721025253-A1YF239M.js" defer></script>
+  <!-- Telegram Chat Button -->
+  <a href="https://t.me/Chacambodia_bot" target="_blank" rel="noopener noreferrer" class="cha-telegram-btn" aria-label="Chat on Telegram">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    <span class="cha-telegram-tooltip" data-i18n="chatWithUs">Chat with us</span>
+  </a>
 </body>
 </html>

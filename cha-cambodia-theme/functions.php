@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Route /verify to verify.php
+// Route /verify, /reset-password, and /verify-member
 add_action('template_redirect', function() {
     $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
     if ($uri === 'verify') {
@@ -12,6 +12,10 @@ add_action('template_redirect', function() {
     }
     if ($uri === 'reset-password') {
         include get_template_directory() . '/reset-password.php';
+        exit;
+    }
+    if ($uri === 'verify-member') {
+        include get_template_directory() . '/verify-member.php';
         exit;
     }
 });
@@ -117,7 +121,7 @@ if (!function_exists('cha_customizer_km_data')) {
             'member_forgot', 'member_forgot_sub', 'member_forgot_btn', 'member_signin_btn', 'member_register_link', 'member_register_title',
             'member_register_name_label', 'member_register_name_placeholder',
             'member_register_province', 'member_register_role',
-            'member_register_role_patient', 'member_register_role_family', 'member_register_role_professional', 'member_register_role_supporter',
+            'member_register_role_patient', 'member_register_role_family', 'member_register_role_professional', 'member_register_role_member',
             'member_register_terms', 'member_register_terms_link', 'member_register_btn', 'member_register_login',
             'member_count', 'member_count_label',
             /* Homepage extras */
@@ -128,8 +132,6 @@ if (!function_exists('cha_customizer_km_data')) {
             'membership_cta_heading', 'membership_cta_text', 'membership_cta_btn', 'membership_cta_login',
             'membership_count', 'membership_count_label',
             'membership_perk_1', 'membership_perk_2', 'membership_perk_3',
-            'campaigns_heading', 'campaigns_raised_lbl', 'campaigns_goal_lbl', 'campaigns_corporate_heading',
-            'campaign_1_title', 'campaign_1_desc', 'campaign_2_title', 'campaign_2_desc', 'campaign_3_title', 'campaign_3_desc',
             'contact_get_in_touch', 'contact_we_are_here', 'contact_office_hours',
             'contact_send_msg', 'contact_send_sub',
             'contact_form_name', 'contact_form_email', 'contact_form_subject', 'contact_form_message',
@@ -154,9 +156,9 @@ add_action('wp_head', 'cha_customizer_km_data');
 
 function cha_enqueue_assets() {
     wp_enqueue_style('cha-style', get_stylesheet_uri());
-    wp_enqueue_style('cha-custom-css', get_template_directory_uri() . '/style-cha.css', array(), '4.8.5');
+    wp_enqueue_style('cha-custom-css', get_template_directory_uri() . '/style-cha.css', array(), '5.1.2');
     wp_enqueue_style('cha-google-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Koulen:wght@400;700&family=Siemreap:wght@400&display=swap');
-    wp_enqueue_script('cha-custom-js', get_template_directory_uri() . '/script-cha.js', array(), '1.3.1', true);
+    wp_enqueue_script('cha-custom-js', get_template_directory_uri() . '/script-cha.js', array(), '1.5.1', true);
     wp_localize_script('cha-custom-js', 'chaApi', array(
         'rest_url' => rest_url('cha/v1/'),
         'nonce'    => wp_create_nonce('wp_rest'),
@@ -170,6 +172,8 @@ function cha_register_menus() {
     ));
 }
 add_action('init', 'cha_register_menus');
+
+add_theme_support('post-thumbnails');
 
 /* ===== CHA NEWS & EVENTS CUSTOM POST TYPE ===== */
 
@@ -197,11 +201,18 @@ function cha_register_news_cpt() {
 }
 add_action('init', 'cha_register_news_cpt');
 
-function cha_news_flush_rewrite() {
-    cha_register_news_cpt();
-    flush_rewrite_rules();
+define('CHA_CPT_VERSION', '1.4');
+
+function cha_flush_rewrite_on_upgrade() {
+    $stored = get_option('cha_cpt_version', '0');
+    if ($stored !== CHA_CPT_VERSION) {
+        cha_register_news_cpt();
+        cha_register_campaigns_cpt();
+        flush_rewrite_rules();
+        update_option('cha_cpt_version', CHA_CPT_VERSION);
+    }
 }
-add_action('after_switch_theme', 'cha_news_flush_rewrite');
+add_action('init', 'cha_flush_rewrite_on_upgrade', 99);
 
 function cha_news_meta_boxes() {
     add_meta_box('cha_news_details', 'Article Details', 'cha_news_details_cb', 'cha_news', 'side', 'high');
@@ -212,6 +223,8 @@ function cha_news_details_cb($post) {
     wp_nonce_field('cha_news_details', 'cha_news_nonce');
     $date_display = get_post_meta($post->ID, '_cha_news_date', true);
     $badge = get_post_meta($post->ID, '_cha_news_badge', true);
+    $title_km = get_post_meta($post->ID, '_cha_news_title_km', true);
+    $excerpt_km = get_post_meta($post->ID, '_cha_news_excerpt_km', true);
     ?>
     <p><label for="cha_news_date"><strong>Display Date</strong><br><small>e.g. Apr 17, 2025</small></label>
     <input type="text" id="cha_news_date" name="cha_news_date" value="<?php echo esc_attr($date_display); ?>" style="width:100%;margin-top:4px;" placeholder="Apr 17, 2025"></p>
@@ -222,6 +235,11 @@ function cha_news_details_cb($post) {
         <option value="Workshop" <?php selected($badge, 'Workshop'); ?>>Workshop</option>
         <option value="Announcement" <?php selected($badge, 'Announcement'); ?>>Announcement</option>
     </select></p>
+    <hr style="margin:12px 0;">
+    <p><label for="cha_news_title_km"><strong>Title (Khmer)</strong><br><small>Leave blank to auto-translate</small></label>
+    <input type="text" id="cha_news_title_km" name="cha_news_title_km" value="<?php echo esc_attr($title_km); ?>" style="width:100%;margin-top:4px;" placeholder="ចំណងជើងភាសាខ្មែរ"></p>
+    <p><label for="cha_news_excerpt_km"><strong>Excerpt (Khmer)</strong><br><small>Leave blank to auto-translate</small></label>
+    <textarea id="cha_news_excerpt_km" name="cha_news_excerpt_km" rows="3" style="width:100%;margin-top:4px;" placeholder="សេចក្តីផ្សាយភាសាខ្មែរ"><?php echo esc_textarea($excerpt_km); ?></textarea></p>
     <?php
 }
 
@@ -231,6 +249,8 @@ function cha_save_news_details($post_id) {
     if (!current_user_can('edit_post', $post_id)) return;
     if (isset($_POST['cha_news_date'])) update_post_meta($post_id, '_cha_news_date', sanitize_text_field($_POST['cha_news_date']));
     if (isset($_POST['cha_news_badge'])) update_post_meta($post_id, '_cha_news_badge', sanitize_text_field($_POST['cha_news_badge']));
+    if (isset($_POST['cha_news_title_km'])) update_post_meta($post_id, '_cha_news_title_km', sanitize_text_field($_POST['cha_news_title_km']));
+    if (isset($_POST['cha_news_excerpt_km'])) update_post_meta($post_id, '_cha_news_excerpt_km', sanitize_textarea_field($_POST['cha_news_excerpt_km']));
 }
 add_action('save_post_cha_news', 'cha_save_news_details');
 
@@ -258,6 +278,137 @@ function cha_news_admin_column_data($column, $post_id) {
     }
 }
 add_action('manage_cha_news_posts_custom_column', 'cha_news_admin_column_data', 10, 2);
+
+/* ===== CHA CAMPAIGNS CUSTOM POST TYPE ===== */
+
+function cha_register_campaigns_cpt() {
+    register_post_type('cha_campaigns', array(
+        'labels' => array(
+            'name'               => 'Campaigns',
+            'singular_name'      => 'Campaign',
+            'add_new'            => 'Add New',
+            'add_new_item'       => 'Add New Campaign',
+            'edit_item'          => 'Edit Campaign',
+            'all_items'          => 'All Campaigns',
+            'view_item'          => 'View Campaign',
+            'search_items'       => 'Search Campaigns',
+            'not_found'          => 'No campaigns found',
+            'not_found_in_trash' => 'No campaigns found in Trash',
+        ),
+        'public'       => true,
+        'show_ui'      => true,
+        'has_archive'  => true,
+        'rewrite'      => array('slug' => 'campaigns'),
+        'menu_icon'    => 'dashicons-megaphone',
+        'supports'     => array('title', 'editor', 'thumbnail', 'excerpt'),
+        'show_in_rest' => true,
+    ));
+}
+add_action('init', 'cha_register_campaigns_cpt');
+
+function cha_campaigns_meta_boxes() {
+    add_meta_box('cha_campaigns_details', 'Campaign Details', 'cha_campaigns_details_cb', 'cha_campaigns', 'side', 'high');
+}
+add_action('add_meta_boxes', 'cha_campaigns_meta_boxes');
+
+function cha_campaigns_details_cb($post) {
+    wp_nonce_field('cha_campaigns_details', 'cha_campaigns_nonce');
+    $raised = get_post_meta($post->ID, '_cha_campaign_raised', true);
+    $goal = get_post_meta($post->ID, '_cha_campaign_goal', true);
+    $color = get_post_meta($post->ID, '_cha_campaign_color', true);
+    $icon = get_post_meta($post->ID, '_cha_campaign_icon', true);
+    $title_km = get_post_meta($post->ID, '_cha_campaign_title_km', true);
+    $desc_km = get_post_meta($post->ID, '_cha_campaign_desc_km', true);
+    ?>
+    <p><label for="cha_campaign_icon"><strong>Icon</strong></label>
+    <select id="cha_campaign_icon" name="cha_campaign_icon" style="width:100%;margin-top:4px;">
+        <option value="heart" <?php selected($icon, 'heart'); ?>>Heart</option>
+        <option value="graduation" <?php selected($icon, 'graduation'); ?>>Graduation Cap</option>
+        <option value="pulse" <?php selected($icon, 'pulse'); ?>>Pulse / Health</option>
+        <option value="users" <?php selected($icon, 'users'); ?>>Users / People</option>
+        <option value="star" <?php selected($icon, 'star'); ?>>Star</option>
+        <option value="handshake" <?php selected($icon, 'handshake'); ?>>Handshake</option>
+        <option value="globe" <?php selected($icon, 'globe'); ?>>Globe</option>
+        <option value="shield" <?php selected($icon, 'shield'); ?>>Shield</option>
+        <option value="lightbulb" <?php selected($icon, 'lightbulb'); ?>>Lightbulb</option>
+        <option value="gift" <?php selected($icon, 'gift'); ?>>Gift</option>
+    </select></p>
+    <p><label for="cha_campaign_raised"><strong>Raised Amount ($)</strong></label>
+    <input type="text" id="cha_campaign_raised" name="cha_campaign_raised" value="<?php echo esc_attr($raised); ?>" style="width:100%;margin-top:4px;" placeholder="4250"></p>
+    <p><label for="cha_campaign_goal"><strong>Goal Amount ($)</strong></label>
+    <input type="text" id="cha_campaign_goal" name="cha_campaign_goal" value="<?php echo esc_attr($goal); ?>" style="width:100%;margin-top:4px;" placeholder="15000"></p>
+    <p><label for="cha_campaign_color"><strong>Theme Color</strong></label>
+    <select id="cha_campaign_color" name="cha_campaign_color" style="width:100%;margin-top:4px;">
+        <option value="red" <?php selected($color, 'red'); ?>>Red</option>
+        <option value="blue" <?php selected($color, 'blue'); ?>>Blue</option>
+        <option value="purple" <?php selected($color, 'purple'); ?>>Purple</option>
+    </select></p>
+    <hr style="margin:12px 0;">
+    <p><label for="cha_campaign_title_km"><strong>Title (Khmer)</strong><br><small>Leave blank to auto-translate</small></label>
+    <input type="text" id="cha_campaign_title_km" name="cha_campaign_title_km" value="<?php echo esc_attr($title_km); ?>" style="width:100%;margin-top:4px;" placeholder="ចំណងជើងភាសាខ្មែរ"></p>
+    <p><label for="cha_campaign_desc_km"><strong>Description (Khmer)</strong><br><small>Leave blank to auto-translate</small></label>
+    <textarea id="cha_campaign_desc_km" name="cha_campaign_desc_km" rows="3" style="width:100%;margin-top:4px;" placeholder="សេចក្តីផ្សាយភាសាខ្មែរ"><?php echo esc_textarea($desc_km); ?></textarea></p>
+    <?php
+}
+
+function cha_save_campaigns_details($post_id) {
+    if (!isset($_POST['cha_campaigns_nonce']) || !wp_verify_nonce($_POST['cha_campaigns_nonce'], 'cha_campaigns_details')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+    if (isset($_POST['cha_campaign_raised'])) update_post_meta($post_id, '_cha_campaign_raised', sanitize_text_field($_POST['cha_campaign_raised']));
+    if (isset($_POST['cha_campaign_goal'])) update_post_meta($post_id, '_cha_campaign_goal', sanitize_text_field($_POST['cha_campaign_goal']));
+    if (isset($_POST['cha_campaign_color'])) update_post_meta($post_id, '_cha_campaign_color', sanitize_text_field($_POST['cha_campaign_color']));
+    if (isset($_POST['cha_campaign_icon'])) update_post_meta($post_id, '_cha_campaign_icon', sanitize_text_field($_POST['cha_campaign_icon']));
+    if (isset($_POST['cha_campaign_title_km'])) update_post_meta($post_id, '_cha_campaign_title_km', sanitize_text_field($_POST['cha_campaign_title_km']));
+    if (isset($_POST['cha_campaign_desc_km'])) update_post_meta($post_id, '_cha_campaign_desc_km', sanitize_textarea_field($_POST['cha_campaign_desc_km']));
+}
+add_action('save_post_cha_campaigns', 'cha_save_campaigns_details');
+
+function cha_campaign_icon_svg($icon_name) {
+    $icons = array(
+        'heart'      => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+        'graduation' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
+        'pulse'      => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+        'users'      => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        'star'       => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+        'handshake'  => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-2 2-4-4 4-4 2 2"/><path d="M18 7l-2-2-4 4 2 2 4-4z"/><path d="M7 17l-2 2"/><path d="M17 7l2-2"/><path d="M2 12h5"/><path d="M17 12h5"/></svg>',
+        'globe'      => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+        'shield'     => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+        'lightbulb'  => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>',
+        'gift'       => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>',
+    );
+    return isset($icons[$icon_name]) ? $icons[$icon_name] : $icons['heart'];
+}
+
+function cha_campaigns_admin_columns($columns) {
+    $new = array();
+    foreach ($columns as $key => $val) {
+        $new[$key] = $val;
+        if ($key === 'title') {
+            $new['cha_campaign_raised'] = 'Raised';
+            $new['cha_campaign_goal'] = 'Goal';
+            $new['cha_campaign_color'] = 'Color';
+        }
+    }
+    return $new;
+}
+add_filter('manage_cha_campaigns_posts_columns', 'cha_campaigns_admin_columns');
+
+function cha_campaigns_admin_column_data($column, $post_id) {
+    if ($column === 'cha_campaign_raised') {
+        $val = get_post_meta($post_id, '_cha_campaign_raised', true);
+        echo $val ? '$' . esc_html(number_format((float)$val)) : '—';
+    }
+    if ($column === 'cha_campaign_goal') {
+        $val = get_post_meta($post_id, '_cha_campaign_goal', true);
+        echo $val ? '$' . esc_html(number_format((float)$val)) : '—';
+    }
+    if ($column === 'cha_campaign_color') {
+        $val = get_post_meta($post_id, '_cha_campaign_color', true);
+        echo $val ? esc_html(ucfirst($val)) : '—';
+    }
+}
+add_action('manage_cha_campaigns_posts_custom_column', 'cha_campaigns_admin_column_data', 10, 2);
 
 /* ===== CHA MEMBERSHIP BACKEND (Database) ===== */
 
@@ -337,6 +488,18 @@ function cha_upgrade_members_table() {
     if (!in_array('address', $cols, true)) {
         $wpdb->query("ALTER TABLE $table ADD address varchar(300) DEFAULT ''");
     }
+    if (!in_array('name_khmer', $cols, true)) {
+        $wpdb->query("ALTER TABLE $table ADD name_khmer varchar(200) DEFAULT ''");
+    }
+}
+
+function cha_migrate_supporter_to_member() {
+    if (get_option('cha_role_supporter_to_member')) return;
+    global $wpdb;
+    $table = cha_get_members_table();
+    if ($wpdb->get_var("SHOW TABLES LIKE '$table'") !== $table) return;
+    $wpdb->query("UPDATE $table SET role = 'Member' WHERE role = 'Supporter'");
+    update_option('cha_role_supporter_to_member', true);
 }
 
 function cha_migrate_old_members() {
@@ -378,6 +541,7 @@ function cha_migrate_old_members() {
 function cha_init_members_db() {
     cha_ensure_members_table();
     cha_upgrade_members_table();
+    cha_migrate_supporter_to_member();
     cha_migrate_old_members();
 }
 add_action('admin_init', 'cha_init_members_db');
@@ -408,6 +572,7 @@ function cha_row_to_rest($row) {
         'licenseNumber'     => $row->license_number,
         'photo'             => $row->photo ?? '',
         'address'           => $row->address ?? '',
+        'nameKhmer'         => $row->name_khmer ?? '',
     );
 }
 
@@ -420,6 +585,7 @@ function cha_rest_to_db($data) {
         'emergencyContact' => 'emergency_contact',
         'linkedPatient'    => 'linked_patient',
         'licenseNumber'    => 'license_number',
+        'nameKhmer'        => 'name_khmer',
     );
     $out = array();
     foreach ($data as $key => $val) {
@@ -462,7 +628,7 @@ function cha_get_members_page($page = 1, $per_page = 20, $role_filter = '') {
     cha_ensure_members_table();
     $table = cha_get_members_table();
     $where = '';
-    $valid_roles = array('Patient', 'Family member / Caregiver', 'Healthcare professional', 'Supporter');
+    $valid_roles = array('Patient', 'Family member / Caregiver', 'Healthcare professional', 'Member');
     if ($role_filter && in_array($role_filter, $valid_roles)) {
         $where = $wpdb->prepare(" WHERE role = %s", $role_filter);
     }
@@ -490,15 +656,54 @@ function cha_generate_member_id() {
     return 'CHA-' . $year . '-' . str_pad(abs(crc32(uniqid()) % 9999 + 1), 4, '0', STR_PAD_LEFT);
 }
 
+/* ---- Rate Limiting Helper (IP-based) ---- */
+
+function cha_get_client_ip() {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        $ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $parts = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        $ip = trim($parts[0]);
+    }
+    return sanitize_text_field($ip);
+}
+
+function cha_check_ip_rate_limit($action, $max_attempts = 20, $window_seconds = 600) {
+    $ip = cha_get_client_ip();
+    $transient_key = 'cha_rl_' . md5($action . '_' . $ip);
+    $attempts = (int) get_transient($transient_key);
+
+    if ($attempts >= $max_attempts) {
+        return new WP_Error(
+            'rate_limited',
+            'Too many attempts from your IP. Please wait 10 minutes before trying again.',
+            array('status' => 429)
+        );
+    }
+
+    if ($attempts === 0) {
+        set_transient($transient_key, 1, $window_seconds);
+    } else {
+        // Increment attempts count
+        set_transient($transient_key, $attempts + 1, $window_seconds);
+    }
+
+    return true;
+}
+
 /* ---- REST endpoints ---- */
 
 function cha_rest_register($request) {
+    $rl = cha_check_ip_rate_limit('register', 20, 600);
+    if (is_wp_error($rl)) return $rl;
+
     $params = $request->get_json_params();
     $email    = sanitize_email($params['email'] ?? '');
     $password = $params['password'] ?? '';
     $phone    = sanitize_text_field($params['phone'] ?? '');
     $name     = sanitize_text_field($params['name'] ?? '');
-    $role     = sanitize_text_field($params['role'] ?? 'Supporter');
+    $role     = sanitize_text_field($params['role'] ?? 'Member');
     $dob      = sanitize_text_field($params['dob'] ?? '');
     $condition = sanitize_text_field($params['condition'] ?? '');
     $blood_type = sanitize_text_field($params['bloodType'] ?? '');
@@ -530,8 +735,8 @@ function cha_rest_register($request) {
     $member_id = cha_generate_member_id();
     $now = current_time('mysql');
     $token = wp_generate_password(32, false);
-    $valid_roles = array('Supporter', 'Patient', 'Family member / Caregiver', 'Healthcare professional');
-    if (!in_array($role, $valid_roles, true)) $role = 'Supporter';
+    $valid_roles = array('Member', 'Patient', 'Family member / Caregiver', 'Healthcare professional');
+    if (!in_array($role, $valid_roles, true)) $role = 'Member';
 
     $insert_data = array(
         'member_id'          => $member_id,
@@ -567,6 +772,9 @@ function cha_rest_register($request) {
 }
 
 function cha_rest_login($request) {
+    $rl = cha_check_ip_rate_limit('login', 20, 600);
+    if (is_wp_error($rl)) return $rl;
+
     $params = $request->get_json_params();
     $email    = sanitize_email($params['email'] ?? '');
     $password = $params['password'] ?? '';
@@ -746,22 +954,43 @@ function cha_test_smtp($request) {
 
 function cha_get_payway_settings() {
     $defaults = array(
-        'merchant_id' => '',
-        'api_key'     => '',
-        'mode'        => 'sandbox',
-        'enabled'     => false,
+        'sandbox_merchant_id'  => '',
+        'sandbox_api_key'      => '',
+        'production_merchant_id' => '',
+        'production_api_key'   => '',
+        'mode'                 => 'sandbox',
+        'enabled'              => false,
     );
     $saved = get_option('cha_payway_settings', array());
-    return wp_parse_args($saved, $defaults);
+
+    // Backward compat: migrate old single merchant_id/api_key to sandbox set
+    if (!empty($saved['merchant_id']) && empty($saved['sandbox_merchant_id'])) {
+        $saved['sandbox_merchant_id'] = $saved['merchant_id'];
+        unset($saved['merchant_id']);
+    }
+    if (!empty($saved['api_key']) && empty($saved['sandbox_api_key'])) {
+        $saved['sandbox_api_key'] = $saved['api_key'];
+        unset($saved['api_key']);
+    }
+
+    $settings = wp_parse_args($saved, $defaults);
+
+    // Return active credentials based on mode
+    $settings['merchant_id'] = $settings[$settings['mode'] . '_merchant_id'] ?? '';
+    $settings['api_key']     = $settings[$settings['mode'] . '_api_key'] ?? '';
+
+    return $settings;
 }
 
 function cha_init_payway_settings() {
     if (get_option('cha_payway_settings') === false) {
         update_option('cha_payway_settings', array(
-            'merchant_id' => '',
-            'api_key'     => '',
-            'mode'        => 'sandbox',
-            'enabled'     => false,
+            'sandbox_merchant_id'    => '',
+            'sandbox_api_key'        => '',
+            'production_merchant_id' => '',
+            'production_api_key'     => '',
+            'mode'                   => 'sandbox',
+            'enabled'                => false,
         ));
     }
     cha_ensure_donations_table();
@@ -843,7 +1072,7 @@ function cha_rest_payway_purchase($request) {
     if (!$firstname) $firstname = $email ? explode('@', $email)[0] : 'Friend';
 
     do {
-        $tran_id = 'CHA' . date('ymdHis') . str_pad((string) mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
+        $tran_id = 'CHA-' . date('ym') . '-' . str_pad((string) mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
         $exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM $table WHERE tran_id = %s", $tran_id));
     } while ($exists);
 
@@ -875,7 +1104,7 @@ function cha_rest_payway_purchase($request) {
         'custom_fields'        => '',
         'return_params'        => $return_params,
         'payout'               => '',
-        'lifetime'             => '30',
+        'lifetime'             => 43200,
         'additional_params'    => '',
         'google_pay_token'     => '',
         'skip_success_page'    => '1',
@@ -1192,6 +1421,9 @@ function cha_rest_verify($request) {
 }
 
 function cha_rest_resend_verification($request) {
+    $rl = cha_check_ip_rate_limit('resend_verification', 20, 600);
+    if (is_wp_error($rl)) return $rl;
+
     $params = $request->get_json_params();
     $email  = sanitize_email($params['email'] ?? '');
     if (empty($email)) {
@@ -1253,6 +1485,9 @@ function cha_send_reset_email($email, $name, $token) {
 }
 
 function cha_rest_forgot_password($request) {
+    $rl = cha_check_ip_rate_limit('forgot_password', 20, 600);
+    if (is_wp_error($rl)) return $rl;
+
     $params = $request->get_json_params();
     $email  = sanitize_email($params['email'] ?? '');
     if (empty($email) || !is_email($email)) {
@@ -1419,7 +1654,7 @@ function cha_rest_update_profile($request) {
     $member_id = $token_member ? $token_member->member_id : sanitize_text_field($params['memberId'] ?? '');
     if (empty($member_id)) return new WP_Error('missing_member_id', 'Member ID is required.', array('status' => 400));
 
-    $allowed = array('bloodType','condition','dob','treatmentCentre','emergencyContact','linkedPatient','relationship','affiliation','specialty','licenseNumber','province','phone','name','email','address');
+    $allowed = array('bloodType','condition','dob','treatmentCentre','emergencyContact','linkedPatient','relationship','affiliation','specialty','licenseNumber','province','phone','name','email','address','nameKhmer');
     $data = array();
     foreach ($allowed as $field) {
         if (isset($params[$field])) $data[$field] = sanitize_text_field($params[$field]);
@@ -1649,6 +1884,15 @@ function cha_add_admin_menu() {
         'dashicons-groups',
         26
     );
+    add_menu_page(
+        'Donations',
+        'Donations',
+        'manage_options',
+        'cha-donations',
+        'cha_render_donations_page',
+        'dashicons-heart',
+        27
+    );
 }
 add_action('admin_menu', 'cha_add_admin_menu');
 
@@ -1683,6 +1927,7 @@ function cha_render_admin_page() {
         $update_id = sanitize_text_field($_POST['member_id']);
         $data = array(
             'name'              => sanitize_text_field($_POST['name']),
+            'name_khmer'        => sanitize_text_field($_POST['name_khmer'] ?? ''),
             'email'             => $edit_email,
             'province'          => sanitize_text_field($_POST['province']),
             'role'              => sanitize_text_field($_POST['role']),
@@ -1738,6 +1983,7 @@ function cha_render_admin_page() {
             wp_die('Security check failed.');
         }
         $add_name     = sanitize_text_field($_POST['name'] ?? '');
+        $add_name_khmer = sanitize_text_field($_POST['name_khmer'] ?? '');
         $add_email    = sanitize_email($_POST['email'] ?? '');
         $add_province = sanitize_text_field($_POST['province'] ?? '');
         $add_role     = sanitize_text_field($_POST['role'] ?? '');
@@ -1750,12 +1996,13 @@ function cha_render_admin_page() {
         } elseif ($wpdb->get_var($wpdb->prepare("SELECT id FROM $table WHERE email = %s", $add_email))) {
             echo '<div class="cha-notice cha-notice-error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> A member with this email already exists.</div>';
         } else {
-            $valid_roles = array('Patient', 'Family member / Caregiver', 'Healthcare professional', 'Supporter');
-            if (!in_array($add_role, $valid_roles)) $add_role = 'Supporter';
+            $valid_roles = array('Patient', 'Family member / Caregiver', 'Healthcare professional', 'Member');
+            if (!in_array($add_role, $valid_roles)) $add_role = 'Member';
             $add_id = cha_generate_member_id();
             $add_data = array(
                 'member_id'    => $add_id,
                 'name'         => $add_name,
+                'name_khmer'   => $add_name_khmer,
                 'email'        => $add_email,
                 'password'     => empty($add_pass) ? wp_hash_password(wp_generate_password()) : wp_hash_password($add_pass),
                 'province'     => $add_province,
@@ -1801,9 +2048,9 @@ function cha_render_admin_page() {
 
     /* Count by role (global, not per-page) */
     $all_members_for_counts = cha_get_all_members();
-    $role_counts = array('Patient' => 0, 'Family member / Caregiver' => 0, 'Healthcare professional' => 0, 'Supporter' => 0);
+    $role_counts = array('Patient' => 0, 'Family member / Caregiver' => 0, 'Healthcare professional' => 0, 'Member' => 0);
     foreach ($all_members_for_counts as $r) {
-        $rl = $r->role ?: 'Supporter';
+        $rl = $r->role ?: 'Member';
         if (isset($role_counts[$rl])) $role_counts[$rl]++;
     }
     $display_count = $total_members;
@@ -1849,7 +2096,7 @@ function cha_render_admin_page() {
     .cha-tab[data-role="Patient"].cha-active { color:var(--cha-blue); }
     .cha-tab[data-role="Family member / Caregiver"].cha-active { color:var(--cha-teal); }
     .cha-tab[data-role="Healthcare professional"].cha-active { color:var(--cha-purple); }
-    .cha-tab[data-role="Supporter"].cha-active { color:var(--cha-amber); }
+    .cha-tab[data-role="Member"].cha-active { color:var(--cha-amber); }
 
     /* Role Badges */
     .cha-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:0.02em; white-space:nowrap; }
@@ -1857,7 +2104,7 @@ function cha_render_admin_page() {
     .cha-badge-patient { background:#EFF6FF; color:var(--cha-blue); } .cha-badge-patient::before { background:var(--cha-blue); }
     .cha-badge-caregiver { background:#CCFBF1; color:#0F766E; } .cha-badge-caregiver::before { background:var(--cha-teal); }
     .cha-badge-professional { background:#F3E8FF; color:var(--cha-purple); } .cha-badge-professional::before { background:var(--cha-purple); }
-    .cha-badge-supporter { background:#FEF3C7; color:var(--cha-amber); } .cha-badge-supporter::before { background:var(--cha-amber); }
+    .cha-badge-member { background:#FEF3C7; color:var(--cha-amber); } .cha-badge-member::before { background:var(--cha-amber); }
 
     /* Table */
     .cha-table-wrap { background:#fff; border:1px solid var(--cha-border); border-radius:16px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.02); }
@@ -1881,21 +2128,49 @@ function cha_render_admin_page() {
     .cha-empty .cha-empty-sub { font-size:0.8125rem; color:var(--cha-muted); margin-top:4px; }
 
     /* Edit Form Card */
-    .cha-edit-wrap { max-width:640px; }
-    .cha-edit-card { background:#fff; border:1px solid var(--cha-border); border-radius:16px; padding:28px 32px; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
-    .cha-edit-card h2 { font-size:1.125rem; font-weight:700; color:var(--cha-blue); margin:0 0 4px; display:flex; align-items:center; gap:10px; }
-    .cha-edit-card .cha-edit-sub { font-size:0.8125rem; color:var(--cha-muted); margin:0 0 20px; }
-    .cha-edit-card .cha-edit-section-title { font-size:0.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--cha-purple); margin:20px 0 12px; padding-bottom:6px; border-bottom:1px solid var(--cha-border); }
-    .cha-edit-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    @media (max-width:600px) { .cha-edit-grid { grid-template-columns:1fr; } }
-    .cha-edit-field { display:flex; flex-direction:column; gap:4px; }
-    .cha-edit-field.full { grid-column:1/-1; }
-    .cha-edit-field label { font-size:0.75rem; font-weight:600; color:var(--cha-text); }
-    .cha-edit-field input,.cha-edit-field select { padding:8px 12px; border:1.5px solid var(--cha-border); border-radius:8px; font-size:0.8125rem; transition:border-color 0.15s ease; background:#fff; }
-    .cha-edit-field input:focus,.cha-edit-field select:focus { border-color:var(--cha-blue); outline:none; box-shadow:0 0 0 3px rgba(11,29,109,0.08); }
-    .cha-edit-actions { display:flex; gap:10px; margin-top:24px; padding-top:16px; border-top:1px solid var(--cha-border); }
-    .cha-edit-actions .button-primary { background:var(--cha-blue); border-color:var(--cha-blue); }
-    .cha-edit-actions .button-primary:hover { background:#0a1a5e; }
+    .cha-edit-wrap { max-width:820px; margin:0 auto; }
+    .cha-edit-card { background:#fff; border:1px solid #E2E8F0; border-radius:20px; padding:36px 40px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.04), 0 8px 10px -6px rgba(0,0,0,0.02); }
+    @media (max-width:768px) { .cha-edit-card { padding:24px 20px; } }
+    .cha-edit-header { display:flex; align-items:center; gap:16px; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid #F1F5F9; }
+    .cha-edit-avatar { width:64px; height:76px; object-fit:cover; border-radius:12px; border:2px solid #E2E8F0; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); }
+    .cha-edit-avatar-placeholder { width:64px; height:76px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; color:#94A3B8; font-size:1.25rem; font-weight:700; background:#F8FAFC; border:2px dashed #CBD5E1; }
+    .cha-edit-title-block h2 { font-size:1.375rem; font-weight:700; color:var(--cha-blue); margin:0 0 6px; letter-spacing:-0.01em; display:flex; align-items:center; gap:10px; }
+    .cha-edit-sub { font-size:0.875rem; color:var(--cha-muted); margin:0; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .cha-id-tag { background:#EFF6FF; color:var(--cha-blue); padding:3px 10px; border-radius:6px; font-weight:700; font-size:0.8125rem; font-family:monospace; }
+    
+    .cha-section-box { background:#FAFCFF; border:1px solid #E2E8F0; border-radius:14px; padding:20px 24px; margin-bottom:24px; }
+    .cha-section-box-header { display:flex; align-items:center; gap:8px; margin-bottom:18px; }
+    .cha-section-box-icon { width:26px; height:26px; border-radius:8px; background:rgba(11,29,109,0.08); color:var(--cha-blue); display:flex; align-items:center; justify-content:center; }
+    .cha-section-box-title { font-size:0.875rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--cha-blue); margin:0; }
+    
+    .cha-role-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
+    @media (max-width:540px) { .cha-role-grid { grid-template-columns:1fr; } }
+    .cha-role-card { display:flex; align-items:flex-start; gap:14px; padding:16px 18px; border:2px solid #E2E8F0; border-radius:12px; cursor:pointer; transition:all 0.2s cubic-bezier(0.16,1,0.3,1); background:#fff; position:relative; }
+    .cha-role-card:hover { border-color:#CBD5E1; transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,0.03); }
+    .cha-role-card.is-selected { border-color:var(--cha-blue); background:#F8FAFF; box-shadow:0 4px 14px rgba(11,29,109,0.08); }
+    .cha-role-radio-custom { width:20px; height:20px; border-radius:50%; border:2px solid #CBD5E1; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; transition:all 0.2s ease; }
+    .cha-role-card.is-selected .cha-role-radio-custom { border-color:var(--cha-blue); }
+    .cha-role-radio-dot { width:10px; height:10px; border-radius:50%; background:var(--cha-blue); display:none; transition:all 0.2s ease; }
+    .cha-role-card.is-selected .cha-role-radio-dot { display:block; }
+    .cha-role-card-text strong { display:block; font-size:0.9375rem; color:#1E293B; margin-bottom:2px; }
+    .cha-role-card-text span { font-size:0.8125rem; color:#64748B; line-height:1.4; }
+
+    .cha-edit-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px 20px; }
+    @media (max-width:640px) { .cha-edit-grid-2 { grid-template-columns:1fr; } }
+    .cha-field-full { grid-column:1/-1; }
+    
+    .cha-edit-field { display:flex; flex-direction:column; gap:6px; }
+    .cha-edit-field label { font-size:0.8125rem; font-weight:600; color:#334155; display:flex; align-items:center; justify-content:space-between; }
+    .cha-edit-field .field-hint { font-size:0.75rem; font-weight:400; color:#94A3B8; }
+    .cha-edit-field input,.cha-edit-field select { width:100%; padding:10px 14px; border:1.5px solid #CBD5E1; border-radius:10px; font-size:0.875rem; color:#1E293B; background:#fff; transition:all 0.15s ease; box-sizing:border-box; }
+    .cha-edit-field input:focus,.cha-edit-field select:focus { border-color:var(--cha-blue); outline:none; box-shadow:0 0 0 4px rgba(11,29,109,0.08); background:#fff; }
+    .cha-edit-field input::placeholder { color:#94A3B8; }
+    
+    .cha-edit-actions { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:32px; padding-top:24px; border-top:1px solid #F1F5F9; }
+    .cha-btn-save-main { display:inline-flex; align-items:center; gap:8px; padding:12px 28px; border-radius:10px; font-size:0.875rem; font-weight:700; color:#fff !important; background:linear-gradient(135deg,#0B1D6D 0%,#183494 100%) !important; border:none !important; cursor:pointer; transition:all 0.2s ease; box-shadow:0 4px 14px rgba(11,29,109,0.25); text-decoration:none; }
+    .cha-btn-save-main:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(11,29,109,0.35); filter:brightness(1.05); }
+    .cha-btn-back-clean { display:inline-flex; align-items:center; gap:8px; padding:11px 20px; border-radius:10px; font-size:0.875rem; font-weight:600; color:#475569; background:#F8FAFC; border:1.5px solid #E2E8F0; text-decoration:none; transition:all 0.15s ease; }
+    .cha-btn-back-clean:hover { background:#F1F5F9; color:#0F172A; border-color:#CBD5E1; }
     .cha-role-tag { display:inline-flex; align-items:center; gap:6px; padding:4px 14px; border-radius:999px; font-size:0.8125rem; font-weight:600; }
 
     /* Modal */
@@ -2018,14 +2293,6 @@ function cha_render_admin_page() {
                 </div>
             </div>
             <div class="cha-header-actions">
-                <a href="<?php echo admin_url('admin.php?page=cha-members&donations=1'); ?>" class="cha-btn" style="background:#166534;color:#fff;border:1px solid rgba(255,255,255,0.1);" title="View donations">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    Donations
-                </a>
-                <a href="<?php echo admin_url('admin.php?page=cha-members&payway=1'); ?>" class="cha-btn" style="background:rgba(255,255,255,0.1);color:#fff;font-size:0.75rem;padding:7px 12px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.15);" title="PayWay Settings">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                    PayWay
-                </a>
                 <a href="<?php echo admin_url('admin.php?page=cha-members&smtp=1'); ?>" class="cha-btn" style="background:rgba(255,255,255,0.1);color:#fff;font-size:0.75rem;padding:7px 12px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.15);" title="SMTP Settings">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                     SMTP
@@ -2132,318 +2399,165 @@ function cha_render_admin_page() {
             $smtp = cha_get_smtp_settings();
         endif; ?>
 
-        <?php if (isset($_GET['payway'])): ?>
-            <?php $payway = cha_get_payway_settings(); ?>
-            <div class="cha-edit-wrap" style="max-width:700px;">
-                <div class="cha-edit-card">
-                    <h2>PayWay Settings (ABA)</h2>
-                    <p class="cha-edit-sub">Configure ABA PayWay payment gateway for online donations. Obtain these from your PayWay merchant dashboard.</p>
-                    <form method="post" action="admin.php?page=cha-members&payway=1">
-                        <?php wp_nonce_field('cha_save_payway', 'cha_payway_nonce'); ?>
-
-                        <div class="cha-smtp-section cha-smtp-blue">
-                            <div class="cha-smtp-header">
-                                <span class="cha-smtp-label">Gateway Connection</span>
-                                <label class="cha-smtp-toggle">
-                                    <input type="checkbox" name="payway_enabled" value="1" <?php checked($payway['enabled']); ?>>
-                                    <span class="cha-smtp-toggle-track"></span>
-                                    <span class="cha-smtp-toggle-text">Enable donations</span>
-                                </label>
-                            </div>
-                            <div class="cha-edit-grid">
-                                <div class="cha-edit-field"><label>Merchant ID</label><input type="text" name="payway_merchant_id" value="<?php echo esc_attr($payway['merchant_id']); ?>" placeholder="e.g. ec000002"></div>
-                                <div class="cha-edit-field"><label>Mode</label>
-                                    <select name="payway_mode">
-                                        <option value="sandbox" <?php selected($payway['mode'], 'sandbox'); ?>>Sandbox (testing)</option>
-                                        <option value="production" <?php selected($payway['mode'], 'production'); ?>>Production (live)</option>
-                                    </select>
-                                </div>
-                                <div class="cha-edit-field full"><label>API Key</label><div style="position:relative;"><input type="password" name="payway_api_key" id="payway_api_key" value="<?php echo esc_attr($payway['api_key']); ?>" style="padding-right:36px;width:100%;box-sizing:border-box;"><button type="button" onclick="var p=document.getElementById('payway_api_key');p.type=p.type==='password'?'text':'password';this.blur();" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
-                            </div>
-                        </div>
-
-                        <div class="cha-smtp-section cha-smtp-white">
-                            <div class="cha-smtp-header"><span class="cha-smtp-label">Setup Checklist</span></div>
-                            <ul style="margin:0;padding-left:18px;line-height:1.9;font-size:0.8125rem;color:#374151;">
-                                <li>Register for a PayWay sandbox account and receive your Merchant ID + API Key.</li>
-                                <li>Whitelist the domain <strong>chacambodia.org</strong> in your PayWay merchant profile (server calls + return URL).</li>
-                                <li>Sandbox endpoint is used automatically in Sandbox mode.</li>
-                            </ul>
-                        </div>
-
-                        <div class="cha-smtp-footer">
-                            <button type="button" id="cha-test-hash-btn" style="background:none;border:none;color:#64748b;font-size:0.8125rem;font-weight:600;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px;">
-                                Test API Key
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                            </button>
-                            <div style="display:flex;align-items:center;gap:12px;">
-                                <button type="submit" name="cha_update_payway" class="cha-btn" style="background:#166534;color:#fff;">Save Settings</button>
-                                <a href="admin.php?page=cha-members" class="cha-back-link" style="font-size:0.8125rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back</a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <script>
-            (function(){
-                var btn = document.getElementById('cha-test-hash-btn');
-                if (!btn) return;
-                var restUrl = <?php echo wp_json_encode(rest_url('cha/v1/')); ?>;
-                var nonce = <?php echo wp_json_encode(wp_create_nonce('wp_rest')); ?>;
-                btn.addEventListener('click', function(){
-                    var key = document.getElementById('payway_api_key');
-                    if (!key || !key.value) { alert('Enter an API key first.'); return; }
-                    btn.disabled = true;
-                    var orig = btn.innerHTML;
-                    btn.innerHTML = 'Testing...';
-                    fetch(restUrl + 'payway/test-hash', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': nonce },
-                        body: JSON.stringify({})
-                    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
-                      .then(function(res){
-                          if (res.ok && res.d.success) {
-                              alert('API key works. Sample hash: ' + res.d.sample_hash.slice(0, 24) + '...');
-                          } else {
-                              alert((res.d && res.d.message) || 'Test failed. Check the API key.');
-                          }
-                      }).catch(function(){ alert('Network error. Please try again.'); })
-                      .finally(function(){ btn.disabled = false; btn.innerHTML = orig; });
-                });
-            })();
-            </script>
-        <?php endif; ?>
-
-        <?php if (isset($_POST['cha_update_payway']) && current_user_can('manage_options')):
-            if (!isset($_POST['cha_payway_nonce']) || !wp_verify_nonce($_POST['cha_payway_nonce'], 'cha_save_payway')) {
-                wp_die('Security check failed.');
-            }
-            update_option('cha_payway_settings', array(
-                'merchant_id' => sanitize_text_field($_POST['payway_merchant_id'] ?? ''),
-                'api_key'     => sanitize_text_field($_POST['payway_api_key'] ?? ''),
-                'mode'        => ($_POST['payway_mode'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox',
-                'enabled'     => isset($_POST['payway_enabled']),
-            ));
-            echo '<div class="updated"><p>PayWay settings saved.</p></div>';
-        endif; ?>
-
-        <?php if (isset($_GET['donations'])): ?>
-            <?php
-            global $wpdb;
-            cha_ensure_donations_table();
-            $don_table = cha_get_donations_table();
-            $per_page = 10;
-            $current_page = max(1, intval($_GET['don_page'] ?? 1));
-            $offset = ($current_page - 1) * $per_page;
-            $total_rows = $wpdb->get_var("SELECT COUNT(*) FROM $don_table");
-            $total_pages = max(1, ceil($total_rows / $per_page));
-            if ($current_page > $total_pages) $current_page = $total_pages;
-            $offset = ($current_page - 1) * $per_page;
-            $don_rows = $wpdb->get_results($wpdb->prepare("SELECT * FROM $don_table ORDER BY created_at DESC LIMIT %d OFFSET %d", $per_page, $offset));
-            $totals = $wpdb->get_row("SELECT COUNT(*) AS total, COALESCE(SUM(CASE WHEN status='completed' THEN amount END),0) AS completed_sum, SUM(CASE WHEN status='completed' THEN 1 ELSE 0 END) AS completed_count FROM $don_table");
-            ?>
-            <div class="cha-edit-wrap" style="max-width:1100px;">
-                <div class="cha-edit-card">
-                    <h2>
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cha-red)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                        Donations
-                    </h2>
-                    <p class="cha-edit-sub">
-                        <?php echo (int) $totals->completed_count; ?> completed &bull; Total raised: <strong>$<?php echo esc_html(number_format((float) $totals->completed_sum, 2)); ?></strong> &bull; <?php echo (int) $totals->total; ?> transactions
-                    </p>
-                    <div style="display:flex;gap:10px;margin-bottom:20px;">
-                        <a href="admin.php?page=cha-members" class="cha-back-link" style="font-size:0.8125rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back to Members</a>
-                        <a href="admin.php?page=cha-members&donations=1&cha_don_export_csv=1" class="cha-btn" style="background:#166534;color:#fff;">Export CSV</a>
-                    </div>
-                    <?php if (empty($don_rows)): ?>
-                        <div class="cha-empty">
-                            <div class="cha-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-                            <p>No donations yet</p>
-                            <p class="cha-empty-sub">Donations will appear here once donors complete a PayWay checkout.</p>
-                        </div>
-                    <?php else: ?>
-                        <div class="cha-table-wrap">
-                            <table class="cha-table">
-                                <thead>
-                                    <tr>
-                                        <th>Receipt</th>
-                                        <th>Donor</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>APV</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <?php foreach ($don_rows as $d): ?>
-                                    <tr>
-                                        <td><div class="cha-id"><?php echo esc_html($d->tran_id); ?></div></td>
-                                        <td>
-                                            <div class="cha-name"><?php echo esc_html($d->name ?: '—'); ?></div>
-                                            <div class="cha-email"><?php echo esc_html($d->email ?: ''); ?></div>
-                                        </td>
-                                        <td style="font-weight:700;color:var(--cha-text);">$<?php echo esc_html(number_format((float) $d->amount, 2)); ?> <?php echo esc_html($d->currency); ?></td>
-                                        <td>
-                                            <?php
-                                            $st = $d->status;
-                                            $bg = $st === 'completed' ? '#ECFDF5' : ($st === 'pending' ? '#FEF3C7' : '#FEF2F2');
-                                            $fg = $st === 'completed' ? '#166534' : ($st === 'pending' ? '#92400E' : '#991B1B');
-                                            ?>
-                                            <span class="cha-badge" style="background:<?php echo $bg; ?>;color:<?php echo $fg; ?>;"><?php echo esc_html(ucfirst($st)); ?></span>
-                                        </td>
-                                        <td style="font-size:0.75rem;color:var(--cha-muted);"><?php echo esc_html($d->apv ?: '—'); ?></td>
-                                        <td><span class="cha-registered"><?php echo esc_html($d->created_at ?: '—'); ?></span></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <?php if ($total_pages > 1): ?>
-                        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;flex-wrap:wrap;">
-                            <?php if ($current_page > 1): ?>
-                                <a href="admin.php?page=cha-members&donations=1&don_page=<?php echo $current_page - 1; ?>" class="cha-btn" style="padding:6px 14px;font-size:0.8125rem;">← Prev</a>
-                            <?php endif; ?>
-                            <?php
-                            $start_page = max(1, $current_page - 2);
-                            $end_page = min($total_pages, $current_page + 2);
-                            if ($start_page > 1): ?>
-                                <a href="admin.php?page=cha-members&donations=1&don_page=1" class="cha-btn" style="padding:6px 12px;font-size:0.8125rem;<?php echo $current_page === 1 ? 'background:#0B1D6D;color:#fff;' : '' ?>">1</a>
-                                <?php if ($start_page > 2): ?><span style="color:#9CA3AF;padding:0 4px;">…</span><?php endif; ?>
-                            <?php endif; ?>
-                            <?php for ($p = $start_page; $p <= $end_page; $p++): ?>
-                                <a href="admin.php?page=cha-members&donations=1&don_page=<?php echo $p; ?>" class="cha-btn" style="padding:6px 12px;font-size:0.8125rem;<?php echo $p === $current_page ? 'background:#0B1D6D;color:#fff;' : '' ?>"><?php echo $p; ?></a>
-                            <?php endfor; ?>
-                            <?php if ($end_page < $total_pages): ?>
-                                <?php if ($end_page < $total_pages - 1): ?><span style="color:#9CA3AF;padding:0 4px;">…</span><?php endif; ?>
-                                <a href="admin.php?page=cha-members&donations=1&don_page=<?php echo $total_pages; ?>" class="cha-btn" style="padding:6px 12px;font-size:0.8125rem;<?php echo $current_page === $total_pages ? 'background:#0B1D6D;color:#fff;' : '' ?>"><?php echo $total_pages; ?></a>
-                            <?php endif; ?>
-                            <?php if ($current_page < $total_pages): ?>
-                                <a href="admin.php?page=cha-members&donations=1&don_page=<?php echo $current_page + 1; ?>" class="cha-btn" style="padding:6px 14px;font-size:0.8125rem;">Next →</a>
-                            <?php endif; ?>
-                        </div>
-                        <p style="text-align:center;font-size:0.75rem;color:#9CA3AF;margin-top:8px;">Page <?php echo $current_page; ?> of <?php echo $total_pages; ?> (<?php echo $total_rows; ?> total)</p>
-                        <?php endif; ?>
-                    <?php endif; ?>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <?php if (isset($_GET['cha_don_export_csv']) && current_user_can('manage_options')): ?>
-            <?php
-            global $wpdb;
-            cha_ensure_donations_table();
-            $don_table = cha_get_donations_table();
-            $rows_d = $wpdb->get_results("SELECT * FROM $don_table ORDER BY created_at DESC");
-            header('Content-Type: text/csv; charset=utf-8');
-            header('Content-Disposition: attachment; filename=cha-donations-' . date('Y-m-d') . '.csv');
-            $out = fopen('php://output', 'w');
-            fputcsv($out, array('Receipt', 'Donor', 'Email', 'Phone', 'Amount', 'Currency', 'Status', 'APV', 'Date'));
-            foreach ($rows_d as $d) {
-                fputcsv($out, array($d->tran_id, $d->name, $d->email, $d->phone, $d->amount, $d->currency, $d->status, $d->apv, $d->created_at));
-            }
-            fclose($out);
-            exit;
-            ?>
-        <?php endif; ?>
-
         <?php if ($editing && $edit_member): ?>
             <div class="cha-edit-wrap">
                 <div class="cha-edit-card">
-                    <h2>
+                    <div class="cha-edit-header">
                         <?php if (!empty($edit_member['photo'])): ?>
-                            <img src="<?php echo esc_url($edit_member['photo']); ?>" alt="<?php echo esc_attr($edit_member['name'] ?? 'Member'); ?>" style="width:40px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--cha-border);">
+                            <img src="<?php echo esc_url($edit_member['photo']); ?>" alt="<?php echo esc_attr($edit_member['name'] ?? 'Member'); ?>" class="cha-edit-avatar">
                         <?php else: ?>
-                            <span style="width:40px;height:52px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:0.875rem;font-weight:700;background:#F3F4F6;">?</span>
+                            <div class="cha-edit-avatar-placeholder">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
                         <?php endif; ?>
-                        Edit <?php echo esc_html($edit_member['name']); ?>
-                    </h2>
-                    <p class="cha-edit-sub">
-                        Member ID: <strong><?php echo esc_html($edit_member['memberId'] ?? '—'); ?></strong>
-                        &middot; Joined <?php echo esc_html($edit_member['memberSince'] ?? '—'); ?>
-                    </p>
+                        <div class="cha-edit-title-block">
+                            <h2>Edit Member &middot; <?php echo esc_html($edit_member['name']); ?></h2>
+                            <p class="cha-edit-sub">
+                                <span>ID: <strong class="cha-id-tag"><?php echo esc_html($edit_member['memberId'] ?? '—'); ?></strong></span>
+                                <span>&bull;</span>
+                                <span>Joined <?php echo esc_html($edit_member['memberSince'] ?? '—'); ?></span>
+                                <?php if (($edit_member['status'] ?? '') === 'active'): ?>
+                                    <span style="background:#ECFDF5;color:#166534;font-size:0.75rem;padding:2px 8px;border-radius:999px;font-weight:700;">Active</span>
+                                <?php else: ?>
+                                    <span style="background:#FFFBEB;color:#B45309;font-size:0.75rem;padding:2px 8px;border-radius:999px;font-weight:700;">Pending</span>
+                                <?php endif; ?>
+                            </p>
+                        </div>
+                    </div>
+
                     <form method="post" action="admin.php?page=cha-members">
                         <?php wp_nonce_field('cha_edit_member', 'cha_edit_nonce'); ?>
                         <input type="hidden" name="member_id" value="<?php echo esc_attr($edit_member['memberId']); ?>">
 
                         <?php
-                        $current_role = $edit_member['role'] ?? 'Supporter';
+                        $current_role = $edit_member['role'] ?? 'Member';
                         $is_patient = ($current_role === 'Patient');
                         ?>
-                        <div class="cha-edit-section-title">I am a</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-                            <label class="cha-role-option" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid <?php echo !$is_patient ? 'var(--cha-blue)' : 'var(--cha-muted)'; ?>;border-radius:8px;cursor:pointer;transition:all 0.2s;background:<?php echo !$is_patient ? 'rgba(11,29,109,0.04)' : 'transparent'; ?>">
-                                <input type="radio" name="role" value="Supporter" <?php echo !$is_patient ? 'checked' : ''; ?> style="display:none">
-                                <span style="width:20px;height:20px;border-radius:50%;border:2px solid <?php echo !$is_patient ? 'var(--cha-blue)' : 'var(--cha-muted)'; ?>;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="width:10px;height:10px;border-radius:50%;background:var(--cha-blue);display:<?php echo !$is_patient ? 'block' : 'none'; ?>;transition:all 0.2s"></span></span>
-                                <span><strong style="display:block;font-size:0.875rem">Member</strong><span style="font-size:0.75rem;color:var(--cha-muted)">Supporter / Family</span></span>
-                            </label>
-                            <label class="cha-role-option" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid <?php echo $is_patient ? 'var(--cha-blue)' : 'var(--cha-muted)'; ?>;border-radius:8px;cursor:pointer;transition:all 0.2s;background:<?php echo $is_patient ? 'rgba(11,29,109,0.04)' : 'transparent'; ?>">
-                                <input type="radio" name="role" value="Patient" <?php echo $is_patient ? 'checked' : ''; ?> style="display:none">
-                                <span style="width:20px;height:20px;border-radius:50%;border:2px solid <?php echo $is_patient ? 'var(--cha-blue)' : 'var(--cha-muted)'; ?>;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="width:10px;height:10px;border-radius:50%;background:var(--cha-blue);display:<?php echo $is_patient ? 'block' : 'none'; ?>;transition:all 0.2s"></span></span>
-                                <span><strong style="display:block;font-size:0.875rem">Patient</strong><span style="font-size:0.75rem;color:var(--cha-muted)">I have a bleeding disorder</span></span>
-                            </label>
+
+                        <!-- Role Section -->
+                        <div class="cha-section-box">
+                            <div class="cha-section-box-header">
+                                <div class="cha-section-box-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                </div>
+                                <h3 class="cha-section-box-title">Membership Category</h3>
+                            </div>
+                            <div class="cha-role-grid">
+                                <label class="cha-role-card <?php echo !$is_patient ? 'is-selected' : ''; ?>" data-role-card="Member">
+                                    <input type="radio" name="role" value="Member" <?php echo !$is_patient ? 'checked' : ''; ?> style="display:none">
+                                    <div class="cha-role-radio-custom">
+                                        <div class="cha-role-radio-dot"></div>
+                                    </div>
+                                    <div class="cha-role-card-text">
+                                        <strong>General Member</strong>
+                                        <span>Supporter, family member, or community advocate</span>
+                                    </div>
+                                </label>
+                                <label class="cha-role-card <?php echo $is_patient ? 'is-selected' : ''; ?>" data-role-card="Patient">
+                                    <input type="radio" name="role" value="Patient" <?php echo $is_patient ? 'checked' : ''; ?> style="display:none">
+                                    <div class="cha-role-radio-custom">
+                                        <div class="cha-role-radio-dot"></div>
+                                    </div>
+                                    <div class="cha-role-card-text">
+                                        <strong>Patient</strong>
+                                        <span>Diagnosed with haemophilia or bleeding disorder</span>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
 
-                        <div class="cha-edit-section-title">Information</div>
-                        <div style="display:flex;flex-direction:column;gap:16px">
-                            <div class="cha-edit-field"><label for="name" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Full name <span style="color:red">*</span></label><input type="text" id="name" name="name" value="<?php echo esc_attr($edit_member['name'] ?? ''); ?>" placeholder="Enter your full name" required style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                            <div class="cha-edit-field"><label for="email" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Email address <span style="color:red">*</span></label><input type="email" id="email" name="email" value="<?php echo esc_attr($edit_member['email'] ?? ''); ?>" placeholder="Enter your email" required style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                            <div class="cha-edit-field"><label for="new_password" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">New Password</label><input type="password" id="new_password" name="new_password" placeholder="Leave blank to keep current" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                            <div class="cha-edit-field"><label for="phone" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Phone number</label><input type="tel" id="phone" name="phone" value="<?php echo esc_attr($edit_member['phone'] ?? ''); ?>" placeholder="Enter your phone number" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                            <div class="cha-edit-field"><label for="address" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Address</label><input type="text" id="address" name="address" value="<?php echo esc_attr($edit_member['address'] ?? ''); ?>" placeholder="Enter your address" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
+                        <!-- General Information Section -->
+                        <div class="cha-section-box">
+                            <div class="cha-section-box-header">
+                                <div class="cha-section-box-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <h3 class="cha-section-box-title">General Information</h3>
+                            </div>
+                            <div class="cha-edit-grid-2">
+                                <div class="cha-edit-field">
+                                    <label for="name">Full Name (English) <span style="color:#DC2626">*</span></label>
+                                    <input type="text" id="name" name="name" value="<?php echo esc_attr($edit_member['name'] ?? ''); ?>" placeholder="e.g. John Doe" required>
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label for="name_khmer">ឈ្មោះខ្មែរ (Khmer Name)</label>
+                                    <input type="text" id="name_khmer" name="name_khmer" value="<?php echo esc_attr($edit_member['nameKhmer'] ?? ''); ?>" placeholder="ឧ. ចន ដូ">
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label for="email">Email Address <span style="color:#DC2626">*</span></label>
+                                    <input type="email" id="email" name="email" value="<?php echo esc_attr($edit_member['email'] ?? ''); ?>" placeholder="name@example.com" required>
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" value="<?php echo esc_attr($edit_member['phone'] ?? ''); ?>" placeholder="+855 12 345 678">
+                                </div>
+                                <div class="cha-edit-field cha-field-full">
+                                    <label for="address">Address</label>
+                                    <input type="text" id="address" name="address" value="<?php echo esc_attr($edit_member['address'] ?? ''); ?>" placeholder="House #, Street, Sangkat, Khan, Province">
+                                </div>
+                                <div class="cha-edit-field cha-field-full">
+                                    <label for="new_password">New Password <span class="field-hint">Leave blank to keep existing password</span></label>
+                                    <input type="password" id="new_password" name="new_password" placeholder="Enter new password (optional)">
+                                </div>
+                            </div>
                         </div>
 
-                        <div id="admin-patient-fields" style="display:<?php echo $is_patient ? 'block' : 'none' ?>;margin-top:20px">
-                            <div class="cha-edit-section-title">Patient Details</div>
-                            <div style="display:flex;flex-direction:column;gap:16px">
-                                <div class="cha-edit-field"><label for="dob" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Date of birth</label><input type="text" id="dob" name="dob" value="<?php echo esc_attr($edit_member['dob'] ?? ''); ?>" placeholder="dd/mm/yyyy" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                                <div class="cha-edit-field"><label for="condition" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Condition</label><input type="text" id="condition" name="condition" value="<?php echo esc_attr($edit_member['condition'] ?? ''); ?>" placeholder="e.g. Hemophilia A" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                                <div class="cha-edit-field"><label for="bloodType" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Blood type</label>
-                                    <select id="bloodType" name="bloodType" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem">
+                        <!-- Patient Details (Conditional) -->
+                        <div id="admin-patient-fields" class="cha-section-box" style="display:<?php echo $is_patient ? 'block' : 'none' ?>;">
+                            <div class="cha-section-box-header">
+                                <div class="cha-section-box-icon" style="background:rgba(227,30,36,0.1);color:var(--cha-red);">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                                </div>
+                                <h3 class="cha-section-box-title" style="color:var(--cha-red);">Medical &amp; Patient Details</h3>
+                            </div>
+                            <div class="cha-edit-grid-2">
+                                <div class="cha-edit-field">
+                                    <label for="dob">Date of Birth</label>
+                                    <input type="text" id="dob" name="dob" value="<?php echo esc_attr($edit_member['dob'] ?? ''); ?>" placeholder="DD/MM/YYYY">
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label for="bloodType">Blood Type</label>
+                                    <select id="bloodType" name="bloodType">
                                         <option value="">Select blood type</option>
                                         <?php foreach (array('A+','A-','B+','B-','AB+','AB-','O+','O-') as $bt): ?>
                                             <option value="<?php echo $bt; ?>" <?php echo ($edit_member['bloodType'] ?? '') === $bt ? 'selected' : ''; ?>><?php echo $bt; ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
+                                <div class="cha-edit-field cha-field-full">
+                                    <label for="condition">Diagnosed Bleeding Condition</label>
+                                    <input type="text" id="condition" name="condition" value="<?php echo esc_attr($edit_member['condition'] ?? ''); ?>" placeholder="e.g. Severe Hemophilia A, Factor IX Deficiency">
+                                </div>
                             </div>
                         </div>
 
-                        <div class="cha-edit-actions" style="margin-top:20px">
-                            <input type="submit" name="cha_update_member" class="button button-primary cha-btn-save" value="Save Changes">
-                            <a href="admin.php?page=cha-members" class="cha-back-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back to Members</a>
+                        <!-- Form Actions -->
+                        <div class="cha-edit-actions">
+                            <a href="admin.php?page=cha-members" class="cha-btn-back-clean">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                                Back to Member List
+                            </a>
+                            <button type="submit" name="cha_update_member" class="cha-btn-save-main">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                Save Changes
+                            </button>
                         </div>
                     </form>
+
                     <script>
                     (function() {
-                        var roles = document.querySelectorAll('input[name="role"]');
                         var patientFields = document.getElementById('admin-patient-fields');
-                        var options = document.querySelectorAll('.cha-role-option');
-                        function updateRoleUI() {
-                            var isPatient = document.querySelector('input[name="role"]:checked').value === 'Patient';
-                            if (patientFields) patientFields.style.display = isPatient ? 'block' : 'none';
-                            options.forEach(function(opt) {
-                                var radio = opt.querySelector('input[type="radio"]');
-                                var dot = opt.querySelector('span > span');
-                                var ring = opt.querySelector('span');
-                                if (radio.value === 'Patient') {
-                                    ring.style.borderColor = isPatient ? 'var(--cha-blue)' : 'var(--cha-muted)';
-                                    ring.style.background = isPatient ? 'rgba(11,29,109,0.04)' : 'transparent';
-                                    ring.style.border = '2px solid ' + (isPatient ? 'var(--cha-blue)' : 'var(--cha-muted)');
-                                    if (dot) dot.style.display = isPatient ? 'block' : 'none';
-                                } else {
-                                    ring.style.borderColor = !isPatient ? 'var(--cha-blue)' : 'var(--cha-muted)';
-                                    ring.style.background = !isPatient ? 'rgba(11,29,109,0.04)' : 'transparent';
-                                    ring.style.border = '2px solid ' + (!isPatient ? 'var(--cha-blue)' : 'var(--cha-muted)');
-                                    if (dot) dot.style.display = !isPatient ? 'block' : 'none';
+                        var cards = document.querySelectorAll('.cha-role-card');
+                        cards.forEach(function(card) {
+                            card.addEventListener('click', function() {
+                                cards.forEach(function(c) { c.classList.remove('is-selected'); });
+                                card.classList.add('is-selected');
+                                var radio = card.querySelector('input[type="radio"]');
+                                if (radio) {
+                                    radio.checked = true;
+                                    var isPatient = (radio.value === 'Patient');
+                                    if (patientFields) patientFields.style.display = isPatient ? 'block' : 'none';
                                 }
-                            });
-                        }
-                        roles.forEach(function(r) { r.addEventListener('change', updateRoleUI); });
-                        options.forEach(function(opt) {
-                            opt.addEventListener('click', function() {
-                                var radio = opt.querySelector('input[type="radio"]');
-                                if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change')); }
                             });
                         });
                     })();
@@ -2453,87 +2567,143 @@ function cha_render_admin_page() {
         <?php elseif ($adding): ?>
             <div class="cha-edit-wrap">
                 <div class="cha-edit-card">
-                    <h2>
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cha-blue)"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Add New Member
-                    </h2>
-                    <p class="cha-edit-sub">Fill in the details below to create a new member.</p>
+                    <div class="cha-edit-header">
+                        <div class="cha-edit-avatar-placeholder" style="background:#EFF6FF;border-color:#BFDBFE;color:var(--cha-blue);">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </div>
+                        <div class="cha-edit-title-block">
+                            <h2>Add New Member</h2>
+                            <p class="cha-edit-sub">Enter member profile details and assign their membership tier.</p>
+                        </div>
+                    </div>
+
                     <form method="post" action="admin.php?page=cha-members&add=1">
                         <?php wp_nonce_field('cha_edit_member', 'cha_edit_nonce'); ?>
-                        <div class="cha-edit-section-title">I am a</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-                            <label class="cha-role-option" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid var(--cha-blue);border-radius:8px;cursor:pointer;transition:all 0.2s;background:rgba(11,29,109,0.04)">
-                                <input type="radio" name="role" value="Supporter" checked style="display:none">
-                                <span style="width:20px;height:20px;border-radius:50%;border:2px solid var(--cha-blue);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="width:10px;height:10px;border-radius:50%;background:var(--cha-blue);display:block;transition:all 0.2s"></span></span>
-                                <span><strong style="display:block;font-size:0.875rem">Member</strong><span style="font-size:0.75rem;color:var(--cha-muted)">Supporter / Family</span></span>
-                            </label>
-                            <label class="cha-role-option" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid var(--cha-muted);border-radius:8px;cursor:pointer;transition:all 0.2s;background:transparent">
-                                <input type="radio" name="role" value="Patient" style="display:none">
-                                <span style="width:20px;height:20px;border-radius:50%;border:2px solid var(--cha-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="width:10px;height:10px;border-radius:50%;background:var(--cha-blue);display:none;transition:all 0.2s"></span></span>
-                                <span><strong style="display:block;font-size:0.875rem">Patient</strong><span style="font-size:0.75rem;color:var(--cha-muted)">I have a bleeding disorder</span></span>
-                            </label>
+
+                        <!-- Role Section -->
+                        <div class="cha-section-box">
+                            <div class="cha-section-box-header">
+                                <div class="cha-section-box-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                </div>
+                                <h3 class="cha-section-box-title">Membership Category</h3>
+                            </div>
+                            <div class="cha-role-grid">
+                                <label class="cha-role-card is-selected" data-role-card="Member">
+                                    <input type="radio" name="role" value="Member" checked style="display:none">
+                                    <div class="cha-role-radio-custom">
+                                        <div class="cha-role-radio-dot"></div>
+                                    </div>
+                                    <div class="cha-role-card-text">
+                                        <strong>General Member</strong>
+                                        <span>Supporter, family member, or community advocate</span>
+                                    </div>
+                                </label>
+                                <label class="cha-role-card" data-role-card="Patient">
+                                    <input type="radio" name="role" value="Patient" style="display:none">
+                                    <div class="cha-role-radio-custom">
+                                        <div class="cha-role-radio-dot"></div>
+                                    </div>
+                                    <div class="cha-role-card-text">
+                                        <strong>Patient</strong>
+                                        <span>Diagnosed with haemophilia or bleeding disorder</span>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
 
-                        <div class="cha-edit-section-title">Information</div>
-                        <div style="display:flex;flex-direction:column;gap:16px">
-                            <div class="cha-edit-field"><label for="add-name" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Full name <span style="color:red">*</span></label><input type="text" id="add-name" name="name" value="<?php echo esc_attr($add_form_name ?? ''); ?>" placeholder="Enter full name" required style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                            <div class="cha-edit-field"><label for="add-email" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Email address <span style="color:red">*</span></label><input type="email" id="add-email" name="email" value="<?php echo esc_attr($add_form_email ?? ''); ?>" placeholder="Enter your email" required style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                            <div class="cha-edit-field"><label for="add-password" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Password</label><input type="password" id="add-password" name="new_password" placeholder="Leave blank to auto-generate" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                            <div class="cha-edit-field"><label for="add-phone" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Phone number</label><input type="tel" id="add-phone" name="phone" value="<?php echo esc_attr($add_form_phone ?? ''); ?>" placeholder="Enter your phone number" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                            <div class="cha-edit-field"><label for="add-address" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Address</label><input type="text" id="add-address" name="address" value="<?php echo esc_attr($add_form_address ?? ''); ?>" placeholder="Enter your address" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
+                        <!-- General Information Section -->
+                        <div class="cha-section-box">
+                            <div class="cha-section-box-header">
+                                <div class="cha-section-box-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <h3 class="cha-section-box-title">General Information</h3>
+                            </div>
+                            <div class="cha-edit-grid-2">
+                                <div class="cha-edit-field">
+                                    <label for="add-name">Full Name (English) <span style="color:#DC2626">*</span></label>
+                                    <input type="text" id="add-name" name="name" value="<?php echo esc_attr($add_form_name ?? ''); ?>" placeholder="e.g. John Doe" required>
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label for="add-name_khmer">ឈ្មោះខ្មែរ (Khmer Name)</label>
+                                    <input type="text" id="add-name_khmer" name="name_khmer" placeholder="ឧ. ចន ដូ">
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label for="add-email">Email Address <span style="color:#DC2626">*</span></label>
+                                    <input type="email" id="add-email" name="email" value="<?php echo esc_attr($add_form_email ?? ''); ?>" placeholder="name@example.com" required>
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label for="add-phone">Phone Number</label>
+                                    <input type="tel" id="add-phone" name="phone" value="<?php echo esc_attr($add_form_phone ?? ''); ?>" placeholder="+855 12 345 678">
+                                </div>
+                                <div class="cha-edit-field cha-field-full">
+                                    <label for="add-address">Address</label>
+                                    <input type="text" id="add-address" name="address" value="<?php echo esc_attr($add_form_address ?? ''); ?>" placeholder="House #, Street, Sangkat, Khan, Province">
+                                </div>
+                                <div class="cha-edit-field cha-field-full">
+                                    <label for="add-password">Password <span class="field-hint">Leave blank to auto-generate a secure password</span></label>
+                                    <input type="password" id="add-password" name="new_password" placeholder="Create password (optional)">
+                                </div>
+                            </div>
                         </div>
 
-                        <div id="admin-add-patient-fields" style="display:none;margin-top:20px">
-                            <div class="cha-edit-section-title">Patient Details</div>
-                            <div style="display:flex;flex-direction:column;gap:16px">
-                                <div class="cha-edit-field"><label for="add-dob" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Date of birth</label><input type="text" id="add-dob" name="dob" placeholder="dd/mm/yyyy" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                                <div class="cha-edit-field"><label for="add-condition" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Condition</label><input type="text" id="add-condition" name="condition" placeholder="e.g. Hemophilia A" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem"></div>
-                                <div class="cha-edit-field"><label for="add-bloodType" style="display:block;margin-bottom:4px;font-size:0.875rem;font-weight:600;color:#333">Blood type</label>
-                                    <select id="add-bloodType" name="bloodType" style="width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.875rem">
+                        <!-- Patient Details (Conditional) -->
+                        <div id="admin-add-patient-fields" class="cha-section-box" style="display:none;">
+                            <div class="cha-section-box-header">
+                                <div class="cha-section-box-icon" style="background:rgba(227,30,36,0.1);color:var(--cha-red);">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                                </div>
+                                <h3 class="cha-section-box-title" style="color:var(--cha-red);">Medical &amp; Patient Details</h3>
+                            </div>
+                            <div class="cha-edit-grid-2">
+                                <div class="cha-edit-field">
+                                    <label for="add-dob">Date of Birth</label>
+                                    <input type="text" id="add-dob" name="dob" placeholder="DD/MM/YYYY">
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label for="add-bloodType">Blood Type</label>
+                                    <select id="add-bloodType" name="bloodType">
                                         <option value="">Select blood type</option>
                                         <?php foreach (array('A+','A-','B+','B-','AB+','AB-','O+','O-') as $bt): ?>
                                             <option value="<?php echo $bt; ?>"><?php echo $bt; ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
+                                <div class="cha-edit-field cha-field-full">
+                                    <label for="add-condition">Diagnosed Bleeding Condition</label>
+                                    <input type="text" id="add-condition" name="condition" placeholder="e.g. Severe Hemophilia A, Factor IX Deficiency">
+                                </div>
                             </div>
                         </div>
 
-                        <div class="cha-edit-actions" style="margin-top:20px">
-                            <input type="submit" name="cha_add_member" class="button button-primary cha-btn-save" value="Create Member">
-                            <a href="admin.php?page=cha-members" class="cha-back-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back to Members</a>
+                        <!-- Form Actions -->
+                        <div class="cha-edit-actions">
+                            <a href="admin.php?page=cha-members" class="cha-btn-back-clean">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                                Back to Member List
+                            </a>
+                            <button type="submit" name="cha_add_member" class="cha-btn-save-main">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Create Member
+                            </button>
                         </div>
                     </form>
+
                     <script>
                     (function() {
-                        var roles = document.querySelectorAll('input[name="role"]');
                         var patientFields = document.getElementById('admin-add-patient-fields');
-                        var options = document.querySelectorAll('.cha-role-option');
-                        function updateRoleUI() {
-                            var isPatient = document.querySelector('input[name="role"]:checked').value === 'Patient';
-                            if (patientFields) patientFields.style.display = isPatient ? 'block' : 'none';
-                            options.forEach(function(opt) {
-                                var radio = opt.querySelector('input[type="radio"]');
-                                var dot = opt.querySelector('span > span');
-                                var ring = opt.querySelector('span');
-                                if (radio.value === 'Patient') {
-                                    ring.style.borderColor = isPatient ? 'var(--cha-blue)' : 'var(--cha-muted)';
-                                    ring.style.background = isPatient ? 'rgba(11,29,109,0.04)' : 'transparent';
-                                    ring.style.border = '2px solid ' + (isPatient ? 'var(--cha-blue)' : 'var(--cha-muted)');
-                                    if (dot) dot.style.display = isPatient ? 'block' : 'none';
-                                } else {
-                                    ring.style.borderColor = !isPatient ? 'var(--cha-blue)' : 'var(--cha-muted)';
-                                    ring.style.background = !isPatient ? 'rgba(11,29,109,0.04)' : 'transparent';
-                                    ring.style.border = '2px solid ' + (!isPatient ? 'var(--cha-blue)' : 'var(--cha-muted)');
-                                    if (dot) dot.style.display = !isPatient ? 'block' : 'none';
+                        var cards = document.querySelectorAll('.cha-role-card');
+                        cards.forEach(function(card) {
+                            card.addEventListener('click', function() {
+                                cards.forEach(function(c) { c.classList.remove('is-selected'); });
+                                card.classList.add('is-selected');
+                                var radio = card.querySelector('input[type="radio"]');
+                                if (radio) {
+                                    radio.checked = true;
+                                    var isPatient = (radio.value === 'Patient');
+                                    if (patientFields) patientFields.style.display = isPatient ? 'block' : 'none';
                                 }
-                            });
-                        }
-                        roles.forEach(function(r) { r.addEventListener('change', updateRoleUI); });
-                        options.forEach(function(opt) {
-                            opt.addEventListener('click', function() {
-                                var radio = opt.querySelector('input[type="radio"]');
-                                if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change')); }
                             });
                         });
                     })();
@@ -2609,6 +2779,9 @@ function cha_render_admin_page() {
                                         <?php endif; ?>
                                         <?php echo esc_html($rm['name'] ?? '—'); ?>
                                     </div>
+                                    <?php if (!empty($rm['nameKhmer'])): ?>
+                                        <div class="cha-name" style="font-size:0.75rem;color:#64748B;margin-top:2px;"><?php echo esc_html($rm['nameKhmer']); ?></div>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <div class="cha-email"><?php echo esc_html($rm['email'] ?? '—'); ?></div>
@@ -2621,7 +2794,7 @@ function cha_render_admin_page() {
                                     if ($rl === 'Patient') { $badge_class = 'cha-badge-patient'; $badge_text = 'Patient'; }
                                     elseif ($rl === 'Family member / Caregiver') { $badge_class = 'cha-badge-caregiver'; $badge_text = 'Caregiver'; }
                                     elseif ($rl === 'Healthcare professional') { $badge_class = 'cha-badge-professional'; $badge_text = 'Healthcare Prof.'; }
-                                    elseif ($rl === 'Supporter') { $badge_class = 'cha-badge-supporter'; $badge_text = 'Supporter'; }
+                                    elseif ($rl === 'Member') { $badge_class = 'cha-badge-member'; $badge_text = 'Member'; }
                                     ?>
                                     <span class="cha-badge <?php echo esc_attr($badge_class); ?>"><?php echo esc_html($badge_text); ?></span>
                                 </td>
@@ -2655,6 +2828,372 @@ function cha_render_admin_page() {
                 <?php endif; ?>
             <?php endif; ?>
         <?php endif; ?>
+    </div>
+    <?php
+}
+
+function cha_render_donations_page() {
+    // Handle PayWay settings save
+    if (isset($_POST['cha_update_payway']) && current_user_can('manage_options')) {
+        if (!isset($_POST['cha_payway_nonce']) || !wp_verify_nonce($_POST['cha_payway_nonce'], 'cha_save_payway')) {
+            wp_die('Security check failed.');
+        }
+        update_option('cha_payway_settings', array(
+            'sandbox_merchant_id'    => sanitize_text_field($_POST['payway_sandbox_merchant_id'] ?? ''),
+            'sandbox_api_key'        => sanitize_text_field($_POST['payway_sandbox_api_key'] ?? ''),
+            'production_merchant_id' => sanitize_text_field($_POST['payway_production_merchant_id'] ?? ''),
+            'production_api_key'     => sanitize_text_field($_POST['payway_production_api_key'] ?? ''),
+            'mode'                   => ($_POST['payway_mode'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox',
+            'enabled'                => isset($_POST['payway_enabled']),
+        ));
+        echo '<div class="updated"><p>PayWay settings saved.</p></div>';
+    }
+
+    // Handle CSV export
+    if (isset($_GET['cha_don_export_csv']) && current_user_can('manage_options')) {
+        global $wpdb;
+        cha_ensure_donations_table();
+        $don_table = cha_get_donations_table();
+        $rows_d = $wpdb->get_results("SELECT * FROM $don_table ORDER BY created_at DESC");
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=cha-donations-' . date('Y-m-d') . '.csv');
+        $out = fopen('php://output', 'w');
+        fputcsv($out, array('Receipt', 'Donor', 'Email', 'Phone', 'Amount', 'Currency', 'Status', 'APV', 'Date'));
+        foreach ($rows_d as $d) {
+            fputcsv($out, array($d->tran_id, $d->name, $d->email, $d->phone, $d->amount, $d->currency, $d->status, $d->apv, $d->created_at));
+        }
+        fclose($out);
+        exit;
+    }
+
+    global $wpdb;
+    cha_ensure_donations_table();
+    $don_table = cha_get_donations_table();
+
+    // Auto-delete pending donations older than 12 hours
+    $wpdb->query("DELETE FROM $don_table WHERE status = 'pending' AND created_at < DATE_SUB(NOW(), INTERVAL 12 HOUR)");
+
+    // Migrate old-format receipt IDs (CHA260910...) to short format (CHA-2609-XXXX)
+    $old_ids = $wpdb->get_col("SELECT tran_id FROM $don_table WHERE tran_id REGEXP '^CHA[0-9]{14,}'");
+    if (!empty($old_ids)) {
+        foreach ($old_ids as $old_id) {
+            $parts = array();
+            if (preg_match('/^CHA(\d{2})(\d{2})\d{10}(\d{4})$/', $old_id, $parts)) {
+                $new_id = 'CHA-' . $parts[1] . $parts[2] . '-' . $parts[3];
+                $wpdb->query($wpdb->prepare("UPDATE $don_table SET tran_id = %s WHERE tran_id = %s", $new_id, $old_id));
+            }
+        }
+    }
+
+    $per_page = 10;
+    $current_page = max(1, intval($_GET['don_page'] ?? 1));
+    $total_rows = $wpdb->get_var("SELECT COUNT(*) FROM $don_table");
+    $total_pages = max(1, ceil($total_rows / $per_page));
+    if ($current_page > $total_pages) $current_page = $total_pages;
+    $offset = ($current_page - 1) * $per_page;
+    $don_rows = $wpdb->get_results($wpdb->prepare("SELECT * FROM $don_table ORDER BY created_at DESC LIMIT %d OFFSET %d", $per_page, $offset));
+    $totals = $wpdb->get_row("SELECT COUNT(*) AS total, COALESCE(SUM(CASE WHEN status='completed' THEN amount END),0) AS completed_sum, SUM(CASE WHEN status='completed' THEN 1 ELSE 0 END) AS completed_count, SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) AS pending_count FROM $don_table");
+    $payway = cha_get_payway_settings();
+    ?>
+    <style>
+        .cha-don-header{background:linear-gradient(135deg,#0B1D6D 0%,#1a3a8a 50%,#6A2C91 100%);border-radius:12px;padding:28px 32px;color:#fff;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+        .cha-don-header h1{font-size:1.5rem;font-weight:700;margin:0;display:flex;align-items:center;gap:10px;}
+        .cha-don-header p{font-size:0.8125rem;margin:4px 0 0;opacity:0.8;}
+        .cha-don-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+        .cha-don-stat{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:18px 20px;display:flex;align-items:center;gap:14px;transition:box-shadow .15s;}
+        .cha-don-stat:hover{box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+        .cha-don-stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .cha-don-stat-value{font-size:1.4rem;font-weight:700;line-height:1.2;}
+        .cha-don-stat-label{font-size:0.75rem;color:#6b7280;margin-top:2px;}
+        .cha-don-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+        .cha-don-card h2{font-size:1rem;font-weight:700;margin:0 0 16px;display:flex;align-items:center;gap:8px;}
+        .cha-don-toggle{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;user-select:none;margin-bottom:16px;}
+        .cha-don-toggle:hover{background:#f1f5f9;}
+        .cha-don-toggle svg{transition:transform .2s;flex-shrink:0;}
+        .cha-don-toggle-label{font-weight:600;font-size:0.875rem;}
+        .cha-don-toggle-desc{font-size:0.75rem;color:#6b7280;margin-top:2px;}
+        .cha-don-settings{display:none;max-height:0;overflow:hidden;transition:max-height .3s ease,opacity .2s ease;opacity:0;}
+        .cha-don-settings.open{display:block;max-height:600px;opacity:1;}
+        .cha-don-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+        .cha-don-field label{display:block;font-size:0.75rem;font-weight:600;color:#374151;margin-bottom:4px;}
+        .cha-don-field input,.cha-don-field select{width:100%;box-sizing:border-box;}
+        .cha-don-table{width:100%;border-collapse:separate;border-spacing:0;}
+        .cha-don-table th{text-align:left;font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;padding:10px 14px;border-bottom:2px solid #e5e7eb;background:#f9fafb;}
+        .cha-don-table td{padding:12px 14px;border-bottom:1px solid #f3f4f6;font-size:0.8125rem;vertical-align:middle;}
+        .cha-don-table tr:hover td{background:#f9fafb;}
+        .cha-don-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.6875rem;font-weight:600;}
+        .cha-don-empty{text-align:center;padding:48px 20px;color:#9CA3AF;}
+        .cha-don-pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;}
+        .cha-don-pagination a,.cha-don-pagination span{padding:6px 12px;border-radius:6px;font-size:0.8125rem;text-decoration:none;border:1px solid #e5e7eb;color:#374151;background:#fff;transition:all .15s;}
+        .cha-don-pagination a:hover{background:#f3f4f6;}
+        .cha-don-pagination .current{background:#0B1D6D;color:#fff;border-color:#0B1D6D;}
+        @media(max-width:900px){.cha-don-stats{grid-template-columns:1fr 1fr;}.cha-don-grid{grid-template-columns:1fr;}}
+        @media(max-width:600px){.cha-don-stats{grid-template-columns:1fr;}.cha-don-header{flex-direction:column;align-items:flex-start;}}
+    </style>
+
+    <div style="max-width:1100px;margin:20px auto;">
+        <!-- Header -->
+        <div class="cha-don-header">
+            <div>
+                <h1 style="color:#fff;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    Donations
+                </h1>
+                <p>Track donations and manage PayWay payment gateway</p>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+                <button type="button" id="cha-pw-toggle-btn" onclick="document.getElementById('cha-pw-settings').classList.toggle('open');" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:0.8125rem;font-weight:600;cursor:pointer;white-space:nowrap;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    PayWay Settings
+                </button>
+                <a href="admin.php?page=cha-donations&cha_don_export_csv=1" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:0.8125rem;font-weight:600;text-decoration:none;white-space:nowrap;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Export CSV
+                </a>
+            </div>
+        </div>
+
+        <!-- PayWay Settings (slides down from header) -->
+        <div class="cha-don-settings" id="cha-pw-settings" style="margin-bottom:24px;">
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                    <h2 style="font-size:1rem;font-weight:700;margin:0;display:flex;align-items:center;gap:8px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B1D6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        PayWay Gateway (ABA) &mdash; <?php echo $payway['enabled'] ? '<span style="color:#166534;">Enabled</span>' : '<span style="color:#dc2626;">Disabled</span>'; ?>
+                    </h2>
+                    <button type="button" onclick="document.getElementById('cha-pw-settings').classList.remove('open');" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;color:#9CA3AF;" title="Close">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <form method="post" action="admin.php?page=cha-donations">
+                    <?php wp_nonce_field('cha_save_payway', 'cha_payway_nonce'); ?>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block;font-size:0.75rem;font-weight:600;color:#374151;margin-bottom:6px;">Mode</label>
+                        <select name="payway_mode" style="width:280px;" onchange="document.getElementById('pw-sandbox-fields').style.display=this.value==='sandbox'?'block':'none';document.getElementById('pw-production-fields').style.display=this.value==='production'?'block':'none';">
+                            <option value="sandbox" <?php selected($payway['mode'], 'sandbox'); ?>>Sandbox (testing)</option>
+                            <option value="production" <?php selected($payway['mode'], 'production'); ?>>Production (live)</option>
+                        </select>
+                    </div>
+
+                    <div id="pw-sandbox-fields" style="display:<?php echo $payway['mode'] === 'sandbox' ? 'block' : 'none'; ?>;">
+                        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin-bottom:12px;">
+                            <div style="font-weight:600;font-size:0.8125rem;color:#166534;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Sandbox Credentials
+                            </div>
+                            <div class="cha-don-grid">
+                                <div class="cha-don-field">
+                                    <label>Merchant ID</label>
+                                    <input type="text" name="payway_sandbox_merchant_id" value="<?php echo esc_attr($payway['sandbox_merchant_id']); ?>" placeholder="e.g. ec476057">
+                                </div>
+                                <div class="cha-don-field">
+                                    <label>API Key</label>
+                                    <div style="position:relative;">
+                                        <input type="password" name="payway_sandbox_api_key" id="pw_sb_key" value="<?php echo esc_attr($payway['sandbox_api_key']); ?>" style="padding-right:36px;">
+                                        <button type="button" onclick="var p=document.getElementById('pw_sb_key');p.type=p.type==='password'?'text':'password';this.blur();" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="pw-production-fields" style="display:<?php echo $payway['mode'] === 'production' ? 'block' : 'none'; ?>;">
+                        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:16px;margin-bottom:12px;">
+                            <div style="font-weight:600;font-size:0.8125rem;color:#991b1b;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                Production Credentials
+                            </div>
+                            <div class="cha-don-grid">
+                                <div class="cha-don-field">
+                                    <label>Merchant ID</label>
+                                    <input type="text" name="payway_production_merchant_id" value="<?php echo esc_attr($payway['production_merchant_id']); ?>" placeholder="Enter production merchant ID">
+                                </div>
+                                <div class="cha-don-field">
+                                    <label>API Key</label>
+                                    <div style="position:relative;">
+                                        <input type="password" name="payway_production_api_key" id="pw_prod_key" value="<?php echo esc_attr($payway['production_api_key']); ?>" style="padding-right:36px;">
+                                        <button type="button" onclick="var p=document.getElementById('pw_prod_key');p.type=p.type==='password'?'text':'password';this.blur();" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6;">
+                        <div style="display:flex;align-items:center;gap:16px;">
+                            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.8125rem;font-weight:500;">
+                                <input type="checkbox" name="payway_enabled" value="1" <?php checked($payway['enabled']); ?>>
+                                Enable donations
+                            </label>
+                            <button type="button" id="cha-test-hash-btn" style="background:none;border:none;color:#6b7280;font-size:0.8125rem;font-weight:600;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px;">
+                                Test API Key
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            </button>
+                        </div>
+                        <button type="submit" name="cha_update_payway" class="button button-primary" style="background:#166534;border-color:#166534;border-radius:6px;">Save Settings</button>
+                    </div>
+                </form>
+                <script>
+                (function(){
+                    var btn = document.getElementById('cha-test-hash-btn');
+                    if (!btn) return;
+                    var restUrl = <?php echo wp_json_encode(rest_url('cha/v1/')); ?>;
+                    var nonce = <?php echo wp_json_encode(wp_create_nonce('wp_rest')); ?>;
+                    btn.addEventListener('click', function(){
+                        var mode = document.querySelector('select[name="payway_mode"]').value;
+                        var keyId = mode === 'sandbox' ? 'pw_sb_key' : 'pw_prod_key';
+                        var key = document.getElementById(keyId);
+                        if (!key || !key.value) { alert('Enter an API key first.'); return; }
+                        btn.disabled = true;
+                        var orig = btn.innerHTML;
+                        btn.innerHTML = 'Testing...';
+                        fetch(restUrl + 'payway/test-hash', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': nonce },
+                            body: JSON.stringify({})
+                        }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+                          .then(function(res){
+                              if (res.ok && res.d.success) {
+                                  alert('API key works. Sample hash: ' + res.d.sample_hash.slice(0, 24) + '...');
+                              } else {
+                                  alert((res.d && res.d.message) || 'Test failed. Check the API key.');
+                              }
+                          }).catch(function(){ alert('Network error. Please try again.'); })
+                          .finally(function(){ btn.disabled = false; btn.innerHTML = orig; });
+                    });
+                })();
+                </script>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="cha-don-stats">
+            <div class="cha-don-stat">
+                <div class="cha-don-stat-icon" style="background:#ECFDF5;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                    <div class="cha-don-stat-value" style="color:#166534;">$<?php echo esc_html(number_format((float) $totals->completed_sum, 0)); ?></div>
+                    <div class="cha-don-stat-label">Total Raised</div>
+                </div>
+            </div>
+            <div class="cha-don-stat">
+                <div class="cha-don-stat-icon" style="background:#EFF6FF;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div>
+                    <div class="cha-don-stat-value" style="color:#1d4ed8;"><?php echo (int) $totals->completed_count; ?></div>
+                    <div class="cha-don-stat-label">Completed</div>
+                </div>
+            </div>
+            <div class="cha-don-stat">
+                <div class="cha-don-stat-icon" style="background:#FEF3C7;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div>
+                    <div class="cha-don-stat-value" style="color:#92400E;"><?php echo (int) $totals->pending_count; ?></div>
+                    <div class="cha-don-stat-label">Pending</div>
+                </div>
+            </div>
+            <div class="cha-don-stat">
+                <div class="cha-don-stat-icon" style="background:#F3E8FF;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A2C91" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                </div>
+                <div>
+                    <div class="cha-don-stat-value" style="color:#6A2C91;"><?php echo (int) $totals->total; ?></div>
+                    <div class="cha-don-stat-label">Total Donors</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="cha-don-card">
+            <h2>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B1D6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Transaction History
+            </h2>
+            <?php if (empty($don_rows)): ?>
+                <div class="cha-don-empty">
+                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 16px;display:block;color:#D1D5DB;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <p style="font-weight:600;font-size:1rem;margin:0;">No donations yet</p>
+                    <p style="font-size:0.8125rem;margin:6px 0 0;">Donations will appear here once donors complete a PayWay checkout.</p>
+                </div>
+            <?php else: ?>
+                <div style="overflow-x:auto;">
+                    <table class="cha-don-table">
+                        <thead>
+                            <tr>
+                                <th>Receipt</th>
+                                <th>Donor</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>APV</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($don_rows as $d): ?>
+                            <tr>
+                                <td><code style="font-size:0.75rem;background:#f1f5f9;padding:3px 8px;border-radius:4px;font-family:monospace;"><?php echo esc_html($d->tran_id); ?></code></td>
+                                <td>
+                                    <div style="display:flex;align-items:center;gap:10px;">
+                                        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0B1D6D,#6A2C91);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.6875rem;font-weight:700;flex-shrink:0;"><?php echo esc_html(mb_strtoupper(mb_substr($d->name ?: '?', 0, 1))); ?></div>
+                                        <div>
+                                            <div style="font-weight:600;"><?php echo esc_html($d->name ?: '—'); ?></div>
+                                            <div style="font-size:0.75rem;color:#6b7280;"><?php echo esc_html($d->email ?: ''); ?></div>
+                                            <?php if (!empty($d->phone)): ?>
+                                                <div style="font-size:0.75rem;color:#9CA3AF;"><?php echo esc_html($d->phone); ?></div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-weight:700;color:#166534;">$<?php echo esc_html(number_format((float) $d->amount, 2)); ?></div>
+                                    <div style="font-size:0.6875rem;color:#9CA3AF;"><?php echo esc_html($d->currency); ?></div>
+                                </td>
+                                <td>
+                                    <?php
+                                    $st = $d->status;
+                                    $bg = $st === 'completed' ? '#ECFDF5' : ($st === 'pending' ? '#FEF3C7' : '#FEF2F2');
+                                    $fg = $st === 'completed' ? '#166534' : ($st === 'pending' ? '#92400E' : '#991B1B');
+                                    $dot = $st === 'completed' ? '#166534' : ($st === 'pending' ? '#D97706' : '#DC2626');
+                                    ?>
+                                    <span class="cha-don-badge" style="background:<?php echo $bg; ?>;color:<?php echo $fg; ?>;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:<?php echo $dot; ?>;margin-right:5px;"></span><?php echo esc_html(ucfirst($st)); ?></span>
+                                </td>
+                                <td style="color:#6b7280;font-family:monospace;font-size:0.75rem;"><?php echo esc_html($d->apv ?: '—'); ?></td>
+                                <td style="color:#6b7280;"><?php echo esc_html($d->created_at ?: '—'); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php if ($total_pages > 1): ?>
+                <div class="cha-don-pagination">
+                    <?php if ($current_page > 1): ?>
+                        <a href="admin.php?page=cha-donations&don_page=<?php echo $current_page - 1; ?>">&larr; Prev</a>
+                    <?php endif; ?>
+                    <?php
+                    $start_page = max(1, $current_page - 2);
+                    $end_page = min($total_pages, $current_page + 2);
+                    if ($start_page > 1): ?>
+                        <a href="admin.php?page=cha-donations&don_page=1">1</a>
+                        <?php if ($start_page > 2): ?><span style="color:#9CA3AF;padding:0 4px;">&hellip;</span><?php endif; ?>
+                    <?php endif; ?>
+                    <?php for ($p = $start_page; $p <= $end_page; $p++): ?>
+                        <a href="admin.php?page=cha-donations&don_page=<?php echo $p; ?>" class="<?php echo $p === $current_page ? 'current' : ''; ?>"><?php echo $p; ?></a>
+                    <?php endfor; ?>
+                    <?php if ($end_page < $total_pages): ?>
+                        <?php if ($end_page < $total_pages - 1): ?><span style="color:#9CA3AF;padding:0 4px;">&hellip;</span><?php endif; ?>
+                        <a href="admin.php?page=cha-donations&don_page=<?php echo $total_pages; ?>"><?php echo $total_pages; ?></a>
+                    <?php endif; ?>
+                    <?php if ($current_page < $total_pages): ?>
+                        <a href="admin.php?page=cha-donations&don_page=<?php echo $current_page + 1; ?>">Next &rarr;</a>
+                    <?php endif; ?>
+                </div>
+                <p style="text-align:center;font-size:0.75rem;color:#9CA3AF;margin-top:8px;">Page <?php echo $current_page; ?> of <?php echo $total_pages; ?> (<?php echo $total_rows; ?> total)</p>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
     </div>
     <?php
 }

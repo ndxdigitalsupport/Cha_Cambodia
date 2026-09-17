@@ -17,7 +17,7 @@ const faqItems = [
   },
   {
     q: 'How do I register for a CHA Membership Card?',
-    a: 'You can create an account directly in the app. Once registered as a Patient or Supporter, your verified digital membership card will be available under the Account tab.',
+    a: 'You can create an account directly in the app. Once registered as a Patient or Member, your verified digital membership card will be available under the Account tab.',
   },
   {
     q: 'Where are the main treatment centres located?',

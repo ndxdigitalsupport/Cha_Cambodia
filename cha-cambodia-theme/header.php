@@ -15,7 +15,7 @@
 <!-- HEADER -->
 <header class="site-header">
     <div class="container header-inner">
-        <a class="brand" href="<?php echo home_url(); ?>"><img class="brand-logo" src="<?php echo get_template_directory_uri(); ?>/cha-logo-left.png" alt="Cambodian Haemophilia Association"></a>
+        <a class="brand" href="<?php echo home_url(); ?>"><img class="brand-logo" src="<?php echo esc_url(cha_get_option('site_logo', get_template_directory_uri() . '/cha-logo-left.png')); ?>" alt="Cambodian Haemophilia Association"></a>
         <nav class="main-nav" aria-label="Primary">
             <a href="<?php echo home_url(); ?>" data-i18n="nav_home"><?php echo esc_html(cha_get_option('nav_home', 'Home')); ?></a>
             <div class="nav-drop" data-nav-drop>
@@ -69,7 +69,7 @@
     <div class="backdrop"></div>
     <div class="panel" role="dialog" aria-modal="true" aria-label="Site menu">
         <div class="panel-head">
-            <a class="brand" href="<?php echo home_url(); ?>"><img class="brand-logo" src="<?php echo get_template_directory_uri(); ?>/cha-logo-left.png" alt="Cambodian Haemophilia Association"></a>
+            <a class="brand" href="<?php echo home_url(); ?>"><img class="brand-logo" src="<?php echo esc_url(cha_get_option('site_logo', get_template_directory_uri() . '/cha-logo-left.png')); ?>" alt="Cambodian Haemophilia Association"></a>
             <button class="close" type="button" aria-label="Close menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <nav aria-label="Mobile primary">

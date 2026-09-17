@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "sdkVersion": "54.0.0",
+    "sdkVersion": "57.0.0",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.chacambodia.app",
@@ -40,7 +40,8 @@
         {
           "photosPermission": "Allow CHA to access your photos to set your membership card photo."
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "extra": {
       "eas": {

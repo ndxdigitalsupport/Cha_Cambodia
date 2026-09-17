@@ -209,12 +209,16 @@ document.addEventListener('click', function(e) {
   // ---------- 5. Donation amount chip ----------
   document.querySelectorAll('[data-amount]').forEach((chip) => {
     chip.addEventListener('click', () => {
-      const group = chip.closest('[data-amount-group]') || document;
-      group.querySelectorAll('[data-amount]').forEach((c) => c.classList.remove('is-active'));
+      const group = chip.closest('.amount-chips');
+      if (group) group.querySelectorAll('[data-amount]').forEach((c) => c.classList.remove('is-active'));
       chip.classList.add('is-active');
       const val = chip.dataset.amount;
-      const other = document.querySelector('[data-amount-other]');
-      if (other && val === 'other') other.focus();
+      const form = chip.closest('form');
+      const other = form ? form.querySelector('[data-amount-other]') : null;
+      if (other) {
+        if (val === 'other') { other.style.display = ''; other.focus(); }
+        else { other.style.display = 'none'; other.value = ''; }
+      }
     });
   });
 
@@ -248,16 +252,35 @@ document.addEventListener('click', function(e) {
     });
   });
 
-  // ---------- 7. Province → Map pin highlight ----------
+  // ---------- 7. Province → Map pin highlight & Card filter ----------
   const provinceSelect = document.querySelector('[data-province-select]');
   const cambodiaMap = document.querySelector('[data-cambodia-map]');
-  if (provinceSelect && cambodiaMap) {
-    provinceSelect.addEventListener('change', () => {
-      const v = provinceSelect.value;
-      cambodiaMap.querySelectorAll('[data-province]').forEach((p) => {
-        p.classList.toggle('is-highlighted', p.dataset.province === v);
+  if (provinceSelect) {
+    const filterCards = () => {
+      const v = (provinceSelect.value || '').toLowerCase().trim();
+      if (cambodiaMap) {
+        cambodiaMap.querySelectorAll('[data-province]').forEach((p) => {
+          p.classList.toggle('is-highlighted', p.dataset.province === v);
+        });
+      }
+      const cards = document.querySelectorAll('.tc-card[data-province]');
+      cards.forEach((card) => {
+        const cardProv = (card.dataset.province || '').toLowerCase().trim();
+        if (!v || cardProv === v) {
+          card.classList.remove('is-hidden');
+          card.style.setProperty('display', 'grid', 'important');
+        } else {
+          card.classList.add('is-hidden');
+          card.style.setProperty('display', 'none', 'important');
+        }
       });
-    });
+    };
+    provinceSelect.addEventListener('change', filterCards);
+    provinceSelect.addEventListener('input', filterCards);
+    // Run once on load in case a province is preselected
+    if (provinceSelect.value) {
+      filterCards();
+    }
   }
 
   // ---------- 8. Scroll reveal ----------
@@ -337,10 +360,8 @@ document.addEventListener('click', function(e) {
 
   // ---------- 12. Donate form — PayWay checkout ----------
   function chaSubmitPaywayDonate(form, submitBtn) {
-    // Get selected amount
-    const activePanel = form.querySelector('.tab-panel.is-active');
-    const activeChip = activePanel ? activePanel.querySelector('.amount-chip.is-active') : null;
-    const otherInput = activePanel ? activePanel.querySelector('[data-amount-other]') : null;
+    const activeChip = form.querySelector('.amount-chip.is-active');
+    const otherInput = form.querySelector('[data-amount-other]');
     let amount = activeChip ? activeChip.dataset.amount : '10';
     if (amount === 'other' && otherInput && otherInput.value) {
       amount = otherInput.value;
@@ -351,19 +372,26 @@ document.addEventListener('click', function(e) {
       return;
     }
 
+    const nameEl = form.querySelector('#doname, #doname-home');
+    const emailEl = form.querySelector('#doemail, #doemail-home');
+    const phoneEl = form.querySelector('#dophone, #dophone-home');
+    const body = { amount: amount, currency: 'USD' };
+    if (nameEl && nameEl.value.trim()) body.firstname = nameEl.value.trim();
+    if (emailEl && emailEl.value.trim()) body.email = emailEl.value.trim();
+    if (phoneEl && phoneEl.value.trim()) body.phone = phoneEl.value.trim();
+
     if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Processing...'; }
 
     fetch(chaApi.rest_url + 'payway/purchase', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: amount, currency: 'USD' }),
+      body: JSON.stringify(body),
     })
       .then((res) => res.json().then((d) => ({ ok: res.ok, d: d })))
       .then((res) => {
         if (!res.ok || !res.d.success) {
           throw new Error((res.d && res.d.message) || 'Could not start payment.');
         }
-        // Build a hidden form POST to PayWay hosted checkout
         const f = document.createElement('form');
         f.method = 'POST';
         f.action = res.d.checkout_url;
@@ -453,6 +481,24 @@ document.addEventListener('click', function(e) {
     });
   }
 
+  // Copy account number interaction
+  const copyBtn = document.getElementById('donate-copy-btn');
+  const copyLabel = document.getElementById('donate-copy-label');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const acctNum = '000283539';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(acctNum).catch(() => {});
+      }
+      copyBtn.classList.add('is-copied');
+      if (copyLabel) copyLabel.textContent = 'Copied!';
+      setTimeout(() => {
+        copyBtn.classList.remove('is-copied');
+        if (copyLabel) copyLabel.textContent = 'Copy';
+      }, 2000);
+    });
+  }
+
   // ---------- 16. Member modal ----------
   const memberModal = document.getElementById('member-modal');
   const memberTriggers = document.querySelectorAll('[data-member-trigger]');
@@ -469,6 +515,24 @@ document.addEventListener('click', function(e) {
   const registerPanel = document.getElementById('member-register-panel');
   const forgotPanel = document.getElementById('member-forgot-panel');
 
+  const modalTitle = document.getElementById('member-modal-title');
+
+  function setMemberModalTitle(key) {
+    if (!modalTitle) return;
+    modalTitle.setAttribute('data-i18n', key);
+    var curLang = localStorage.getItem('cha-lang') || 'en';
+    if (typeof window.chaUpdateMemberModalTitle === 'function') {
+      window.chaUpdateMemberModalTitle(key);
+      return;
+    }
+    var dict = (typeof i18n !== 'undefined' && i18n[curLang]) ? i18n[curLang] : null;
+    if (dict && dict[key]) {
+      modalTitle.textContent = dict[key];
+    } else {
+      modalTitle.textContent = key === 'member_register_modal_title' ? 'Register' : (key === 'member_forgot_title' ? 'Reset Password' : 'Member Login');
+    }
+  }
+
   // Register-specific trigger (hero button): open modal and show register panel
   const registerTriggers = document.querySelectorAll('[data-member-register-trigger]');
   registerTriggers.forEach((t) => t.addEventListener('click', (e) => {
@@ -476,27 +540,28 @@ document.addEventListener('click', function(e) {
     memberModal.classList.add('is-open'); memberModal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
     if (loginPanel) loginPanel.style.display = 'none';
     if (registerPanel) registerPanel.style.display = 'block';
-    if (modalTitle) modalTitle.textContent = 'Register';
+    setMemberModalTitle('member_register_modal_title');
   }));
 
   const registerLink = memberModal.querySelector('[data-member-register]');
   const backLoginLink = memberModal.querySelector('[data-member-back-login]');
-  if (registerLink) registerLink.addEventListener('click', (e) => { e.preventDefault(); loginPanel.style.display = 'none'; registerPanel.style.display = 'block'; if (modalTitle) modalTitle.textContent = 'Register'; });
-  if (backLoginLink) backLoginLink.addEventListener('click', (e) => { e.preventDefault(); registerPanel.style.display = 'none'; loginPanel.style.display = 'block'; if (modalTitle) modalTitle.textContent = 'Member Login'; });
+  if (registerLink) registerLink.addEventListener('click', (e) => { e.preventDefault(); loginPanel.style.display = 'none'; registerPanel.style.display = 'block'; setMemberModalTitle('member_register_modal_title'); });
+  if (backLoginLink) backLoginLink.addEventListener('click', (e) => { e.preventDefault(); registerPanel.style.display = 'none'; loginPanel.style.display = 'block'; setMemberModalTitle('member_login_title'); });
 
   // Forgot-password panel: open from login link, back returns to login
   const forgotLink = memberModal.querySelector('[data-member-forgot]');
   const backLoginForgotLink = memberModal.querySelector('[data-member-back-login-forgot]');
-  if (forgotLink) forgotLink.addEventListener('click', (e) => { e.preventDefault(); loginPanel.style.display = 'none'; if (forgotPanel) forgotPanel.style.display = 'block'; if (modalTitle) modalTitle.textContent = 'Reset Password'; });
-  if (backLoginForgotLink) backLoginForgotLink.addEventListener('click', (e) => { e.preventDefault(); if (forgotPanel) forgotPanel.style.display = 'none'; loginPanel.style.display = 'block'; if (modalTitle) modalTitle.textContent = 'Member Login'; });
+  if (forgotLink) forgotLink.addEventListener('click', (e) => { e.preventDefault(); loginPanel.style.display = 'none'; if (forgotPanel) forgotPanel.style.display = 'block'; setMemberModalTitle('member_forgot_title'); });
+  if (backLoginForgotLink) backLoginForgotLink.addEventListener('click', (e) => { e.preventDefault(); if (forgotPanel) forgotPanel.style.display = 'none'; loginPanel.style.display = 'block'; setMemberModalTitle('member_login_title'); });
 
   // Reset to login on close
   const origCloseMember = closeMember;
-  closeMember = () => { origCloseMember(); if (loginPanel) loginPanel.style.display = 'block'; if (registerPanel) registerPanel.style.display = 'none'; if (forgotPanel) forgotPanel.style.display = 'none'; if (modalTitle) modalTitle.textContent = 'Member Login'; };
+  closeMember = () => { origCloseMember(); if (loginPanel) loginPanel.style.display = 'block'; if (registerPanel) registerPanel.style.display = 'none'; if (forgotPanel) forgotPanel.style.display = 'none'; setMemberModalTitle('member_login_title'); };
 
   // ---- Role selector: toggle patient fields ----
   const roleOptions = registerPanel.querySelectorAll('.role-option');
   const patientFields = document.getElementById('patient-fields');
+  const reqPatientList = registerPanel.querySelectorAll('.req-patient');
   roleOptions.forEach(function(opt) {
     opt.addEventListener('click', function() {
       roleOptions.forEach(function(o) { o.style.borderColor = 'var(--c-border)'; o.style.background = 'transparent'; });
@@ -504,7 +569,9 @@ document.addEventListener('click', function(e) {
       opt.style.background = 'rgba(11,29,109,0.04)';
       var radio = opt.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
-      if (patientFields) patientFields.style.display = radio && radio.value === 'Patient' ? 'block' : 'none';
+      var isPatient = radio && radio.value === 'Patient';
+      if (patientFields) patientFields.style.display = isPatient ? 'block' : 'none';
+      reqPatientList.forEach(function(r) { r.style.display = isPatient ? 'inline' : 'none'; });
     });
   });
   // Init: select default role
@@ -522,9 +589,26 @@ document.addEventListener('click', function(e) {
     const address = document.getElementById('mregaddress').value.trim();
     const consented = document.getElementById('mregconsent').checked;
     const roleRadio = registerPanel.querySelector('input[name="mregrole"]:checked');
-    const role = roleRadio ? roleRadio.value : 'Supporter';
+    const role = roleRadio ? roleRadio.value : 'Member';
     if (!name || !email || !pass) { chaToast('Please fill in all required fields.', 'error'); return; }
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) { chaToast('Please enter a valid email address.', 'error'); return; }
+    var emailDomain = email.split('@')[1].toLowerCase();
+    var allowedDomains = ['gmail.com','yahoo.com','outlook.com','hotmail.com','live.com','icloud.com','aol.com','protonmail.com','proton.me','mail.com','com.kh'];
+    if (allowedDomains.indexOf(emailDomain) === -1) { chaToast('Please use a valid email address (gmail.com, yahoo.com, outlook.com, etc.).', 'error'); return; }
     if (!consented) { chaToast('Please agree to the Terms &amp; Conditions.', 'error'); return; }
+    
+    if (role === 'Patient') {
+      const dob = document.getElementById('mregdob').value.trim();
+      var condSel = document.getElementById('mregcondition');
+      var condVal = condSel.value === 'Other' ? document.getElementById('mregcondition-other').value.trim() : condSel.value;
+      var bloodVal = document.getElementById('mregblood').value;
+      if (!phone || !address || !dob || !condVal || !bloodVal) {
+        chaToast('Patients must provide phone, address, date of birth, hemophilia type, and blood type.', 'error');
+        return;
+      }
+    }
+
     const body = { name, email, password: pass, phone, address, role };
     if (role === 'Patient') {
       body.dob = document.getElementById('mregdob').value;
@@ -559,7 +643,6 @@ document.addEventListener('click', function(e) {
     });
   }
 initHemophiliaOther('mregcondition', 'mregcondition-other');
-  initHemophiliaOther('p-edit-condition', 'p-edit-condition-other');
 
   // Simple dd/mm/yyyy auto-format for typing
   ['mregdob', 'p-edit-dob'].forEach(function(id) {
@@ -635,7 +718,7 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       if (forgotForm) forgotForm.reset();
       if (forgotPanel) forgotPanel.style.display = 'none';
       if (loginPanel) loginPanel.style.display = 'block';
-      if (modalTitle) modalTitle.textContent = 'Member Login';
+      setMemberModalTitle('member_login_title');
       chaToast(data.message || 'If an account exists for that email, a reset link has been sent.', 'success', 12000);
     } catch (err) {
       chaToast('Network error. Please try again.', 'error');
@@ -690,9 +773,28 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
   }
   function populateMemberView(user) {
     var initials = (user.name || '?').split(' ').map(function(w){ return w[0]; }).join('').substring(0,2).toUpperCase();
-    document.getElementById('dash-member-avatar').textContent = initials;
+    var avatarFallback = document.getElementById('dash-member-avatar');
+    var photoImg = document.getElementById('dash-member-photo');
+    var photoDel = document.getElementById('dash-member-photo-delete');
+
+    if (avatarFallback) avatarFallback.textContent = initials;
+    if (user.photo && photoImg) {
+      photoImg.src = user.photo;
+      photoImg.style.display = 'block';
+      if (avatarFallback) avatarFallback.style.display = 'none';
+      if (photoDel) photoDel.style.display = 'flex';
+    } else {
+      if (photoImg) { photoImg.src = ''; photoImg.style.display = 'none'; }
+      if (avatarFallback) avatarFallback.style.display = 'flex';
+      if (photoDel) photoDel.style.display = 'none';
+    }
+
     document.getElementById('dash-member-name').textContent = user.name || '';
-    document.getElementById('dash-member-role').textContent = user.role || 'Member';
+    var nameVal = document.getElementById('dash-member-name-val');
+    if (nameVal) nameVal.textContent = user.name || '';
+    var roleBadge = document.getElementById('dash-member-role-badge');
+    if (roleBadge) roleBadge.textContent = user.role || 'Member';
+
     document.getElementById('dash-member-id').textContent = user.memberId || '';
     document.getElementById('dash-member-email').textContent = user.email || '';
     document.getElementById('dash-member-phone').textContent = user.phone || 'Not provided';
@@ -834,13 +936,23 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
     document.getElementById('dash-patient-name').textContent = user.name || '';
     document.getElementById('dash-patient-id').textContent = user.memberId || '';
     document.getElementById('dash-patient-name-display').textContent = user.name || '';
+    var khmerNameEl = document.getElementById('dash-patient-name-khmer');
+    if (khmerNameEl) khmerNameEl.textContent = user.nameKhmer || user.name || '—';
     document.getElementById('dash-patient-dob').textContent = formatDateDisplay(user.dob) || 'Not set';
     document.getElementById('dash-patient-condition').textContent = user.condition || 'Not set';
     document.getElementById('dash-patient-blood').textContent = user.bloodType || 'Not set';
     document.getElementById('dash-patient-phone').textContent = user.phone || 'Not provided';
-    document.getElementById('dash-patient-id-back').textContent = user.memberId || '';
+    var backId = document.getElementById('dash-patient-id-back');
+    if (backId) backId.textContent = user.memberId || '';
     document.getElementById('dash-patient-created').textContent = user.registered ? user.registered.slice(0, 10) : '—';
     document.getElementById('dash-patient-address').textContent = user.address || '—';
+    
+    // QR Code Generation — links directly to official member verification record
+    var qrImg = document.getElementById('dash-patient-qr');
+    if (qrImg && user.memberId) {
+      var verifyUrl = window.location.origin + '/verify-member?id=' + encodeURIComponent(user.memberId);
+      qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(verifyUrl);
+    }
     // Photo
     var photo = document.getElementById('dash-patient-photo');
     var placeholder = document.getElementById('dash-patient-photo-placeholder');
@@ -850,16 +962,19 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       photo.style.display = 'block';
       placeholder.style.display = 'none';
       if (delBtn) delBtn.style.display = 'flex';
+      photo.onload = function() { if (window._lockFlipperHeight) window._lockFlipperHeight(); };
     } else {
       photo.style.display = 'none';
       placeholder.style.display = 'flex';
       if (delBtn) delBtn.style.display = 'none';
     }
+    if (window._lockFlipperHeight) setTimeout(window._lockFlipperHeight, 50);
   }
 
-  // Photo upload
-  var photoInput = document.getElementById('patient-photo-input');
-  if (photoInput) {
+  // Photo upload (Member + Patient)
+  ['patient-photo-input', 'member-photo-input'].forEach(function(inputId) {
+    var photoInput = document.getElementById(inputId);
+    if (!photoInput) return;
     photoInput.addEventListener('change', async function() {
       var file = this.files[0];
       if (!file) return;
@@ -878,13 +993,7 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
         if (data.success && data.photoUrl) {
           user.photo = data.photoUrl;
           localStorage.setItem('cha_current_user', JSON.stringify(user));
-          var photo = document.getElementById('dash-patient-photo');
-          var placeholder = document.getElementById('dash-patient-photo-placeholder');
-          var delBtn = document.getElementById('dash-photo-delete');
-          photo.src = data.photoUrl;
-          photo.style.display = 'block';
-          placeholder.style.display = 'none';
-          if (delBtn) delBtn.style.display = 'flex';
+          populateDashboard(user);
           chaToast('Photo updated!', 'success');
         } else {
           chaToast(data.message || 'Upload failed.', 'error');
@@ -893,11 +1002,12 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
         chaToast('Upload failed. Please try again.', 'error');
       }
     });
-  }
+  });
 
-  // Photo delete
-  var deleteBtn = document.getElementById('dash-photo-delete');
-  if (deleteBtn) {
+  // Photo delete (Member + Patient)
+  ['dash-photo-delete', 'dash-member-photo-delete'].forEach(function(btnId) {
+    var deleteBtn = document.getElementById(btnId);
+    if (!deleteBtn) return;
     deleteBtn.addEventListener('click', async function() {
       var user = JSON.parse(localStorage.getItem('cha_current_user') || 'null');
       if (!user) return;
@@ -911,94 +1021,63 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
         if (data.success) {
           user.photo = '';
           localStorage.setItem('cha_current_user', JSON.stringify(user));
-          var photo = document.getElementById('dash-patient-photo');
-          var placeholder = document.getElementById('dash-patient-photo-placeholder');
-          var delBtn = document.getElementById('dash-photo-delete');
-          photo.src = '';
-          photo.style.display = 'none';
-          placeholder.style.display = 'flex';
-          delBtn.style.display = 'none';
+          populateDashboard(user);
           chaToast('Photo removed.', 'success');
         }
       } catch (err) {
         chaToast('Failed to remove photo.', 'error');
       }
     });
-  }
+  });
 
-  // Print card button
-  var printBtn = document.getElementById('dash-print-card');
-  if (printBtn) {
-    printBtn.addEventListener('click', function() {
-      var front = document.querySelector('.id-card-front');
-      var back = document.querySelector('.id-card-back');
-      if (!front) return;
+  // Card 3D Flip Handler
+  var flipBtn = document.getElementById('dash-card-flip-btn');
+  var flipper = document.getElementById('dash-id-card-flipper');
+  var scene = document.querySelector('.id-card-scene');
+  var sideIndicator = document.getElementById('dash-card-side-indicator');
+  var flipAnimating = false;
+  window._lockFlipperHeight = function() {
+    if (!flipper) return;
+    var front = flipper.querySelector('.id-card-front');
+    var back = flipper.querySelector('.id-card-back');
+    if (!front || !back) return;
+    var maxH = Math.max(front.scrollHeight, back.scrollHeight);
+    if (maxH > 0) flipper.style.height = maxH + 'px';
+  };
+  if (flipBtn && flipper) {
+    window._lockFlipperHeight();
 
-      var css = [
-        '@page{size:portrait;margin:0.4in}',
-        'body{margin:0;padding:0;font-family:Arial,sans-serif;background:#fff;display:flex;flex-direction:column;align-items:center}',
-        '.card{width:100%;max-width:720px;border:2px solid #333;border-radius:10px;padding:16px;margin-bottom:20px;box-sizing:border-box;page-break-inside:avoid}',
-        '.card-front-inner{display:grid;grid-template-columns:90px 1fr;gap:12px;padding:0}',
-        '.id-card-photo-wrap{width:90px;align-self:stretch;border-radius:6px;overflow:hidden;border:2px solid #ccc;position:relative;background:#f5f5f5;flex-shrink:0}',
-        '.id-card-photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}',
-        '.id-card-photo-upload,.id-card-photo-delete{display:none!important}',
-        '.id-card-details{display:flex;flex-direction:column;gap:1px;justify-content:center;min-width:0}',
-        '.id-card-row{display:flex;align-items:baseline;gap:3px;font-size:11px;line-height:1.5}',
-        '.id-card-label{color:#1e3a8a;font-weight:700;white-space:nowrap;flex-shrink:0}',
-        '.id-card-dots{flex:1;border-bottom:1px dotted #ccc;min-width:6px}',
-        '.id-card-value{color:#111;font-weight:500;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-        '.id-card-edit-input{display:none!important}',
-        '.back-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}',
-        '.back-header img{height:32px}',
-        '.back-title{font-size:11px;font-weight:700;color:#dc2626}',
-        '.rules{font-size:10px;line-height:1.5;color:#555}',
-        '.rules p{font-weight:700;color:#1e3a8a;margin:0 0 4px}',
-        '.rules ol{margin:0;padding-left:14px}',
-        '.rules li{margin-bottom:2px}',
-        '.back-footer{display:flex;justify-content:flex-end;align-items:flex-end;margin-top:16px}',
-        '.back-footer div{font-size:9px;color:#999;text-align:right}',
-        '.back-footer div:first-child{font-weight:700;color:#1e3a8a}',
-        '.back-content{font-size:10px;line-height:1.5;color:#555}',
-        '#dash-print-card,[data-dashboard-logout],#dash-patient-edit-btn,#dash-patient-save-btn,#dash-patient-cancel-btn{display:none!important}'
-      ].join('\n');
+    flipBtn.addEventListener('click', function() {
+      if (flipAnimating) return;
+      flipAnimating = true;
+      var isFlipped = flipper.classList.contains('is-flipped');
 
-      function cloneCard(el) {
-        var clone = el.cloneNode(true);
-        clone.querySelectorAll('.id-card-photo-upload,.id-card-photo-delete,.id-card-edit-input,#dash-print-card,[data-dashboard-logout],#dash-patient-edit-btn,#dash-patient-save-btn,#dash-patient-cancel-btn').forEach(function(n){n.remove()});
-        return clone;
+      if (sideIndicator) {
+        sideIndicator.textContent = isFlipped ? 'Front Side' : 'Back Side';
       }
 
-      var c = cloneCard(front);
-      c.className = 'card';
-      c.removeAttribute('style');
-      var inner = c.querySelector('.id-card-front-inner');
-      if (inner) inner.className = 'card-front-inner';
+      window._lockFlipperHeight();
 
-      var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Patient ID Card</title><style>' + css + '</style></head><body>';
-      html += c.outerHTML;
+      flipper.style.transition = 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)';
+      flipper.style.transform = 'rotateY(90deg)';
 
-      if (back) {
-        var c2 = cloneCard(back);
-        c2.className = 'card';
-        c2.removeAttribute('style');
-        var backInner = c2.querySelector('div[style]');
-        if (backInner) {
-          var header = backInner.querySelector('div[style*="justify-content:space-between"]');
-          if (header) header.className = 'back-header';
-          var rules = backInner.querySelector('div[style*="font-size:0.6875rem"]');
-          if (rules) rules.className = 'rules back-content';
-          var footer = c2.querySelector('div[style*="justify-content:flex-end"]');
-          if (footer) footer.className = 'back-footer';
-        }
-        html += c2.outerHTML;
-      }
+      setTimeout(function() {
+        flipper.classList.toggle('is-flipped');
+        window._lockFlipperHeight();
 
-      html += '</body></html>';
-      var w = window.open('', '_blank', 'width=800,height=600');
-      w.document.write(html);
-      w.document.close();
-      w.focus();
-      setTimeout(function(){ w.print(); }, 500);
+        flipper.style.transition = 'none';
+        flipper.style.transform = 'rotateY(-90deg)';
+        flipper.offsetHeight;
+        flipper.style.transition = 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)';
+        flipper.style.transform = 'rotateY(0deg)';
+
+        setTimeout(function() {
+          flipper.style.transition = '';
+          flipper.style.transform = '';
+          window._lockFlipperHeight();
+          flipAnimating = false;
+        }, 350);
+      }, 350);
     });
   }
 
@@ -1023,6 +1102,8 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
     memberEditBtn.addEventListener('click', function() {
       var user = JSON.parse(localStorage.getItem('cha_current_user') || 'null');
       if (!user) return;
+      var nameEdit = document.getElementById('m-edit-name');
+      if (nameEdit) nameEdit.value = user.name || '';
       document.getElementById('m-edit-email').value = user.email || '';
       document.getElementById('m-edit-phone').value = user.phone || '';
       document.getElementById('m-edit-address').value = user.address || '';
@@ -1042,10 +1123,13 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
     memberSaveBtn.addEventListener('click', async function() {
       var user = JSON.parse(localStorage.getItem('cha_current_user') || 'null');
       if (!user) return;
+      var nameEdit = document.getElementById('m-edit-name');
+      var name = nameEdit ? nameEdit.value.trim() : '';
       var email = document.getElementById('m-edit-email').value.trim();
       var phone = document.getElementById('m-edit-phone').value.trim();
       var address = document.getElementById('m-edit-address').value.trim();
       var payload = { memberId: user.memberId };
+      if (name && name !== user.name) payload.name = name;
       if (email && email !== user.email) payload.email = email;
       if (phone !== (user.phone || '')) payload.phone = phone;
       if (address !== (user.address || '')) payload.address = address;
@@ -1077,22 +1161,18 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
 
   function populatePatientEditInputs(user) {
     document.getElementById('p-edit-name').value = user.name || '';
+    document.getElementById('p-edit-name-khmer').value = user.nameKhmer || '';
     document.getElementById('p-edit-dob').value = user.dob || '';
     var cond = user.condition || '';
     var condSel = document.getElementById('p-edit-condition');
-    var condOther = document.getElementById('p-edit-condition-other');
-    if (['Hemophilia A','Hemophilia B'].indexOf(cond) >= 0) {
-      condSel.value = cond;
-      condOther.value = '';
-      condOther.style.display = 'none';
-    } else if (cond) {
-      condSel.value = 'Other';
-      condOther.value = cond;
-      condOther.style.display = 'block';
-    } else {
-      condSel.value = '';
-      condOther.value = '';
-      condOther.style.display = 'none';
+    if (condSel) {
+      if (['Hemophilia A','Hemophilia B','Other'].indexOf(cond) >= 0) {
+        condSel.value = cond;
+      } else if (cond) {
+        condSel.value = 'Other';
+      } else {
+        condSel.value = '';
+      }
     }
     var bt = document.getElementById('p-edit-blood');
     if (user.bloodType) { bt.value = user.bloodType; }
@@ -1123,13 +1203,15 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       if (!user) return;
       var payload = { memberId: user.memberId };
       var name = document.getElementById('p-edit-name').value.trim();
+      var nameKhmer = document.getElementById('p-edit-name-khmer').value.trim();
       var dob = document.getElementById('p-edit-dob').value;
       var condSel = document.getElementById('p-edit-condition');
-      var condition = condSel.value === 'Other' ? document.getElementById('p-edit-condition-other').value.trim() || 'Other' : condSel.value;
+      var condition = condSel ? condSel.value : '';
       var bloodType = document.getElementById('p-edit-blood').value;
       var phone = document.getElementById('p-edit-phone').value.trim();
       var address = document.getElementById('p-edit-address').value.trim();
       if (name && name !== user.name) payload.name = name;
+      if (nameKhmer !== (user.nameKhmer || '')) payload.nameKhmer = nameKhmer;
       if (phone !== (user.phone || '')) payload.phone = phone;
       if (address !== (user.address || '')) payload.address = address;
       if (dob !== (formatDateDisplay(user.dob) || '')) payload.dob = dob;
@@ -1171,7 +1253,6 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
   if (currentUser) updateMemberButton(currentUser);
 
   // ---- Button click: if logged in, open dashboard; else open modal ----
-  const modalTitle = document.getElementById('member-modal-title');
   memberTriggers.forEach((t) => {
     t.addEventListener('click', (e) => {
       e.preventDefault();
@@ -1182,7 +1263,7 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
         memberModal.classList.add('is-open'); memberModal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
         if (loginPanel) loginPanel.style.display = 'block';
         if (registerPanel) registerPanel.style.display = 'none';
-        if (modalTitle) modalTitle.textContent = 'Member Login';
+        setMemberModalTitle('member_login_title');
       }
     });
   });
@@ -1221,10 +1302,12 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       nav_about_vwd: "About VWD",
       nav_other_bleeding: "About other bleeding disorders",
       nav_treatment_centres: "Treatment Centres",
+      nav_programs: "Haemophilia Treatment Centres",
+      nav_csr: "CSR Program",
       nav_csr_program: "CSR Program",
-      nav_fundraising: "Fundraising",
-      nav_online_donation: "Online donation",
-      nav_corporate_partners: "Corporate Partners",
+      nav_csr_fundraising: "Fundraising",
+      nav_csr_donate: "Online donation",
+      nav_csr_partners: "Corporate Partners",
       nav_news: "News",
       nav_latest_news: "Latest News",
       nav_upcoming_events: "Upcoming Events",
@@ -1257,6 +1340,7 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       help_learn_more: "Learn More",
       help_join_now: "Join Now",
       help_donate_now: "Donate Now",
+      chatWithUs: "Chat with us",
       /* News */
       news_heading: "Latest News & Events",
       news_sub: "Updates from our community awareness, treatment guidelines and training programs.",
@@ -1280,6 +1364,10 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       cta_donate: "Donate Now",
       /* About */
       about_divider: "About Us",
+      about_hero_eyebrow: "About CHA Cambodia",
+      about_badge_title: "Patient-Led NGO",
+      about_badge_sub: "Est. 2011 · WFH Member",
+      about_frame_tag: "Est. 2011 · Phnom Penh",
       about_heading: "Who is CHA?",
       about_lead: "The Cambodian Haemophilia Association is a patient-led organization dedicated to improving the quality of life for people living with bleeding disorders across Cambodia.",
       about_vision_label: "Our Vision",
@@ -1313,10 +1401,47 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       src_cta_btn_1: "Get Involved",
       src_cta_btn_2: "Learn More",
       /* History */
+      history_journey_eyebrow: "Our Journey · Since 2011",
       history_heading: "Our History",
       history_view_timeline: "View Full Timeline",
       history_intro: "CHA was founded in 2011 by patients and families who came together with a shared vision: to ensure no one in Cambodia faces a bleeding disorder alone. What began as a small support group has grown into a national patient-led organization.",
       history_presidents: "Past Presidents",
+      history_tab_1: "Established",
+      history_tab_2: "WFH Member",
+      history_tab_3: "Partnerships",
+      history_tab_4: "National Reach",
+      history_phase_1: "Phase 01 · Genesis",
+      history_era_2011: "Year 2011",
+      history_h1_1: "Founded by compassionate families & pioneering patients in Phnom Penh",
+      history_h1_2: "Created Cambodia's first peer-to-peer haemophilia support registry",
+      history_btn_explore_2014: "Explore 2014: Global Recognition",
+      history_badge_2011: "Founding Era · 2011",
+      history_c1_title: "United by Hope",
+      history_c1_desc: "Patient support circle during CHA's inaugural foundation meeting.",
+      history_phase_2: "Phase 02 · International Alliance",
+      history_era_2014: "Year 2014",
+      history_h2_1: "Direct inclusion in the WFH Humanitarian Aid Program",
+      history_h2_2: "International standards for diagnostic validation and safe clotting factor",
+      history_btn_explore_2017: "Explore 2017: Hospital Partnerships",
+      history_badge_2014: "Global Alignment · 2014",
+      history_c2_title: "World Federation of Hemophilia",
+      history_c2_desc: "Connecting Cambodian patients to the global community of care.",
+      history_phase_3: "Phase 03 · Clinical Expansion",
+      history_era_2017: "Year 2017",
+      history_h3_1: "Treating hospital network established with emergency factor supplies",
+      history_h3_2: "Specialized training for nurses and haematologists on bleed management",
+      history_btn_explore_2023: "Explore 2023: National Reach",
+      history_badge_2017: "Hospital Units · 2017",
+      history_c3_title: "Clinical Capacity Building",
+      history_c3_desc: "Collaborating with hospital clinical teams to expedite acute care.",
+      history_phase_4: "Phase 04 · Community & Digital",
+      history_era_2023: "Year 2023",
+      history_h4_1: "Outreach camps covering 10+ Cambodian provinces",
+      history_h4_2: "Digital member health cards for immediate emergency diagnosis identification",
+      history_btn_explore_2011: "Back to 2011: Origins",
+      history_badge_2023: "Nationwide · 2023",
+      history_c4_title: "Nationwide Family",
+      history_c4_desc: "Empowering bleeding disorder patients and families across Cambodia.",
       history_established: "CHA Established",
       history_established_desc: "CHA was established by patients and families.",
       history_wfh_member: "WFH Member",
@@ -1327,6 +1452,116 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       history_national_desc: "Expanded education and outreach across provinces.",
       history_president: "President",
       /* Leadership */
+      lead_mandate_eyebrow: "5th Mandate (2026–2030)",
+      lead_chart_motto: "Sustaining The Association For The Hemophilia Patients' Well-being",
+      lead_role_founder_adv: "Founder & Advisor",
+      lead_badge_founder: "Founder",
+      lead_badge_cofounder: "Co-Founder",
+      lead_role_med_adv: "Medical Advisor",
+      lead_name_sophal: "Prof. Chean Sophâl",
+      lead_desc_sophal: "Founding Patron & Clinical Advisor",
+      lead_role_cofounder_adv: "Co-Founder & Advisor",
+      lead_name_singheng: "Dr. Sing Heng",
+      lead_desc_singheng: "Co-Founder & Medical Advisor",
+      lead_role_hon_pres: "Honorary President",
+      lead_name_sokpanha: "Mr. Sem Sokpanha",
+      lead_desc_sokpanha: "Honorary Leadership Patron",
+      lead_flow_exec: "Executive Governance",
+      lead_tier_exec: "Executive Board Officers",
+      lead_role_pres: "President",
+      lead_name_chanthearithy: "Mr. Run C. Rithy",
+      lead_mandate_pres: "5th Mandate (2026–2030)",
+      lead_role_vp: "Vice President",
+      lead_name_syneang: "Mr. Noeurn Syneang",
+      lead_mandate_vp: "CHA Vice President",
+      lead_role_treasurer: "Head of Finance",
+      lead_name_somaly: "Mrs. Soung Somaly",
+      lead_mandate_cfo: "Chief Financial Officer",
+      lead_role_secgen: "Secretary General",
+      lead_name_choryee: "Mrs. Hun Choryee",
+      lead_mandate_secgen: "Secretary General",
+      lead_flow_depts: "Operational Team & Department Heads",
+      dept_badge_1: "CHA Supporting Group",
+      dept_name_1: "Mr. Sreng Sung",
+      dept_role_1: "Head of Siem Reap Supporting Group",
+      dept_badge_2: "Digital",
+      dept_name_2: "Mr. Oum Naro",
+      dept_role_2: "Head of Digital",
+      dept_badge_3: "Head of Reaction Unit",
+      dept_name_3: "Mr. Kan Sokkhai",
+      dept_role_3: "Head of Reaction Unit",
+      dept_badge_5: "Deputy Secretary General & Head of Volunteers",
+      dept_name_5: "Mr. Sath Dara",
+      dept_role_5: "Deputy Secretary General & Head of Volunteers",
+      dept_role_5_chart: "Deputy Secretary General & Head of Volunteers",
+      hubs_eyebrow: "Grassroots & Operational Networks",
+      hubs_title: "Specialized Working Groups & Regional Chapters",
+      hubs_subtitle: "On-the-ground patient empowerment, youth advocacy, women’s care circles, and provincial hospital outreach across Cambodia.",
+      hub_badge_youth: "Youth Advocacy",
+      hub_count_7: "7 Members",
+      hub_team_7: "Team (7)",
+      hub_role_leader: "Group Leader",
+      hub_lead_kc: "Mr. Keopich Chanda",
+      hub_oversight_1: "Supervised by Mr. Run Chanthearithy & Mr. Kan Sokkhai",
+      hub_badge_women: "Women & Family Care",
+      hub_count_12: "12 Members",
+      hub_team_12: "Team (12)",
+      hub_lead_sr: "Mrs. Sum Roatha",
+      hub_badge_src: "Northwest Regional Hub",
+      hub_count_6: "6 Members",
+      hub_team_6: "Team (6)",
+      hub_name_src: "Siem Reap Chapter (SRC)",
+      hub_desc_src: "Coordinating regional clinical outreach, emergency clotting factor delivery, and hospital care with Angkor Hospital for Children and local health centres.",
+      hub_role_chapter_head: "Chapter Head",
+      hub_lead_ss: "Mr. Sreng Sung",
+      hub_oversight_src: "Clinical Advisor: Dr. Sing Heng (Medical Advisor)",
+      hub_badge_volunteers: "Community Field Force",
+      hub_name_volunteers: "Volunteer Network",
+      hub_desc_volunteers: "Frontline volunteers mobilizing across provinces to support patient hospital transport, community roadshows, emergency donation logistics, and blood drives.",
+      hub_role_network_leader: "Network Leader",
+      hub_lead_sd: "Mr. Sath Dara",
+      /* Working Group & Chapter Roster Drawers */
+      roster_role_deputy_leader: "Deputy Leader",
+      roster_role_finance: "Finance Coordinator",
+      roster_role_admin: "Administration",
+      roster_role_youth_vol: "Youth Volunteer",
+      roster_role_member: "Member",
+      roster_role_supervisor: "Supervisor",
+      roster_role_reg_vol: "Regional Volunteer",
+      roster_role_field_vol: "Field Volunteer",
+      roster_youth_title: "Youth Group Team",
+      roster_youth_subtitle: "7 active members & officers",
+      roster_youth_m1_name: "Mr. Say Ouksaphea",
+      roster_youth_m2_name: "Mr. Ky Eangtol",
+      roster_youth_m3_name: "Mr. Srim Pengleang",
+      roster_youth_m4_name: "Mr. Khan Dara",
+      roster_women_title: "Women's Group Team",
+      roster_women_subtitle: "12 active members & officers",
+      roster_women_m1_name: "Mrs. Yim Mary",
+      roster_women_m2_name: "Mrs. Him Somala",
+      roster_women_m3_name: "Mrs. Srim Sreypich",
+      roster_women_m4_name: "Mrs. Try Kakada",
+      roster_women_m5_name: "Mrs. Phon Sokny",
+      roster_women_m6_name: "Mrs. Som Phalla",
+      roster_women_m7_name: "Mrs. Heng Sim",
+      roster_women_m8_name: "Mrs. Touch Socheata",
+      roster_women_m9_name: "Mrs. Hou Sreyny",
+      roster_src_title: "Siem Reap Chapter Team",
+      roster_src_subtitle: "6 active members & officers",
+      roster_src_m1_name: "Mr. Run Chanthearithy",
+      roster_src_m2_name: "Ms. Keo Sovandy",
+      roster_src_m3_name: "Mrs. Sun Sokhorn",
+      roster_src_m4_name: "Mr. Pach Panhavorinvong",
+      roster_vol_title: "Volunteer Network Team",
+      roster_vol_subtitle: "12 active members & volunteers",
+      roster_vol_m1_name: "Ms. Chor Sonita",
+      roster_vol_m2_name: "Ms. Srin Vinching",
+      roster_vol_m3_name: "Ms. Oeun Sreyneath",
+      roster_vol_m4_name: "Mr. Pov Lay",
+      roster_vol_m5_name: "Mr. Phorn Soveat",
+      roster_vol_m6_name: "Mr. Mom Bunthart",
+      roster_vol_m7_name: "Mr. Yong Tetyutthuon",
+      roster_vol_m8_name: "Ms. Noeurn SoVannitta",
       leadership_heading: "Leadership Team",
       leadership_sub: "Dedicated individuals leading CHA's mission across Cambodia.",
       leadership_meet: "Meet the Full Team",
@@ -1335,6 +1570,38 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       leadership_women_title: "Women's Group",
       leadership_women_desc: "Empowering women affected by bleeding disorders through support circles, education on VWD and carrier issues, and community-building events.",
       /* WFH */
+      wfh_alliances_eyebrow: "Global Alliances & International Twinning",
+      wfh_switch_wfh: "World Federation of Hemophilia",
+      wfh_switch_hfa: "Haemophilia Foundation Australia",
+      wfh_hq_montreal: "Montreal, Canada · Global Federation",
+      wfh_metric_membership: "Active Membership",
+      wfh_metric_passthrough: "Humanitarian Pass-through",
+      wfh_p1_title: "Humanitarian Aid & Factor Donations",
+      wfh_p1_desc: "Securing emergency clotting factor concentrates distributed directly to treatment centers across Cambodia.",
+      wfh_p2_title: "Standardized Clinical Guidelines",
+      wfh_p2_desc: "Deploying WFH international diagnostic standards and comprehensive care models for Cambodian pediatric clinics.",
+      wfh_p3_title: "Global Advocacy & Assembly Representation",
+      wfh_p3_desc: "Representing Cambodian bleeding disorder patients at the biennial WFH World Congress.",
+      wfh_official_portal: "Official Portal",
+      wfh_btn_explore_hfa: "Explore HFA Australia Twinning",
+      wfh_glass_title: "WFH Global Network",
+      wfh_glass_subtitle: "Recognized National Member Organization",
+      wfh_pill_member_since: "Official Member · Since 2014",
+      wfh_hq_melbourne: "Melbourne, Australia · Twinning Alliance",
+      wfh_metric_clinicians: "Clinicians Mentored",
+      wfh_metric_bilateral_val: "Bilateral",
+      wfh_metric_bilateral_lbl: "Active Twinning",
+      wfh_hfa_p1_title: "Clinical Mentorship & Medical Fellowships",
+      wfh_hfa_p1_desc: "Connecting Australian senior hematologists with Cambodian doctors and hospital staff.",
+      wfh_hfa_p2_title: "Specialized Nurse & Physiotherapy Workshops",
+      wfh_hfa_p2_desc: "Practical rehabilitation guidance to prevent joint immobility and muscle bleeding complications.",
+      wfh_hfa_p3_title: "Youth & Family Advocacy Camps",
+      wfh_hfa_p3_desc: "Empowering parents, carriers, and youth ambassadors with self-infusion and psychosocial support.",
+      wfh_at_hfa: "at HFA Australia",
+      wfh_btn_view_wfh: "View WFH Global Partnership",
+      wfh_hfa_glass_title: "Australia Twinning Alliance",
+      wfh_hfa_glass_subtitle: "Capacity Building & Clinical Mentorship",
+      wfh_pill_twinning_partner: "Twinning Program Partner",
       wfh_heading: "Our Work with WFH & HFA",
       wfh_sub: "CHA proudly partners with leading global organizations to strengthen haemophilia care across Cambodia.",
       wfh_wfh_name: "World Federation of Hemophilia",
@@ -1348,11 +1615,14 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       wfh_hfa_desc: "HFA partners with CHA on capacity building, clinical training, and patient advocacy. Joint programs connect Cambodian clinicians with Australian expertise.",
       wfh_hfa_link: "Learn More",
       /* Haemophilia */
+      haem_eyebrow: "Genetic Bleeding Condition",
       haem_divider: "About Haemophilia",
       haem_heading: "What is Haemophilia?",
       haem_contact: "Contact a Specialist",
       haem_para_1: "Haemophilia is a rare genetic bleeding disorder that affects a person's ability to stop bleed. People with haemophilia can bleed longer than others after an injury or even without a known cause.",
       haem_para_2: "While there is no cure, modern treatments allow people with haemophilia to live full, active and healthy lives. Early diagnosis, proper treatment and ongoing support are key to preventing complications and joint damage.",
+      haem_clot_title: "Clotting Cascade Deficiency",
+      haem_clot_desc: "Factor VIII (A) & Factor IX (B) Coagulation Mesh",
       /* Types */
       types_heading: "Types of Haemophilia",
       types_sub: "The two main types of haemophilia — both require proper diagnosis and lifelong management.",
@@ -1361,8 +1631,14 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       types_b_title: "Haemophilia B",
       types_b_desc: "Caused by a deficiency of factor IX. Sometimes called Christmas disease.",
       /* Symptoms */
+      symptoms_eyebrow: "Clinical Indicators",
       symptoms_heading: "Common Symptoms",
       symptoms_sub: "Recognizing the signs of a bleeding disorder is the first step toward diagnosis and proper care.",
+      symptom_sign_1: "Sign 01",
+      symptom_sign_2: "Sign 02",
+      symptom_sign_3: "Sign 03",
+      symptom_sign_4: "Sign 04",
+      symptom_sign_5: "Sign 05",
       symptom_bruising: "Easy Bruising",
       symptom_bruising_desc: "Unexplained bruises from minor bumps or pressure.",
       symptom_nosebleeds: "Frequent Nosebleeds",
@@ -1377,10 +1653,14 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       symptom_find_centre: "Find a Treatment Centre",
       symptom_contact_specialist: "Contact a Specialist",
       /* VWD */
+      vwd_eyebrow: "Most Common Bleeding Disorder",
       vwd_heading: "Von Willebrand Disease (VWD)",
       vwd_para_1: "Von Willebrand Disease is the most common inherited bleeding disorder, affecting both males and females equally. It is caused by a deficiency or dysfunction of von Willebrand factor (VWF), a protein that helps blood clot.",
       vwd_para_2: "There are three main types of VWD — Type 1 (mild), Type 2 (moderate), and Type 3 (severe). Each varies in how much VWF is present and how well it functions. Symptoms include easy bruising, frequent nosebleeds, heavy menstrual bleeding, and prolonged bleeding after surgery or injury.",
       vwd_find: "Find Treatment",
+      vwd_action_note: "Affects up to 1% of the world's population",
+      vwd_chip_title: "Von Willebrand Factor (VWF)",
+      vwd_chip_desc: "Platelet Adhesion & Factor VIII Stabilizer",
       /* Other */
       other_heading: "Other Bleeding Disorders",
       other_rare_title: "Rare Factor Deficiencies",
@@ -1389,9 +1669,28 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       other_platelet_desc: "Conditions where platelets don't work properly, leading to bleeding despite normal platelet counts.",
       other_more: "For more information on any bleeding disorder, contact our team or visit a treatment centre.",
       /* Treatment */
+      tc_eyebrow: "National Care Partners",
       treatment_heading: "Treatment Centres",
       treatment_sub: "Find haemophilia treatment centres across Cambodia — search by province.",
       treatment_select: "Select Province",
+      tc_select_all: "All Provinces (Nationwide)",
+      tc_active_badge: "2 Verified Centres Active",
+      province_phnom_penh: "Phnom Penh",
+      province_siem_reap: "Siem Reap",
+      province_battambang: "Battambang",
+      province_sihanoukville: "Sihanoukville",
+      tc_nph_title: "National Pediatric Hospital (NPH) — Haemophilia Clinic",
+      tc_nph_address: "100 Russian Blvd, Phnom Penh",
+      tc_nph_hours: "Mon – Fri: 8:00 AM – 4:30 PM",
+      tc_ahc_title: "Angkor Hospital for Children (AHC) — Haemophilia Unit",
+      tc_ahc_address: "Tep Vong St, Siem Reap",
+      tc_ahc_hours: "Mon – Sun: 24h Inpatient",
+      tc_tag_haem_ab: "Haemophilia A & B",
+      tc_tag_vwd_care: "VWD Care",
+      tc_tag_consultation: "Consultation",
+      tc_tag_diagnostic: "Diagnostic Lab",
+      tc_tag_factor_rep: "Factor Replacement",
+      tc_tag_family_counselling: "Family Counselling",
       treatment_view_map: "View on Map",
       treatment_emergency: "Emergency Support",
       treatment_emergency_desc: "If you have a bleeding emergency, contact your nearest treatment centre or call our support line.",
@@ -1437,6 +1736,21 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       membership_benefit_5_desc: "Stay informed with the latest news and CHA announcements.",
       /* Donate */
       donate_heading: "Make a Donation",
+      donate_khqr_badge: "KHQR National Pay",
+      donate_scan_title: "Scan & Support",
+      donate_scan_desc: "Directly transfer your donation using ABA Mobile, Bakong, Wing, ACLEDA, Canadia, or banking apps across Cambodia.",
+      donate_modal_desc: "Scan with ABA Mobile, Bakong, or any Cambodian banking app to send your contribution.",
+      donate_account_name_lbl: "ACCOUNT NAME",
+      donate_copy_btn: "Copy Account Number",
+      donate_modal_copy_btn: "Copy",
+      donate_save_qr_btn: "Save QR Image",
+      donate_step1_title: "Open Banking App",
+      donate_step1_desc: "ABA, Bakong, etc.",
+      donate_step2_title: "Scan KHQR Code",
+      donate_step2_desc: "Point camera at QR",
+      donate_step3_title: "Enter Amount",
+      donate_step3_desc: "Directly support patients",
+      donate_trust_note: "Instant Direct Settlement · Zero Processing Fee",
       /* Contact */
       contact_divider: "Contact Us",
       contact_heading: "Contact Us",
@@ -1462,7 +1776,7 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       contact_subject_ph: "What's this about?",
       contact_message_ph: "How can we help?",
       contact_send: "Send Message",
-      contact_address_val: "#35, St. 121, Sangkat Tuel Tumpong 2, Khan Chamkarmon, Phnom Penh, Cambodia",
+      contact_address_val: "#Building 100, Russia Blvd (114), Phnom Penh, Cambodia, P.O Box 700",
       /* Footer */
       footer_tagline: "Supporting people with bleeding disorders across Cambodia.",
       footer_quick_links: "Quick Links",
@@ -1480,7 +1794,10 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       footer_get_involved: "Get Involved",
       footer_address: "Phnom Penh, Cambodia",
       /* Campaigns */
+      campaigns_active: "Active Initiatives",
       campaigns_heading: "Current Campaigns",
+      campaigns_ongoing: "Ongoing",
+      campaigns_view_all: "View All",
       campaigns_1_title: "Patient Support Fund",
       campaigns_1_desc: "Help patients access essential treatment and medication.",
       campaigns_2_title: "Education & Awareness",
@@ -1490,6 +1807,21 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       campaigns_raised_label: "raised",
       campaigns_goal_label: "Goal",
       campaigns_partners: "Corporate Partners",
+      campaigns_partners_sub: "Global Healthcare Allies",
+      campaigns_archive_heading: "Current Campaigns",
+      campaigns_archive_sub: "Support our mission — every contribution changes lives across Cambodia.",
+      news_archive_heading: "News & Events",
+      news_archive_sub: "Stay updated with the latest from the Cambodian Haemophilia Association.",
+      news_filter_all: "All",
+      news_filter_event: "Event",
+      news_filter_update: "Update",
+      news_filter_workshop: "Workshop",
+      news_filter_announcement: "Announcement",
+      news_badge_event: "Event",
+      news_badge_update: "Update",
+      news_badge_workshop: "Workshop",
+      news_badge_announcement: "Announcement",
+      news_back_to_news: "Back to News",
       nav_member: "Become a Member",
       nav_my_card: "My Card",
       nav_volunteer: "Volunteer",
@@ -1524,6 +1856,82 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       dash_ph_address: "Address",
       dash_ph_name: "Name",
       dash_ph_condition: "e.g. Hemophilia A",
+      /* Modals & Forms */
+      donate_modal_title: "Make a Donation",
+      donate_modal_heading: "Help Change Lives!",
+      donate_modal_sub: "Your support provides treatment, education, and hope to people with bleeding disorders in Cambodia.",
+      donate_acct_name: "Donation",
+      donate_acct_sub: "Secure & encrypted",
+      donate_acct_safe: "Safe",
+      donate_other: "Other",
+      donate_ph_amount: "Enter amount in USD",
+      donate_secure_title: "Secure Payment",
+      donate_secure_desc: "Pay securely with credit/debit cards, ABA Pay, KHQR, WeChat Pay or Alipay via PayWay (ABA Bank).",
+      donate_btn: "Donate Now",
+      donate_footer_note: "Secure & encrypted via PayWay (ABA Bank)",
+      member_login_title: "Member Login",
+      member_login_sub: "Sign in to access your account, resources, and community.",
+      form_email_label: "Email",
+      form_email_ph: "Enter your email",
+      form_pass_label: "Password",
+      form_pass_ph: "Enter your password",
+      form_create_pass_ph: "Create a password",
+      member_forgot: "Forgot password?",
+      member_signin_btn: "Sign In",
+      member_register_link: "Register",
+      member_register_modal_title: "Register",
+      member_register_title: "Join our community of patients, families, and members.",
+      form_i_am_a: "I am a",
+      role_member: "Member",
+      role_patient: "Patient",
+      role_patient_desc: "I have Haemophilia",
+      form_name_label: "Full name",
+      form_name_ph: "Enter your full name",
+      form_phone_label: "Phone number (optional)",
+      form_phone_ph: "Enter your phone number",
+      form_address_label: "Address (optional)",
+      form_address_ph: "Enter your address",
+      form_hemophilia_type_lbl: "Hemophilia Type",
+      form_select_type: "Select type",
+      form_opt_other: "Other",
+      form_specify_cond_ph: "Specify your condition",
+      form_select_blood: "Select blood type",
+      form_terms_agree: "I agree to the",
+      form_terms_link: "Terms & Conditions",
+      member_register_btn: "Register",
+      member_already_account: "Already have an account?",
+      member_forgot_title: "Reset Password",
+      member_forgot_sub: "Enter your email and we will send you a link to reset your password.",
+      member_forgot_btn: "Send Reset Link",
+      /* Patient Card i18n */
+      card_title_front: "Patient Identification Card",
+      card_title_eng: "Patient Identification Card",
+      card_title_back: "Patient Identification Card",
+      card_label_id: "Member ID",
+      card_label_name_khmer: "Khmer Name",
+      card_label_name_latin: "Latin Name",
+      card_label_dob: "Date of Birth",
+      card_label_condition: "Hemophilia Type",
+      card_label_blood: "Blood Type",
+      card_label_issue_date: "Issue Date",
+      card_label_address: "Address",
+      card_label_phone: "Phone",
+      card_hotline_nph: "National Pediatric Hospital Hotline: 012 751 728",
+      card_hotline_ahc: "Angkor Hospital for Children Hotline: 063 963 409",
+      card_keep_notice: "Please keep this member ID card in good condition.",
+      card_qr_label: "Scan Us",
+      card_org_name_kh: "Cambodian Hemophilia Association",
+      card_org_name_en: "Cambodian Hemophilia Association",
+      card_rules_heading: "Conditions:",
+      card_rule_1: "1. This patient ID card is for use exclusively within the Cambodian Hemophilia Association.",
+      card_rule_2: "2. This card is valid throughout the 5th mandate (2026–2030).",
+      card_rule_3: "3. All patients must renew their ID card before May 17, 2030.",
+      card_president_label: "Association President",
+      card_president_name: "Run Chanthearithy",
+      card_office_address: "Address: No. 100 Russian Federation Blvd, Phnom Penh. Tel: (+855) 96 660 5334",
+      dash_flip_card: "Flip Card",
+      dash_side_front: "Front Side",
+      dash_side_back: "Back Side",
     },
     km: {
       /* Nav */
@@ -1549,10 +1957,15 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       nav_haemophilia_vwd: "អំពីជំងឺ VWD",
       nav_haemophilia_other: "អំពីអាការៈហូរឈាមផ្សេងទៀត",
       nav_treatment_centres: "មជ្ឈមណ្ឌលព្យាបាលជំងឺហេម៉ូហ្វីលា",
+      nav_programs: "មជ្ឈមណ្ឌលព្យាបាលជំងឺហេម៉ូហ្វីលា",
+      nav_csr: "កម្មវិធី CSR",
       nav_csr_program: "កម្មវិធី CSR",
       nav_fundraising: "ប្រមូលថវិកា",
+      nav_csr_fundraising: "ប្រមូលថវិកា",
       nav_online_donation: "បរិច្ចាគតាមអ៊ីនធឺណិត",
+      nav_csr_donate: "បរិច្ចាគតាមអ៊ីនធឺណិត",
       nav_corporate_partners: "ដៃគូអាជីវកម្ម",
+      nav_csr_partners: "ដៃគូអាជីវកម្ម",
       nav_news: "ព័ត៌មាន",
       nav_latest_news: "ព័ត៌មានថ្មីៗ",
       nav_upcoming_events: "ព្រឹត្តិការណ៍ខាងមុខ",
@@ -1587,6 +2000,7 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       help_learn_more: "ស្វែងយល់បន្ថែម",
       help_join_now: "ចូលរួមឥឡូវ",
       help_donate_now: "បរិច្ចាគឥឡូវ",
+      chatWithUs: "ជជែកជាមួយយើង",
       /* News */
       news_heading: "ព័ត៌មាន និងព្រឹត្តិការណ៍ថ្មីៗ",
       news_sub: "ព័ត៌មានថ្មីៗពីសកម្មភាពសហគមន៍ គោលនាំព្យាបាល និងកម្មវិធីបណ្តុះបណ្តាល។",
@@ -1610,6 +2024,10 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       cta_donate: "បរិច្ចាគឥឡូវ",
       /* About */
       about_divider: "អំពីយើង",
+      about_hero_eyebrow: "អំពី CHA កម្ពុជា",
+      about_badge_title: "អង្គការដឹកនាំដោយអ្នកជំងឺ",
+      about_badge_sub: "បង្កើតឆ្នាំ ២០១១ · សមាជិក WFH",
+      about_frame_tag: "បង្កើតឆ្នាំ ២០១១ · រាជធានីភ្នំពេញ",
       about_heading: "CHA ជាអ្វី?",
       about_lead: "សមាគមជំងឺហេម៉ូហ្វីលាកម្ពុជា (CHA) គឺជាអង្គការដឹកនាំដោយអ្នកជំងឺ ដែលឧទ្ទិសដល់ការកែលម្អគុណភាពជីវិតរបស់អ្នកដែលរស់នៅជាមួយអាការៈហូរឈាមនៅទូទាំងប្រទេសកម្ពុជា។",
       about_vision_label: "ចក្ខុវិស័យ",
@@ -1643,10 +2061,47 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       src_cta_btn_1: "ចូលរួម",
       src_cta_btn_2: "ស្វែងយល់បន្ថែម",
       /* History */
+      history_journey_eyebrow: "ដំណើររបស់យើង · តាំងពីឆ្នាំ ២០១១",
       history_heading: "ប្រវត្តិសាស្រ្ត",
       history_view_timeline: "មើលពេលវេលាពេញ",
       history_intro: "CHA ត្រូវបានបង្កើតឡើងក្នុងឆ្នាំ ២០១១ ដោយអ្នកជំងឺ និងគ្រួសារដែលមានចក្ខុវិស័យរួមគ្នា៖ ធានាថាមិនមានអ្នកណាម្នាក់នៅកម្ពុជាជួបប្រទះអាការៈហូរឈាមម្នាក់ឯង។",
       history_presidents: "ប្រធានកាលពីអតីត",
+      history_tab_1: "បង្កើតឡើង",
+      history_tab_2: "សមាជិក WFH",
+      history_tab_3: "ភាពជាដៃគូ",
+      history_tab_4: "ទូទាំងប្រទេស",
+      history_phase_1: "ដំណាក់កាលទី ០១ · ចាប់ផ្តើម",
+      history_era_2011: "ឆ្នាំ ២០១១",
+      history_h1_1: "បង្កើតឡើងដោយក្រុមគ្រួសារប្រកបដោយសេចក្តីមេត្តា និងអ្នកជំងឺឈានមុខនៅភ្នំពេញ",
+      history_h1_2: "បានបង្កើតបញ្ជីឈ្មោះគាំទ្រអ្នកជំងឺហេម៉ូហ្វីលាដំបូងគេនៅកម្ពុជា",
+      history_btn_explore_2014: "ស្វែងយល់ឆ្នាំ ២០១៤៖ ការទទួលស្គាល់ជាសកល",
+      history_badge_2011: "សម័យកាលបង្កើត · ឆ្នាំ ២០១១",
+      history_c1_title: "រួបរួមគ្នាដោយក្តីសង្ឃឹម",
+      history_c1_desc: "រង្វង់គាំទ្រអ្នកជំងឺក្នុងអំឡុងពេលកិច្ចប្រជុំបង្កើតដំបូងរបស់ CHA។",
+      history_phase_2: "ដំណាក់កាលទី ០២ · សម្ព័ន្ធភាពអន្តរជាតិ",
+      history_era_2014: "ឆ្នាំ ២០១៤",
+      history_h2_1: "ការដាក់បញ្ចូលដោយផ្ទាល់ទៅក្នុងកម្មវិធីជំនួយមនុស្សធម៌ WFH",
+      history_h2_2: "ស្តង់ដារអន្តរជាតិសម្រាប់ការបញ្ជាក់រោគវិនិច្ឆ័យ និងកត្តាកំណកឈាមសុវត្ថិភាព",
+      history_btn_explore_2017: "ស្វែងយល់ឆ្នាំ ២០១៧៖ ភាពជាដៃគូមន្ទីរពេទ្យ",
+      history_badge_2014: "ការតម្រឹមជាសកល · ឆ្នាំ ២០១៤",
+      history_c2_title: "សហព័ន្ធគាំទ្រជំងឺហេម៉ូហ្វីលាពិភពលោក",
+      history_c2_desc: "ការតភ្ជាប់អ្នកជំងឺកម្ពុជាទៅកាន់សហគមន៍ថែទាំសកលលោក។",
+      history_phase_3: "ដំណាក់កាលទី ០៣ · ការពង្រីកគ្លីនិក",
+      history_era_2017: "ឆ្នាំ ២០១៧",
+      history_h3_1: "បណ្តាញមន្ទីរពេទ្យព្យាបាលត្រូវបានបង្កើតឡើងជាមួយការផ្គត់ផ្គង់កត្តាសង្គ្រោះបន្ទាន់",
+      history_h3_2: "ការបណ្តុះបណ្តាលឯកទេសសម្រាប់គិលានុបដ្ឋាយិកា និងគ្រូពេទ្យឯកទេសឈាមស្តីពីការគ្រប់គ្រងការហូរឈាម",
+      history_btn_explore_2023: "ស្វែងយល់ឆ្នាំ ២០២៣៖ ការឈានដល់ថ្នាក់ជាតិ",
+      history_badge_2017: "អង្គភាពមន្ទីរពេទ្យ · ឆ្នាំ ២០១៧",
+      history_c3_title: "ការកសាងសមត្ថភាពគ្លីនិក",
+      history_c3_desc: "កិច្ចសហការជាមួយក្រុមគ្លីនិកមន្ទីរពេទ្យដើម្បីពន្លឿនការថែទាំបន្ទាន់។",
+      history_phase_4: "ដំណាក់កាលទី ០៤ · សហគមន៍ និងឌីជីថល",
+      history_era_2023: "ឆ្នាំ ២០២៣",
+      history_h4_1: "ជំរុំផ្សព្វផ្សាយគ្របដណ្តប់លើសពី ១០ ខេត្តនៅកម្ពុជា",
+      history_h4_2: "ប័ណ្ណសុខភាពសមាជិកឌីជីថលសម្រាប់ការកំណត់អត្តសញ្ញាណរោគវិនិច្ឆ័យសង្គ្រោះបន្ទាន់ភ្លាមៗ",
+      history_btn_explore_2011: "ត្រឡប់ទៅឆ្នាំ ២០១១៖ ប្រភពដើម",
+      history_badge_2023: "ទូទាំងប្រទេស · ឆ្នាំ ២០២៣",
+      history_c4_title: "គ្រួសារទូទាំងប្រទេស",
+      history_c4_desc: "ពង្រឹងសមត្ថភាពអ្នកជំងឺ និងក្រុមគ្រួសារដែលមានបញ្ហាហូរឈាមទូទាំងប្រទេសកម្ពុជា។",
       history_established: "CHA បង្កើតឡើង",
       history_established_desc: "CHA ត្រូវបានបង្កើតឡើងដោយអ្នកជំងឺ និងគ្រួសារ។",
       history_wfh_member: "សមាជិក WFH",
@@ -1657,6 +2112,116 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       history_national_desc: "ពង្រីកការអប់រំ និងការឈានដល់ទូទាំងខេត្ត។",
       history_president: "ប្រធាន",
       /* Leadership */
+      lead_mandate_eyebrow: "អាណត្តិទី ៥ (២០២៦–២០៣០)",
+      lead_chart_motto: "ទ្រទ្រង់សមាគម ដើម្បីសុខុមាលភាពអ្នកជំងឺអេម៉ូហ្វីលី",
+      lead_role_founder_adv: "ស្ថាបនិក និងទីប្រឹក្សា",
+      lead_badge_founder: "ស្ថាបនិក",
+      lead_badge_cofounder: "សហស្ថាបនិក",
+      lead_role_med_adv: "ទីប្រឹក្សាវេជ្ជសាស្ត្រ",
+      lead_name_sophal: "សាស្ត្រាចារ្យ ឈាន សុផល",
+      lead_desc_sophal: "ស្ថាបនិកគាំទ្រ និងទីប្រឹក្សាគ្លីនិក",
+      lead_role_cofounder_adv: "សហស្ថាបនិក និងទីប្រឹក្សា",
+      lead_name_singheng: "វេជ្ជបណ្ឌិត ស៊ឹង ហេង",
+      lead_desc_singheng: "សហស្ថាបនិក និងទីប្រឹក្សាវេជ្ជសាស្ត្រ",
+      lead_role_hon_pres: "ប្រធានកិត្តិយស",
+      lead_name_sokpanha: "លោក សែម សុខបញ្ញា",
+      lead_desc_sokpanha: "ឥស្សរជនដឹកនាំកិត្តិយស",
+      lead_flow_exec: "អភិបាលកិច្ចប្រតិបត្តិ",
+      lead_tier_exec: "មន្ត្រីក្រុមប្រឹក្សាភិបាលប្រតិបត្តិ",
+      lead_role_pres: "ប្រធាន",
+      lead_name_chanthearithy: "លោក រុន ស៊ី. រិទ្ធី",
+      lead_mandate_pres: "អាណត្តិទី ៥ (២០២៦–២០៣០)",
+      lead_role_vp: "អនុប្រធាន",
+      lead_name_syneang: "លោក នឿន ស៊ីនាង",
+      lead_mandate_vp: "អនុប្រធាន CHA",
+      lead_role_treasurer: "ប្រធានផ្នែកហិរញ្ញវត្ថុ",
+      lead_name_somaly: "លោកស្រី ស៊ូង សុម៉ាលី",
+      lead_mandate_cfo: "ប្រធានផ្នែកហិរញ្ញវត្ថុ",
+      lead_role_secgen: "អគ្គលេខាធិការ",
+      lead_name_choryee: "លោកស្រី ហ៊ុន ចរិយា",
+      lead_mandate_secgen: "អគ្គលេខាធិការ",
+      lead_flow_depts: "ក្រុមការងារប្រតិបត្តិ និងប្រធាននាយកដ្ឋាន",
+      dept_badge_1: "ក្រុមគាំទ្រ CHA",
+      dept_name_1: "លោក ស្រេង ស៊ឹង",
+      dept_role_1: "ប្រធានក្រុមគាំទ្រខេត្តសៀមរាប",
+      dept_badge_2: "ឌីជីថល",
+      dept_name_2: "លោក អ៊ុំ ណារ៉ូ",
+      dept_role_2: "ប្រធានផ្នែកឌីជីថល",
+      dept_badge_3: "ប្រធានអង្គភាពប្រតិកម្មរហ័ស",
+      dept_name_3: "លោក កាន់ សុខខៃ",
+      dept_role_3: "ប្រធានអង្គភាពប្រតិកម្មរហ័ស",
+      dept_badge_5: "អគ្គលេខាធិការរង និងប្រធានផ្នែកស្ម័គ្រចិត្ត",
+      dept_name_5: "លោក សាត ដារ៉ា",
+      dept_role_5: "អគ្គលេខាធិការរង និងប្រធានផ្នែកស្ម័គ្រចិត្ត",
+      dept_role_5_chart: "អគ្គលេខាធិការរង និងប្រធានផ្នែកស្ម័គ្រចិត្ត",
+      hubs_eyebrow: "បណ្តាញមូលដ្ឋាន និងប្រតិបត្តិការ",
+      hubs_title: "ក្រុមការងារឯកទេស និងជំពូកប្រចាំតំបន់",
+      hubs_subtitle: "ការពង្រឹងសមត្ថភាពអ្នកជំងឺ ការតស៊ូមតិយុវជន រង្វង់ថែទាំស្ត្រី និងការផ្សព្វផ្សាយតាមមន្ទីរពេទ្យខេត្តទូទាំងប្រទេសកម្ពុជា។",
+      hub_badge_youth: "ការតស៊ូមតិយុវជន",
+      hub_count_7: "សមាជិក ៧ នាក់",
+      hub_team_7: "ក្រុម (៧ នាក់)",
+      hub_role_leader: "ប្រធានក្រុម",
+      hub_lead_kc: "លោក កែវពេជ្រ ច័ន្ទដា",
+      hub_oversight_1: "ត្រួតពិនិត្យដោយ លោក រុន ច័ន្ទធារិទ្ធិ និង លោក កាន់ សុខខៃ",
+      hub_badge_women: "ការថែទាំស្ត្រី និងគ្រួសារ",
+      hub_count_12: "សមាជិក ១២ នាក់",
+      hub_team_12: "ក្រុម (១២ នាក់)",
+      hub_lead_sr: "លោកស្រី ស៊ុំ រដ្ឋា",
+      hub_badge_src: "មណ្ឌលប្រចាំតំបន់ពាយ័ព្យ",
+      hub_count_6: "សមាជិក ៦ នាក់",
+      hub_team_6: "ក្រុម (៦ នាក់)",
+      hub_name_src: "ជំពូកខេត្តសៀមរាប (SRC)",
+      hub_desc_src: "សម្របសម្រួលការងារគ្លីនិកប្រចាំតំបន់ ការផ្តល់កត្តាកំណកឈាមសង្គ្រោះបន្ទាន់ និងការថែទាំតាមមន្ទីរពេទ្យជាមួយមន្ទីរពេទ្យកុមារអង្គរ និងមណ្ឌលសុខភាពមូលដ្ឋាន។",
+      hub_role_chapter_head: "ប្រធានជំពូក",
+      hub_lead_ss: "លោក ស្រេង ស៊ឹង",
+      hub_oversight_src: "ទីប្រឹក្សាគ្លីនិក៖ វេជ្ជបណ្ឌិត ស៊ឹង ហេង (ទីប្រឹក្សាវេជ្ជសាស្ត្រ)",
+      hub_badge_volunteers: "កម្លាំងវាលសហគមន៍",
+      hub_name_volunteers: "បណ្តាញអ្នកស្ម័គ្រចិត្ត",
+      hub_desc_volunteers: "អ្នកស្ម័គ្រចិត្តជួរមុខចល័តតាមបណ្តាខេត្តដើម្បីគាំទ្រការដឹកជញ្ជូនអ្នកជំងឺទៅមន្ទីរពេទ្យ ការផ្សព្វផ្សាយសហគមន៍ ភស្តុភារបរិច្ចាគសង្គ្រោះបន្ទាន់ និងយុទ្ធនាការបរិច្ចាគឈាម។",
+      hub_role_network_leader: "ប្រធានបណ្តាញ",
+      hub_lead_sd: "លោក សាត ដារ៉ា",
+      /* Working Group & Chapter Roster Drawers */
+      roster_role_deputy_leader: "អនុប្រធានក្រុម",
+      roster_role_finance: "អ្នកសម្របសម្រួលហិរញ្ញវត្ថុ",
+      roster_role_admin: "រដ្ឋបាល",
+      roster_role_youth_vol: "អ្នកស្ម័គ្រចិត្តយុវជន",
+      roster_role_member: "សមាជិក",
+      roster_role_supervisor: "អ្នកត្រួតពិនិត្យ",
+      roster_role_reg_vol: "អ្នកស្ម័គ្រចិត្តប្រចាំតំបន់",
+      roster_role_field_vol: "អ្នកស្ម័គ្រចិត្តជួរមុខ",
+      roster_youth_title: "ក្រុមយុវជន",
+      roster_youth_subtitle: "សមាជិក និងមន្ត្រីសកម្ម ៧ នាក់",
+      roster_youth_m1_name: "លោក សាយ អុកសភា",
+      roster_youth_m2_name: "លោក គី អៀងថុល",
+      roster_youth_m3_name: "លោក ស្រឹម ប៉េងលាង",
+      roster_youth_m4_name: "លោក ខាន់ ដារ៉ា",
+      roster_women_title: "ក្រុមស្ត្រី",
+      roster_women_subtitle: "សមាជិក និងមន្ត្រីសកម្ម ១២ នាក់",
+      roster_women_m1_name: "លោកស្រី យឹម ម៉ារី",
+      roster_women_m2_name: "លោកស្រី ហ៊ីម សុម៉ាឡា",
+      roster_women_m3_name: "លោកស្រី ស្រឹម ស្រីពេជ្រ",
+      roster_women_m4_name: "លោកស្រី ទ្រី កក្កដា",
+      roster_women_m5_name: "លោកស្រី ផុន សុខនី",
+      roster_women_m6_name: "លោកស្រី សំ ផល្លា",
+      roster_women_m7_name: "លោកស្រី ហេង ស៊ីម",
+      roster_women_m8_name: "លោកស្រី ទូច សុជាតា",
+      roster_women_m9_name: "លោកស្រី ហ៊ូ ស្រីនី",
+      roster_src_title: "ក្រុមជំពូកខេត្តសៀមរាប",
+      roster_src_subtitle: "សមាជិក និងមន្ត្រីសកម្ម ៦ នាក់",
+      roster_src_m1_name: "លោក រុន ច័ន្ទធារិទ្ធិ",
+      roster_src_m2_name: "កញ្ញា កែវ សុវណ្ណឌី",
+      roster_src_m3_name: "លោកស្រី ស៊ុន សុខន",
+      roster_src_m4_name: "លោក ប៉ាច បញ្ញាវរវង្ស",
+      roster_vol_title: "ក្រុមបណ្តាញអ្នកស្ម័គ្រចិត្ត",
+      roster_vol_subtitle: "សមាជិក និងអ្នកស្ម័គ្រចិត្តសកម្ម ១២ នាក់",
+      roster_vol_m1_name: "កញ្ញា ជ័រ សូនីតា",
+      roster_vol_m2_name: "កញ្ញា ស្រ៊ិន វីនឈីង",
+      roster_vol_m3_name: "កញ្ញា អឿន ស្រីនាត",
+      roster_vol_m4_name: "លោក ពៅ ឡាយ",
+      roster_vol_m5_name: "លោក ផន សូវៀត",
+      roster_vol_m6_name: "លោក ម៉ម ប៊ុនធាត",
+      roster_vol_m7_name: "លោក យ៉ង ថេតយុទ្ធថន",
+      roster_vol_m8_name: "កញ្ញា នឿន សុវណ្ណនីតា",
       leadership_heading: "ក្រុមដឹកនាំ",
       leadership_sub: "អ្នកដែលឧទ្ទិសដល់បេសកកម្មរបស់ CHA នៅទូទាំងប្រទេសកម្ពុជា។",
       leadership_meet: "ជួបក្រុមពេញ",
@@ -1665,6 +2230,38 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       leadership_women_title: "ក្រុមស្ត្រី",
       leadership_women_desc: "ផ្តល់សមត្ថភាពដល់ស្ត្រីដែលរងផលប៉ះពាល់ពីអាការៈហូរឈាមតាមរយៈវង់គាំទ្រ ការអប់រំអំពីជំងឺ VWD និងបញ្ហាអ្នកផ្ទុក និងព្រឹត្តិការណ៍ស្ថាបនាសហគមន៍។",
       /* WFH */
+      wfh_alliances_eyebrow: "សម្ព័ន្ធភាពសកល និងការផ្គូផ្គងអន្តរជាតិ",
+      wfh_switch_wfh: "សហព័ន្ធគាំទ្រជំងឺហេម៉ូហ្វីលាពិភពលោក",
+      wfh_switch_hfa: "មូលនិធិជំងឺហេម៉ូហ្វីលាអូស្ត្រាលី",
+      wfh_hq_montreal: "ម៉ុងត្រេអាល់ កាណាដា · សហព័ន្ធសកល",
+      wfh_metric_membership: "សមាជិកភាពសកម្ម",
+      wfh_metric_passthrough: "ជំនួយមនុស្សធម៌ ១០០%",
+      wfh_p1_title: "ជំនួយមនុស្សធម៌ និងការបរិច្ចាគកត្តាកំណកឈាម",
+      wfh_p1_desc: "ការធានានូវកត្តាកំណកឈាមសង្គ្រោះបន្ទាន់ចែកចាយដោយផ្ទាល់ទៅកាន់មជ្ឈមណ្ឌលព្យាបាលទូទាំងប្រទេសកម្ពុជា។",
+      wfh_p2_title: "គោលការណ៍ណែនាំគ្លីនិកស្តង់ដារ",
+      wfh_p2_desc: "ការអនុវត្តស្តង់ដាររោគវិនិច្ឆ័យអន្តរជាតិ WFH និងគំរូថែទាំទូលំទូលាយសម្រាប់គ្លីនិកកុមារកម្ពុជា។",
+      wfh_p3_title: "ការតស៊ូមតិសកល និងតំណាងមហាសន្និបាត",
+      wfh_p3_desc: "តំណាងឱ្យអ្នកជំងឺដែលមានបញ្ហាហូរឈាមនៅកម្ពុជាក្នុងសមាជពិភពលោក WFH រៀងរាល់ពីរឆ្នាំម្តង។",
+      wfh_official_portal: "គេហទំព័រផ្លូវការ",
+      wfh_btn_explore_hfa: "ស្វែងយល់ពីសម្ព័ន្ធភាព HFA អូស្ត្រាលី",
+      wfh_glass_title: "បណ្តាញសកល WFH",
+      wfh_glass_subtitle: "អង្គការសមាជិកជាតិដែលត្រូវបានទទួលស្គាល់",
+      wfh_pill_member_since: "សមាជិកផ្លូវការ · តាំងពីឆ្នាំ ២០១៤",
+      wfh_hq_melbourne: "មែលប៊ន អូស្ត្រាលី · សម្ព័ន្ធភាពផ្គូផ្គង",
+      wfh_metric_clinicians: "គ្រូពេទ្យត្រូវបានបណ្តុះបណ្តាល",
+      wfh_metric_bilateral_val: "ទ្វេភាគី",
+      wfh_metric_bilateral_lbl: "ការផ្គូផ្គងសកម្ម",
+      wfh_hfa_p1_title: "ការណែនាំគ្លីនិក និងអាហារូបករណ៍វេជ្ជសាស្ត្រ",
+      wfh_hfa_p1_desc: "ការតភ្ជាប់គ្រូពេទ្យឯកទេសឈាមជាន់ខ្ពស់អូស្ត្រាលីជាមួយវេជ្ជបណ្ឌិត និងបុគ្គលិកមន្ទីរពេទ្យកម្ពុជា។",
+      wfh_hfa_p2_title: "សិក្ខាសាលាឯកទេសគិលានុបដ្ឋាយិកា និងចលនាសម្ព័ន្ធ",
+      wfh_hfa_p2_desc: "ការណែនាំអំពីការស្តារនីតិសម្បទាជាក់ស្តែងដើម្បីការពារភាពគាំងសន្លាក់ និងផលវិបាកនៃការហូរឈាមសាច់ដុំ។",
+      wfh_hfa_p3_title: "ជំរុំតស៊ូមតិយុវជន និងក្រុមគ្រួសារ",
+      wfh_hfa_p3_desc: "ការពង្រឹងសមត្ថភាពឪពុកម្តាយ អ្នកផ្ទុក និងទូតយុវជនជាមួយនឹងការចាក់ថ្នាំដោយខ្លួនឯង និងការគាំទ្រផ្លូវចិត្ត-សង្គម។",
+      wfh_at_hfa: "នៅ HFA អូស្ត្រាលី",
+      wfh_btn_view_wfh: "មើលភាពជាដៃគូសកល WFH",
+      wfh_hfa_glass_title: "សម្ព័ន្ធភាពផ្គូផ្គងអូស្ត្រាលី",
+      wfh_hfa_glass_subtitle: "ការកសាងសមត្ថភាព និងការណែនាំគ្លីនិក",
+      wfh_pill_twinning_partner: "ដៃគូកម្មវិធីផ្គូផ្គង",
       wfh_heading: "ការងាររបស់យើងជាមួយ WFH និង HFA",
       wfh_sub: "CHA សូមក្រើនរង្វង់ក្នុងការជាដៃគូជាមួយអង្គការឈានមុខគេក្នុងពិភពលោកដើម្បីពង្រឹងការថែទាំជំងឺហេម៉ូហ្វីលានៅកម្ពុជា។",
       wfh_wfh_name: "សហព័ន្ធគាំទ្រជំងឺហេម៉ូហ្វីលាពិភពលោក",
@@ -1678,11 +2275,14 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       wfh_hfa_desc: "HFA ជាដៃគូជាមួយ CHA ក្នុងការកសាងសមត្ថភាព ការបណ្តុះបណ្តាលពេទ្យ និងការតស៊ូមតិអ្នកជំងឺ។ កម្មវិធីរួមភ្ជាប់អ្នកពេទ្យកម្ពុជាជាមួយជំនាញអូស្ត្រាលី។",
       wfh_hfa_link: "ស្វែងយល់បន្ថែម",
       /* Haemophilia */
+      haem_eyebrow: "ជំងឺហូរឈាមសរីរាង្គកំណើត",
       haem_divider: "អំពីជំងឺហេម៉ូហ្វីលា",
       haem_heading: "ជំងឺហេម៉ូហ្វីលាគឺជាអ្វី?",
       haem_contact: "ទំនាក់ទំនងជំនាញ",
       haem_para_1: "ជំងឺហេម៉ូហ្វីលាគឺជាអាការៈហូរឈាមសរីរាង្គកំណើតដ៏កម្រមួយដែលប៉ះពាល់ដល់សមត្ថភាពរបស់អ្នកជំងឺក្នុងការបញ្ឈប់ការហូរឈាម។ អ្នកជំងឺហេម៉ូហ្វីលាអាចហូរឈាមយូរជាងអ្នកដទៃបន្ទាប់ពីរបួស ឬសូម្បីតែដោយគ្មានមូលហេតុដែលដឹង។",
       haem_para_2: "ទោះបីជាមិនមានវិធីព្យាបាលក៏ដោយ ក៏ការព្យាបាលទំនើបអនុញ្ញាតឱ្យអ្នកជំងឺហេម៉ូហ្វីលារស់នៅពេញលេញ សកម្ម និងមានសុខភាពល្អ។ ការវិនិច្ឆ័យដំបូង ការព្យាបាលត្រឹមត្រូវ និងការគាំទ្រជាបន្តបន្ទាប់គឺជាគន្លឹះក្នុងការការពារផលវិបាក និងការខូចខាតសន្លាក់។",
+      haem_clot_title: "កង្វះដំណើរការកកឈាម",
+      haem_clot_desc: "បណ្តាញកកឈាម Factor VIII (A) & Factor IX (B)",
       /* Types */
       types_heading: "ប្រភេទជំងឺហេម៉ូហ្វីលា",
       types_sub: "ប្រភេទសំខាន់ៗចំនួនពីរនៃជំងឺហេម៉ូហ្វីលា — ទាំងពីរត្រូវការការវិនិច្ឆ័យត្រឹមត្រូវ និងការគ្រប់គ្រងអាយុជីវិត។",
@@ -1691,8 +2291,14 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       types_b_title: "ហ្វូនឌីកប្រភេទ B",
       types_b_desc: "បណ្តាលមកពីការខ្វះខាត factor IX។ ពេលខ្លះហៅថា ជំងឺ Christmas។",
       /* Symptoms */
+      symptoms_eyebrow: "សូចនាករគ្លីនិក",
       symptoms_heading: "រោគសញ្ញាទូទៅ",
       symptoms_sub: "ការស្គាល់សញ្ញានៃអាការៈហូរឈាមគឺជាជំហានដំបូងឆ្ពោះទៅរកការវិនិច្ឆ័យ និងការថែទាំដែលត្រឹមត្រូវ។",
+      symptom_sign_1: "សញ្ញា ០១",
+      symptom_sign_2: "សញ្ញា ០២",
+      symptom_sign_3: "សញ្ញា ០៣",
+      symptom_sign_4: "សញ្ញា ០៤",
+      symptom_sign_5: "សញ្ញា ០៥",
       symptom_bruising: "ស្នាមជាំងាយស្រួល",
       symptom_bruising_desc: "ស្នាមជាំដែលមិនពន្យល់បានពីការប៉ះទង្គិចតូច។",
       symptom_nosebleeds: "ការហូរឈាមច្រមុជច្រើន",
@@ -1707,10 +2313,14 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       symptom_find_centre: "ស្វែងរកមជ្ឈមណ្ឌលព្យាបាល",
       symptom_contact_specialist: "ទំនាក់ទំនងជំនាញ",
       /* VWD */
+      vwd_eyebrow: "ជំងឺហូរឈាមដែលកើតមានញឹកញាប់បំផុត",
       vwd_heading: "ជំងឺ Von Willebrand (VWD)",
       vwd_para_1: "ជំងឺ Von Willebrand គឺជាអាការៈហូរឈាមកំណើតដែលឃើញញឹកញាប់បំផុត ដែលប៉ះពាល់ដល់ប្រុស និងស្រីស្មើគ្នា។ វាបណ្តាលមកពីការខ្វះខាត ឬមុខងារមិនប្រក្រតីនៃវិទ្យុសាស្រ្ត von Willebrand (VWF) ដែលជាប្រូតេអ៊ីនដែលជួយឈាមកក។",
       vwd_para_2: "មានប្រភេទសំខាន់ៗចំនួនបួននៃជំងឺ VWD — ប្រភេទ ១ (ស្រាល) ប្រភេទ ២ (មធ្យម) និងប្រភេទ ៣ (ធ្ងន់ធ្ងរ)។ មួយនីមួយៗខុសគ្នាលើចំនួន VWF ដែលមាន និងរបៀបដែលវាដំណើរការ។ រោគសញ្ញារួមមានស្នាមជាំងាយស្រួល ការហូរឈាមច្រមុជច្រើន ការហូរឈាមអូវុលច្រើន និងការហូរឈាមយូរបន្ទាប់ពីវះកាត់ ឬរបួស។",
       vwd_find: "ស្វែងរកការព្យាបាល",
+      vwd_action_note: "ប៉ះពាល់ដល់ប្រជាជនពិភពលោកប្រហែល ១%",
+      vwd_chip_title: "កត្តា Von Willebrand (VWF)",
+      vwd_chip_desc: "ការតោងផ្លាកែត និងលំនឹង Factor VIII",
       /* Other */
       other_heading: "អាការៈហូរឈាមផ្សេងទៀត",
       other_rare_title: "ការខ្វះខាតកត្តាដ៏កម្រ",
@@ -1719,9 +2329,28 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       other_platelet_desc: "ស្ថានភាពដែល platelet មិនដំណើរការត្រឹមត្រូវ ដែលនាំឱ្យហូរឈាមទោះបីជាចំនួន platelet ធម្មតា។",
       other_more: "សម្រាប់ព័ត៌មានបន្ថែមអំពីអាការៈហូរឈាមណាមួយ សូមទំនាក់ទំនងក្រុមរបស់យើង ឬទស្សនាមជ្ឈមណ្ឌលព្យាបាល។",
       /* Treatment */
+      tc_eyebrow: "ដៃគូថែទាំជាតិ",
       treatment_heading: "មជ្ឈមណ្ឌលព្យាបាល",
       treatment_sub: "ស្វែងរកមជ្ឈមណ្ឌលព្យាបាលជំងឺហេម៉ូហ្វីលានៅទូទាំងប្រទេសកម្ពុជា — ស្វែងតាមខេត្ត។",
       treatment_select: "ជ្រើសរើសខេត្ត",
+      tc_select_all: "គ្រប់ខេត្ត (ទូទាំងប្រទេស)",
+      tc_active_badge: "មជ្ឈមណ្ឌលផ្ទៀងផ្ទាត់សកម្មចំនួន ២",
+      province_phnom_penh: "រាជធានីភ្នំពេញ",
+      province_siem_reap: "ខេត្តសៀមរាប",
+      province_battambang: "ខេត្តបាត់ដំបង",
+      province_sihanoukville: "ខេត្តព្រះសីហនុ",
+      tc_nph_title: "មន្ទីរពេទ្យកុមារជាតិ (NPH) — គ្លីនិកជំងឺហេម៉ូហ្វីលា",
+      tc_nph_address: "មហាវិថីសហព័ន្ធរុស្ស៊ី (១០០) រាជធានីភ្នំពេញ",
+      tc_nph_hours: "ច័ន្ទ – សុក្រ៖ ៨:០០ ព្រឹក – ៤:៣០ ល្ងាច",
+      tc_ahc_title: "មន្ទីរពេទ្យកុមារអង្គរ (AHC) — អង្គភាពជំងឺហេម៉ូហ្វីលា",
+      tc_ahc_address: "ផ្លូវទេពវង្ស ក្រុងសៀមរាប",
+      tc_ahc_hours: "ច័ន្ទ – អាទិត្យ៖ សម្រាកព្យាបាល ២៤ ម៉ោង",
+      tc_tag_haem_ab: "ជំងឺហេម៉ូហ្វីលា A & B",
+      tc_tag_vwd_care: "ការថែទាំ VWD",
+      tc_tag_consultation: "ការពិគ្រោះយោបល់",
+      tc_tag_diagnostic: "មន្ទីរពិសោធន៍វិនិច្ឆ័យ",
+      tc_tag_factor_rep: "ការជំនួសកត្តាកំណកឈាម",
+      tc_tag_family_counselling: "ការប្រឹក្សាគ្រួសារ",
       treatment_view_map: "មើលនៅលើផែនទី",
       treatment_emergency: "ជំនួយបន្ទាន់",
       treatment_emergency_desc: "ប្រសិនបើអ្នកមានបញ្ហាបន្ទាន់ពីការហូរឈាម សូមទំនាក់ទំនងមជ្ឈមណ្ឌលព្យាបាលជិតអ្នក ឬហៅលេខបន្ទាន់របស់យើង។",
@@ -1767,6 +2396,21 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       membership_benefit_5_desc: "ទទួលបានព័ត៌មានថ្មីៗ និងសេចក្តីប្រកាសរបស់ CHA។",
       /* Donate */
       donate_heading: "ធ្វើការបរិច្ចាគ",
+      donate_khqr_badge: "KHQR ទូទាំងប្រទេស",
+      donate_scan_title: "ស្កេន & គាំទ្រ",
+      donate_scan_desc: "ផ្ទេរការបរិច្ចាគរបស់អ្នកដោយផ្ទាល់តាមរយៈ ABA Mobile, Bakong, Wing, ACLEDA, Canadia ឬកម្មវិធីធនាគារនានានៅកម្ពុជា។",
+      donate_modal_desc: "ស្កេនជាមួយ ABA Mobile, Bakong ឬកម្មវិធីធនាគារនៅកម្ពុជាដើម្បីផ្ញើការចូលរួមរបស់អ្នក។",
+      donate_account_name_lbl: "ឈ្មោះគណនី",
+      donate_copy_btn: "ចម្លងលេខគណនី",
+      donate_modal_copy_btn: "ចម្លង",
+      donate_save_qr_btn: "រក្សាទុក QR រូបភាព",
+      donate_step1_title: "បើកកម្មវិធីធនាគារ",
+      donate_step1_desc: "ABA, Bakong ជាដើម",
+      donate_step2_title: "ស្កេនកូដ KHQR",
+      donate_step2_desc: "តម្រង់កាមេរ៉ាទៅ QR",
+      donate_step3_title: "បញ្ចូលចំនួនទឹកប្រាក់",
+      donate_step3_desc: "ជួយគាំទ្រអ្នកជំងឺដោយផ្ទាល់",
+      donate_trust_note: "ផ្ទេរផ្ទាល់ភ្លាមៗ · គ្មានកម្រៃសេវាបន្ថែម",
       /* Contact */
       contact_divider: "ទំនាក់ទំនង",
       contact_heading: "ទំនាក់ទំនង",
@@ -1792,7 +2436,7 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       contact_subject_ph: "នេះអំពីអ្វី?",
       contact_message_ph: "យើងអាចជួយដូចម្តេច?",
       contact_send: "ផ្ញើសារ",
-      contact_address_val: "ផ្ទះលេខ ៣៥ ផ្លូវ ១២១ សង្កាត់ទួលទំពូងទី ២ ខណ្ឌចំការមន ភ្នំពេញ កម្ពុជា",
+      contact_address_val: "#អាគារ ១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី (១១៤) រាជធានីភ្នំពេញ កម្ពុជា ប្រអប់សំបុត្រ ៧០០",
       /* Footer */
       footer_tagline: "គាំទ្រអ្នកមានអាការៈហូរឈាមនៅកម្ពុជា។",
       footer_quick_links: "តំណភ្ជាប់រហ័ស",
@@ -1809,7 +2453,10 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       footer_find_us: "រកឃើញយើង",
       footer_get_involved: "ចូលរួម",
       footer_address: "ភ្នំពេញ កម្ពុជា",
+      campaigns_active: "សកម្មភាពបច្ចុប្បន្ន",
       campaigns_heading: "យុទ្ធនាការបច្ចុប្បន្ន",
+      campaigns_ongoing: "កំពុងដំណើរការ",
+      campaigns_view_all: "មើលទាំងអស់",
       campaigns_1_title: "មូលនិធិជំនួយអ្នកជំងឺ",
       campaigns_1_desc: "ជួយអ្នកជំងឺទទួលបានការព្យាបាល និងថ្នាំសំខាន់ៗ។",
       campaigns_2_title: "ការអប់រំ និងការយល់ដឹង",
@@ -1819,6 +2466,21 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       campaigns_raised_label: "ប្រមូលបាន",
       campaigns_goal_label: "គោលដៅ",
       campaigns_partners: "ដៃគូអាជីវកម្ម",
+      campaigns_partners_sub: "ដៃគូសុខភាពសកល",
+      campaigns_archive_heading: "យុទ្ធនាការបច្ចុប្បន្ន",
+      campaigns_archive_sub: "គាំទ្របេសកកម្មរបស់យើង — រាល់ការចូលរួមចំណែកផ្លាស់ប្តូរជីវិតនៅទូទាំងកម្ពុជា។",
+      news_archive_heading: "ព័ត៌មាន និងព្រឹត្តិការណ៍",
+      news_archive_sub: "ទទួលបានព័ត៌មានថ្មីៗពីសមាគមជំងឺហូរឈាមកម្ពុជា។",
+      news_filter_all: "ទាំងអស់",
+      news_filter_event: "ព្រឹត្តិការណ៍",
+      news_filter_update: "បច្ចុប្បន្នភាព",
+      news_filter_workshop: "សិក្ខាសាលា",
+      news_filter_announcement: "សេចក្តីប្រកាស",
+      news_badge_event: "ព្រឹត្តិការណ៍",
+      news_badge_update: "បច្ចុប្បន្នភាព",
+      news_badge_workshop: "សិក្ខាសាលា",
+      news_badge_announcement: "សេចក្តីប្រកាស",
+      news_back_to_news: "ត្រឡប់ទៅព័ត៌មាន",
       nav_member: "ក្លាយជាសមាជិក",
       nav_my_card: "មើលកាត",
       nav_volunteer: "ស្ម័គ្រចិត្ត",
@@ -1853,6 +2515,82 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       dash_ph_address: "អាស័យដ្ឋាន",
       dash_ph_name: "ឈ្មោះ",
       dash_ph_condition: "ឧ. ហេម៉ូហ្វីលីយ៉ា A",
+      /* Modals & Forms */
+      donate_modal_title: "ធ្វើការបរិច្ចាគ",
+      donate_modal_heading: "ជួយផ្លាស់ប្តូរជីវិត!",
+      donate_modal_sub: "ការគាំទ្ររបស់អ្នកជួយផ្តល់ការព្យាបាល ការអប់រំ និងក្តីសង្ឃឹមដល់អ្នកមានបញ្ហាជំងឺហូរឈាមនៅកម្ពុជា។",
+      donate_acct_name: "ការបរិច្ចាគ",
+      donate_acct_sub: "មានសុវត្ថិភាព និងការសម្ងាត់ខ្ពស់",
+      donate_acct_safe: "សុវត្ថិភាព",
+      donate_other: "ផ្សេងទៀត",
+      donate_ph_amount: "បញ្ចូលចំនួនទឹកប្រាក់ជាដុល្លារ (USD)",
+      donate_secure_title: "ការទូទាត់ប្រកបដោយសុវត្ថិភាព",
+      donate_secure_desc: "ទូទាត់ប្រកបដោយសុវត្ថិភាពតាមកាតឥណទាន/ឥណពន្ធ, ABA Pay, KHQR, WeChat Pay ឬ Alipay តាមរយៈ PayWay (ធនាគារ ABA)។",
+      donate_btn: "បរិច្ចាគឥឡូវ",
+      donate_footer_note: "សុវត្ថិភាព និងការពារសម្ងាត់តាមរយៈ PayWay (ធនាគារ ABA)",
+      member_login_title: "ចូលប្រើប្រាស់គណនី",
+      member_login_sub: "ចូលគណនីដើម្បីទទួលបានធនធាន និងការតភ្ជាប់ជាមួយសហគមន៍។",
+      form_email_label: "អ៊ីមែល",
+      form_email_ph: "បញ្ចូលអ៊ីមែលរបស់អ្នក",
+      form_pass_label: "ពាក្យសម្ងាត់",
+      form_pass_ph: "បញ្ចូលពាក្យសម្ងាត់របស់អ្នក",
+      form_create_pass_ph: "បង្កើតពាក្យសម្ងាត់",
+      member_forgot: "ភ្លេចពាក្យសម្ងាត់?",
+      member_signin_btn: "ចូល",
+      member_register_link: "ចុះឈ្មោះ",
+      member_register_modal_title: "ចុះឈ្មោះសមាជិក",
+      member_register_title: "ចូលរួមជាមួយសហគមន៍អ្នកជំងឺ ក្រុមគ្រួសារ និងសមាជិករបស់យើង។",
+      form_i_am_a: "ខ្ញុំជា",
+      role_member: "សមាជិក",
+      role_patient: "អ្នកជំងឺ",
+      role_patient_desc: "ខ្ញុំមានជំងឺហេម៉ូហ្វីលា",
+      form_name_label: "ឈ្មោះពេញ",
+      form_name_ph: "បញ្ចូលឈ្មោះពេញរបស់អ្នក",
+      form_phone_label: "លេខទូរស័ព្ទ (មិនបង្ខំ)",
+      form_phone_ph: "បញ្ចូលលេខទូរស័ព្ទរបស់អ្នក",
+      form_address_label: "អាសយដ្ឋាន (មិនបង្ខំ)",
+      form_address_ph: "បញ្ចូលអាសយដ្ឋានរបស់អ្នក",
+      form_hemophilia_type_lbl: "ប្រភេទជំងឺហេម៉ូហ្វីលា",
+      form_select_type: "ជ្រើសរើសប្រភេទ",
+      form_opt_other: "ផ្សេងទៀត",
+      form_specify_cond_ph: "បញ្ជាក់លម្អិតពីស្ថានភាពជំងឺ",
+      form_select_blood: "ជ្រើសរើសប្រភេទឈាម",
+      form_terms_agree: "ខ្ញុំយល់ព្រមលើ",
+      form_terms_link: "លក្ខខណ្ឌនៃការប្រើប្រាស់",
+      member_register_btn: "ចុះឈ្មោះឥឡូវ",
+      member_already_account: "មានគណនីរួចហើយមែនទេ?",
+      member_forgot_title: "កំណត់ពាក្យសម្ងាត់ឡើងវិញ",
+      member_forgot_sub: "បញ្ចូលអ៊ីមែលរបស់អ្នក ហើយយើងនឹងផ្ញើតំណភ្ជាប់ដើម្បីកំណត់ពាក្យសម្ងាត់ឡើងវិញ។",
+      member_forgot_btn: "ផ្ញើតំណភ្ជាប់កំណត់ពាក្យសម្ងាត់",
+      /* Patient Card i18n (KM) */
+      card_title_front: "ប័ណ្ណសម្គាល់អ្នកជំងឺ",
+      card_title_eng: "Patient Identification Card",
+      card_title_back: "ប័ណ្ណសម្គាល់អ្នកជំងឺ",
+      card_label_id: "លេខប័ណ្ណ ID",
+      card_label_name_khmer: "នាម និងគោត្តនាម",
+      card_label_name_latin: "ឈ្មោះជាឡាតាំង",
+      card_label_dob: "ថ្ងៃខែឆ្នាំកំណើត",
+      card_label_condition: "ប្រភេទហេម៉ូហ្វីលីអា",
+      card_label_blood: "ប្រភេទក្រុមឈាម",
+      card_label_issue_date: "ធ្វើប័ណ្ណនៅថ្ងៃ",
+      card_label_address: "អាសយដ្ឋាន",
+      card_label_phone: "ទូរស័ព្ទ",
+      card_hotline_nph: "លេខទូរស័ព្ទបន្ទាន់មន្ទីរពេទ្យកុមារជាតិ: 012 751 728",
+      card_hotline_ahc: "លេខទូរស័ព្ទបន្ទាន់មន្ទីរពេទ្យកុមារអង្គរ: 063 963 409",
+      card_keep_notice: "សូមរក្សាប័ណ្ណសម្គាល់សមាជិកនេះឱ្យបានល្អ",
+      card_qr_label: "ស្កេនយើងខ្ញុំ",
+      card_org_name_kh: "សមាគមហេម៉ូហ្វីលាកម្ពុជា",
+      card_org_name_en: "Cambodian Hemophilia Association",
+      card_rules_heading: "លក្ខខណ្ឌ៖",
+      card_rule_1: "១. ប័ណ្ណសម្គាល់អ្នកជំងឺ គឺនឹងប្រើប្រាស់តែនៅក្នុងសមាគមជំងឺហេម៉ូហ្វីលាកម្ពុជា តែប៉ុណ្ណោះ។",
+      card_rule_2: "២. ប័ណ្ណសម្គាល់អ្នកជំងឺ មានសុពលភាពប្រើប្រាស់ពេញមួយអាណត្តិទី៥ ឆ្នាំ២០២៦-២០៣០",
+      card_rule_3: "៣. អ្នកជំងឺទាំងអស់ ត្រូវបន្តសុពលភាពប័ណ្ណសម្គាល់អ្នកជំងឺថ្មី ឱ្យបានមុនថ្ងៃទី១៧ ខែឧសភា ឆ្នាំ២០៣០",
+      card_president_label: "ប្រធានសមាគម",
+      card_president_name: "រុន ច័ន្ទរិទ្ធី",
+      card_office_address: "អាសយដ្ឋាន: លេខ១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី រាជធានីភ្នំពេញ ទូរស័ព្ទលេខ (+៨៥៥) ៩៦ ៦៦០ ៥៣៣៤",
+      dash_flip_card: "បង្វិលប័ណ្ណ",
+      dash_side_front: "ខាងមុខ",
+      dash_side_back: "ខាងក្រោយ",
     }
   };
 
@@ -1921,9 +2659,10 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       }
     });
 
-    /* Update lang label */
-    var label = document.querySelector('.lang-label');
-    if (label) label.textContent = dict.lang_label;
+    /* Update lang label across all switchers (desktop + mobile drawer) */
+    document.querySelectorAll('.lang-label').forEach(function(lbl) {
+      lbl.textContent = dict.lang_label;
+    });
 
     /* Swap dropdown trigger text (button inner text before SVG) */
     document.querySelectorAll('.nav-drop-trigger').forEach(function(btn) {
@@ -1958,7 +2697,132 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
         }
       }
     });
+
+    /* Update member modal title if present */
+    updateMemberModalTitle();
+
+    /* Auto-translate post content (news + campaign titles/descriptions) */
+    autoTranslateContent(lang);
   }
+
+  /* ---- Auto-translate: manual KM override + Google Translate fallback ---- */
+  function autoTranslateContent(lang) {
+    /* 1. Handle .auto-text elements (titles, descriptions on cards) */
+    document.querySelectorAll('.auto-text[data-en]').forEach(function(el) {
+      var enText = el.getAttribute('data-en') || '';
+      var kmManual = el.getAttribute('data-km') || '';
+
+      if (lang === 'en') {
+        el.textContent = enText;
+        return;
+      }
+
+      if (kmManual) {
+        el.textContent = kmManual;
+        return;
+      }
+
+      var cacheKey = 'auto_km_' + hashCode(enText);
+      var cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        el.textContent = cached;
+        return;
+      }
+
+      el.textContent = enText;
+      fetchGoogleTranslation(enText, 'en', 'km').then(function(kmText) {
+        if (kmText) {
+          el.textContent = kmText;
+          try { localStorage.setItem(cacheKey, kmText); } catch(e) {}
+        }
+      });
+    });
+
+    /* 2. Handle .auto-content elements (full article body — translate text nodes) */
+    document.querySelectorAll('[data-auto-content]').forEach(function(container) {
+      if (lang === 'en') {
+        /* Restore from backup */
+        if (container.hasAttribute('data-en-backup')) {
+          container.innerHTML = container.getAttribute('data-en-backup');
+        }
+        return;
+      }
+
+      /* Backup original HTML on first KM switch */
+      if (!container.hasAttribute('data-en-backup')) {
+        container.setAttribute('data-en-backup', container.innerHTML);
+      }
+
+      /* Collect all text nodes */
+      var textNodes = [];
+      var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
+      var node;
+      while (node = walker.nextNode()) {
+        var txt = node.textContent.trim();
+        if (txt.length > 1) textNodes.push({ node: node, text: txt });
+      }
+      if (!textNodes.length) return;
+
+      /* Batch translate: join with separator, translate once, split back */
+      var batchKey = 'auto_km_batch_' + hashCode(textNodes.map(function(n){return n.text;}).join('|||'));
+      var cachedBatch = localStorage.getItem(batchKey);
+      if (cachedBatch) {
+        applyBatchTranslation(textNodes, cachedBatch);
+        return;
+      }
+
+      var batchText = textNodes.map(function(n){return n.text;}).join('\n===SPLIT===\n');
+      fetchGoogleTranslation(batchText, 'en', 'km').then(function(kmResult) {
+        if (kmResult) {
+          try { localStorage.setItem(batchKey, kmResult); } catch(e) {}
+          applyBatchTranslation(textNodes, kmResult);
+        }
+      });
+    });
+  }
+
+  function applyBatchTranslation(textNodes, kmResult) {
+    var parts = kmResult.split('\n===SPLIT===\n');
+    for (var i = 0; i < textNodes.length && i < parts.length; i++) {
+      textNodes[i].node.textContent = parts[i];
+    }
+  }
+
+  function fetchGoogleTranslation(text, from, to) {
+    var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + from + '&tl=' + to + '&dt=t&q=' + encodeURIComponent(text);
+    return fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+      if (data && data[0]) {
+        return data[0].map(function(s) { return s[0]; }).join('');
+      }
+      return null;
+    }).catch(function() { return null; });
+  }
+
+  function hashCode(str) {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+      var ch = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + ch;
+      hash |= 0;
+    }
+    return hash.toString(36);
+  }
+
+  function updateMemberModalTitle(explicitKey) {
+    var titleEl = document.getElementById('member-modal-title');
+    if (!titleEl) return;
+    var key = explicitKey || titleEl.getAttribute('data-i18n') || 'member_login_title';
+    titleEl.setAttribute('data-i18n', key);
+    var curLang = localStorage.getItem('cha-lang') || 'en';
+    var curDict = i18n[curLang] || {};
+    if (curLang === 'km') {
+      var hasCustom = window.chaCustomizerKM && window.chaCustomizerKM[key];
+      titleEl.textContent = hasCustom || curDict[key] || (key === 'member_register_modal_title' ? 'ចុះឈ្មោះ' : (key === 'member_forgot_title' ? 'កំណត់ពាក្យសម្ងាត់ឡើងវិញ' : 'ការចូលសមាជិក'));
+    } else {
+      titleEl.textContent = curDict[key] || (key === 'member_register_modal_title' ? 'Register' : (key === 'member_forgot_title' ? 'Reset Password' : 'Member Login'));
+    }
+  }
+  window.chaUpdateMemberModalTitle = updateMemberModalTitle;
 
   function toggleLang() {
     var current = localStorage.getItem('cha-lang') || 'en';
@@ -1995,3 +2859,277 @@ function togglePass(e) {
     eyeClosed.style.display = 'none';
   }
 }
+
+/* History Milestone Showcase Tabs & Timeline (Concept A) */
+(function initHistoryMilestones() {
+  function setupMilestones() {
+    var showcase = document.querySelector('.history-showcase');
+    if (!showcase) return;
+
+    var tabBtns = showcase.querySelectorAll('.milestone-tab-btn');
+    var panels = showcase.querySelectorAll('.milestone-story-panel');
+    var progressFill = document.getElementById('milestoneProgressFill');
+    var jumpBtns = showcase.querySelectorAll('[data-jump-milestone]');
+
+    if (!tabBtns.length || !panels.length) return;
+
+    function activateIndex(index) {
+      if (index < 0 || index >= tabBtns.length) return;
+
+      // Update tabs
+      tabBtns.forEach(function(btn, i) {
+        var isTarget = (i === index);
+        btn.classList.toggle('is-active', isTarget);
+        btn.setAttribute('aria-selected', isTarget ? 'true' : 'false');
+      });
+
+      // Update panels
+      panels.forEach(function(panel, i) {
+        var isTarget = (i === index);
+        panel.classList.toggle('is-active', isTarget);
+      });
+
+      // Update progress line fill percentage
+      if (progressFill && tabBtns.length > 1) {
+        var pct = (index / (tabBtns.length - 1)) * 100;
+        progressFill.style.width = pct + '%';
+      }
+    }
+
+    // Bind tab clicks
+    tabBtns.forEach(function(btn, i) {
+      btn.addEventListener('click', function() {
+        activateIndex(i);
+      });
+    });
+
+    // Bind jump buttons inside story panels
+    jumpBtns.forEach(function(jBtn) {
+      jBtn.addEventListener('click', function() {
+        var targetIdx = parseInt(jBtn.getAttribute('data-jump-milestone'), 10);
+        if (!isNaN(targetIdx)) {
+          activateIndex(targetIdx);
+          // Smooth scroll to timeline top if scrolled past
+          var topOffset = showcase.getBoundingClientRect().top + window.pageYOffset - 110;
+          if (window.pageYOffset > topOffset) {
+            window.scrollTo({ top: topOffset, behavior: 'smooth' });
+          }
+        }
+      });
+    });
+
+    // Initial state
+    activateIndex(0);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupMilestones);
+  } else {
+    setupMilestones();
+  }
+})();
+
+/* Leadership Specialized Working Groups Roster Toggle */
+(function initGroupRosters() {
+  function setupRosters() {
+    var toggleBtns = document.querySelectorAll('.btn-roster-toggle, .btn-roster-pill-toggle');
+    var closeBtns = document.querySelectorAll('.btn-roster-close');
+
+    function closeAllDrawers() {
+      document.querySelectorAll('.hub-roster-content.is-open').forEach(function(content) {
+        content.classList.remove('is-open');
+      });
+      document.querySelectorAll('.btn-roster-pill-toggle.is-open, .btn-roster-toggle.is-open').forEach(function(btn) {
+        btn.classList.remove('is-open');
+      });
+      document.querySelectorAll('.hub-action-footer.is-roster-open').forEach(function(footer) {
+        footer.classList.remove('is-roster-open');
+      });
+    }
+
+    toggleBtns.forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var targetId = btn.getAttribute('data-roster-target');
+        var content = document.getElementById(targetId);
+        if (!content) return;
+
+        var footer = btn.closest('.hub-action-footer');
+        var isOpen = content.classList.contains('is-open');
+
+        // Close any other open drawer first
+        closeAllDrawers();
+
+        if (!isOpen) {
+          content.classList.add('is-open');
+          btn.classList.add('is-open');
+          if (footer) {
+            // Re-trigger animation cleanly
+            footer.classList.remove('is-roster-open');
+            void footer.offsetWidth; // force reflow
+            footer.classList.add('is-roster-open');
+          }
+        }
+      });
+    });
+
+    closeBtns.forEach(function(cBtn) {
+      cBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeAllDrawers();
+      });
+    });
+
+    // Close on click outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.hub-roster-content') && !e.target.closest('.btn-roster-pill-toggle')) {
+        closeAllDrawers();
+      }
+    });
+
+    // Close on ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAllDrawers();
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupRosters);
+  } else {
+    setupRosters();
+  }
+})();
+
+/* WFH & HFA Flagship Partner Switcher */
+(function initWfhPartnerSwitcher() {
+  function setupWfhSwitcher() {
+    var switchBtns = document.querySelectorAll('.partner-switch-btn');
+    var panels = document.querySelectorAll('.wfh-showcase-panel');
+    var triggerButtons = document.querySelectorAll('[data-partner-switch]');
+
+    if (!switchBtns.length || !panels.length) return;
+
+    function activatePartner(targetId) {
+      // Update switch tabs
+      switchBtns.forEach(function(btn) {
+        var isTarget = (btn.getAttribute('data-partner-target') === targetId);
+        btn.classList.toggle('is-active', isTarget);
+        btn.setAttribute('aria-selected', isTarget ? 'true' : 'false');
+      });
+
+      // Update panels
+      panels.forEach(function(panel) {
+        var isTarget = (panel.id === targetId);
+        panel.classList.toggle('is-active', isTarget);
+      });
+    }
+
+    switchBtns.forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var targetId = btn.getAttribute('data-partner-target');
+        if (targetId) activatePartner(targetId);
+      });
+    });
+
+    // Handle secondary switch buttons inside panels
+    triggerButtons.forEach(function(tBtn) {
+      tBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var targetId = tBtn.getAttribute('data-partner-switch');
+        if (targetId) {
+          activatePartner(targetId);
+          var showcase = document.getElementById('about-wfh');
+          if (showcase) {
+            var topOffset = showcase.getBoundingClientRect().top + window.pageYOffset - 90;
+            if (window.pageYOffset > topOffset) {
+              window.scrollTo({ top: topOffset, behavior: 'smooth' });
+            }
+          }
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupWfhSwitcher);
+  } else {
+    setupWfhSwitcher();
+  }
+})();
+
+/* Homepage Stat Counter Animation (0 -> Target) */
+(function initStatCounterAnimation() {
+  function startCounters() {
+    var statElements = document.querySelectorAll('[data-counter-target]');
+    if (!statElements.length) return;
+
+    var animated = false;
+
+    function runCountUp() {
+      statElements.forEach(function(el) {
+        var target = parseInt(el.getAttribute('data-counter-target'), 10);
+        var suffix = el.getAttribute('data-counter-suffix') || '';
+        if (isNaN(target)) return;
+
+        var start = 0;
+        var duration = 1800; // 1.8 seconds
+        var startTime = null;
+
+        // Custom easing function: easeOutQuart
+        function easeOutQuart(x) {
+          return 1 - Math.pow(1 - x, 4);
+        }
+
+        function step(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var progress = Math.min((timestamp - startTime) / duration, 1);
+          var easedProgress = easeOutQuart(progress);
+          var current = Math.floor(easedProgress * target);
+
+          el.textContent = current + suffix;
+
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          } else {
+            el.textContent = target + suffix;
+          }
+        }
+
+        window.requestAnimationFrame(step);
+      });
+    }
+
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function(entries, obs) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting && !animated) {
+            animated = true;
+            runCountUp();
+            obs.disconnect();
+          }
+        });
+      }, { threshold: 0.3 });
+
+      var triggerTarget = document.querySelector('.stat-strip') || statElements[0];
+      if (triggerTarget) {
+        observer.observe(triggerTarget);
+      }
+    } else {
+      runCountUp();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startCounters);
+  } else {
+    startCounters();
+  }
+})();
+
+
+

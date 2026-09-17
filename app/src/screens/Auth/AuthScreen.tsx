@@ -110,7 +110,7 @@ export default function AuthScreen({ navigation, route }: any) {
       password: form.password,
       phone: form.phone.trim(),
       address: form.address.trim(),
-      role: role === 'patient' ? 'Patient' : 'Supporter',
+      role: role === 'patient' ? 'Patient' : 'Member',
     };
     if (role === 'patient') {
       if (form.dob.trim()) payload.dob = form.dob.trim();
@@ -193,7 +193,7 @@ export default function AuthScreen({ navigation, route }: any) {
                   </View>
                   <View style={styles.roleTextWrap}>
                     <Text style={styles.roleTitle}>{t('auth.member', 'Member')}</Text>
-                    <Text style={styles.roleSubtitle}>{t('auth.supporterFamily', 'Supporter / Family')}</Text>
+                    <Text style={styles.roleSubtitle}>{t('auth.supporterFamily', 'Member')}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity

@@ -48,10 +48,10 @@
     <section class="section section-soft" id="news-events"><div class="container">
       <div class="section-heading flex-between" data-reveal>
         <div>
-          <h2><?php esc_html_e('Latest News & Events', 'cha-cambodia'); ?></h2>
-          <p><?php esc_html_e('Updates from our community awareness, treatment guidelines and training programs.', 'cha-cambodia'); ?></p>
+          <h2 data-i18n="news_heading"><?php esc_html_e('Latest News & Events', 'cha-cambodia'); ?></h2>
+          <p data-i18n="news_sub"><?php esc_html_e('Updates from our community awareness, treatment guidelines and training programs.', 'cha-cambodia'); ?></p>
         </div>
-        <a class="btn btn-outline btn-sm" href="<?php echo esc_url(get_post_type_archive_link('cha_news')); ?>"><?php esc_html_e('View All', 'cha-cambodia'); ?> <span class="arrow">&rarr;</span></a>
+        <a class="btn btn-outline btn-sm" href="<?php echo esc_url(get_post_type_archive_link('cha_news')); ?>" data-i18n="news_view_all"><?php esc_html_e('View All', 'cha-cambodia'); ?> <span class="arrow">&rarr;</span></a>
       </div>
       <div class="grid grid-3">
         <?php
@@ -79,13 +79,20 @@
                     <?php endif; ?>
                     <div class="card-date">
                       <span><?php echo esc_html($date_display); ?></span>
-                      <span class="badge <?php echo esc_attr($badge_class); ?>"><?php echo esc_html($badge); ?></span>
+                      <span class="badge <?php echo esc_attr($badge_class); ?> auto-text" data-en="<?php echo esc_attr($badge); ?>" data-km="" data-i18n="news_badge_<?php echo esc_attr(strtolower($badge)); ?>"><?php echo esc_html($badge); ?></span>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h3 class="card-title"><?php the_title(); ?></h3>
-                    <p class="card-text"><?php echo esc_html(get_the_excerpt()); ?></p>
-                    <a class="card-link" href="<?php the_permalink(); ?>"><?php esc_html_e('Read More', 'cha-cambodia'); ?> <span class="arrow">&rarr;</span></a>
+                    <?php
+                    $news_title = get_the_title();
+                    $news_km_title = get_post_meta(get_the_ID(), '_cha_news_title_km', true);
+                    $news_excerpt = get_the_excerpt();
+                    if (strlen($news_excerpt) > 120) $news_excerpt = wp_trim_words($news_excerpt, 18, '...');
+                    $news_km_excerpt = get_post_meta(get_the_ID(), '_cha_news_excerpt_km', true);
+                    ?>
+                    <h3 class="card-title auto-text" data-en="<?php echo esc_attr($news_title); ?>" data-km="<?php echo esc_attr($news_km_title); ?>"><?php the_title(); ?></h3>
+                    <p class="card-text auto-text" data-en="<?php echo esc_attr($news_excerpt); ?>" data-km="<?php echo esc_attr($news_km_excerpt); ?>"><?php echo esc_html($news_excerpt); ?></p>
+                    <a class="card-link" href="<?php the_permalink(); ?>" data-i18n="news_read_more"><?php esc_html_e('Read More', 'cha-cambodia'); ?> <span class="arrow">&rarr;</span></a>
                   </div>
                 </article>
             <?php endwhile;
@@ -107,9 +114,9 @@
                     </div>
                   </div>
                   <div class="card-body">
-                    <h3 class="card-title"><?php echo esc_html($fallback_titles[$i]); ?></h3>
-                    <p class="card-text"><?php echo esc_html($fallback_descs[$i]); ?></p>
-                    <a class="card-link" href="<?php echo esc_url(get_post_type_archive_link('cha_news')); ?>"><?php esc_html_e('Read More', 'cha-cambodia'); ?> <span class="arrow">&rarr;</span></a>
+                    <h3 class="card-title auto-text" data-en="<?php echo esc_attr($fallback_titles[$i]); ?>" data-km=""><?php echo esc_html($fallback_titles[$i]); ?></h3>
+                    <p class="card-text auto-text" data-en="<?php echo esc_attr($fallback_descs[$i]); ?>" data-km=""><?php echo esc_html($fallback_descs[$i]); ?></p>
+                    <a class="card-link" href="<?php echo esc_url(get_post_type_archive_link('cha_news')); ?>" data-i18n="news_read_more"><?php esc_html_e('Read More', 'cha-cambodia'); ?> <span class="arrow">&rarr;</span></a>
                   </div>
                 </article>
             <?php endfor;
@@ -193,50 +200,46 @@
       </div>
       <div class="tab-panel" data-tab-panel="csr-member" style="padding-top:0">
         <div class="section-heading" data-reveal><h2 data-i18n="membership_heading"><?php echo esc_html(cha_get_option('membership_benefits_heading', 'Membership Benefits')); ?></h2></div>
-        <div class="membership-benefits membership-benefits-v2">
+        <div class="membership-benefits">
           <!-- Card 1: Community & Support -->
-          <div class="membership-benefit-card-v2 benefit-theme-blue benefit-stagger-1" data-reveal>
-            <div class="membership-benefit-icon-v2">
+          <div class="membership-benefit-card" data-reveal>
+            <div class="membership-benefit-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </div>
-            <div class="benefit-card-text">
-              <div class="benefit-card-tag">Community Network</div>
+            <div>
               <h3 data-i18n="membership_benefit_1_title"><?php echo esc_html(cha_get_option('benefit_1_title', 'Community & Support')); ?></h3>
               <p data-i18n="membership_benefit_1_desc"><?php echo esc_html(cha_get_option('benefit_1_desc', 'Connect with patients, families, and caregivers across Cambodia.')); ?></p>
             </div>
           </div>
 
           <!-- Card 2: Access to Resources -->
-          <div class="membership-benefit-card-v2 benefit-theme-red benefit-stagger-2" data-reveal>
-            <div class="membership-benefit-icon-v2">
+          <div class="membership-benefit-card" data-reveal>
+            <div class="membership-benefit-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
             </div>
-            <div class="benefit-card-text">
-              <div class="benefit-card-tag">Education & Care</div>
+            <div>
               <h3 data-i18n="membership_benefit_2_title"><?php echo esc_html(cha_get_option('benefit_2_title', 'Access to Resources')); ?></h3>
               <p data-i18n="membership_benefit_2_desc"><?php echo esc_html(cha_get_option('benefit_2_desc', 'Exclusive guides, educational materials, and treatment information.')); ?></p>
             </div>
           </div>
 
           <!-- Card 3: Events & Workshops -->
-          <div class="membership-benefit-card-v2 benefit-theme-purple benefit-stagger-3" data-reveal>
-            <div class="membership-benefit-icon-v2">
+          <div class="membership-benefit-card" data-reveal>
+            <div class="membership-benefit-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
-            <div class="benefit-card-text">
-              <div class="benefit-card-tag">Programs & Training</div>
+            <div>
               <h3 data-i18n="membership_benefit_3_title"><?php echo esc_html(cha_get_option('benefit_3_title', 'Events & Workshops')); ?></h3>
               <p data-i18n="membership_benefit_3_desc"><?php echo esc_html(cha_get_option('benefit_3_desc', 'Participate in hands-on workshops, community events, and online learning sessions.')); ?></p>
             </div>
           </div>
 
           <!-- Card 4: Advocacy & Awareness -->
-          <div class="membership-benefit-card-v2 benefit-theme-amber benefit-stagger-4" data-reveal>
-            <div class="membership-benefit-icon-v2">
+          <div class="membership-benefit-card" data-reveal>
+            <div class="membership-benefit-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
             </div>
-            <div class="benefit-card-text">
-              <div class="benefit-card-tag">Patient Rights</div>
+            <div>
               <h3 data-i18n="membership_benefit_4_title"><?php echo esc_html(cha_get_option('benefit_4_title', 'Advocacy & Awareness')); ?></h3>
               <p data-i18n="membership_benefit_4_desc"><?php echo esc_html(cha_get_option('benefit_4_desc', 'Help raise awareness and advocate for better care nationwide.')); ?></p>
             </div>
@@ -259,7 +262,7 @@
             </div>
           </div>
           <div class="membership-cta-img">
-            <img src="<?php echo get_template_directory_uri(); ?>/family.jpg" alt="CHA community — families and supporters">
+            <img src="<?php echo esc_url(cha_get_option('membership_cta_img', get_template_directory_uri() . '/family.jpg')); ?>" alt="CHA community — families and members">
             <div class="membership-cta-badge"><strong data-i18n="membership_badge_count"><?php echo esc_html(cha_get_option('membership_count', '500+')); ?></strong><span data-i18n="membership_badge_label"><?php echo esc_html(cha_get_option('membership_count_label', 'members & growing')); ?></span></div>
           </div>
         </div>
@@ -311,120 +314,127 @@
       </div>
       <div class="campaigns-list campaigns-panel-v2" data-reveal>
         <div class="campaigns-header-row">
-          <div>
-            <div class="campaigns-eyebrow">
-              <span class="campaigns-eyebrow-dot"></span>
-              <span>Active Initiatives</span>
-            </div>
-            <h3 class="campaigns-main-title" data-i18n="campaigns_heading"><?php echo esc_html(cha_get_option('campaigns_heading', 'Current Campaigns')); ?></h3>
+          <div class="campaigns-title-col">
+            <h3 class="campaigns-main-title" data-i18n="campaigns_heading"><?php esc_html_e('Current Campaigns', 'cha-cambodia'); ?></h3>
+            <p class="campaigns-main-sub" data-i18n="campaigns_sub"><?php esc_html_e('Support our life-saving missions and emergency patient care.', 'cha-cambodia'); ?></p>
           </div>
-          <span class="campaigns-count-badge">3 Ongoing</span>
+          <?php
+          $camp_count_q = new WP_Query(array('post_type' => 'cha_campaigns', 'posts_per_page' => 10, 'post_status' => 'publish'));
+          $camp_count = $camp_count_q->found_posts;
+          wp_reset_postdata();
+          ?>
+          <div class="campaigns-actions-col">
+            <span class="campaigns-count-badge"><?php echo esc_html($camp_count); ?> <span data-i18n="campaigns_ongoing">Ongoing</span></span>
+            <?php if ($camp_count > 0) : ?>
+              <a href="<?php echo esc_url(get_post_type_archive_link('cha_campaigns')); ?>" class="campaigns-view-all-link" data-i18n="campaigns_view_all">View All &rarr;</a>
+            <?php endif; ?>
+          </div>
         </div>
 
         <div class="campaigns-cards-stack">
-          <!-- Campaign 1: Patient Support Fund -->
-          <article class="campaign-card-v2 campaign-theme-red">
-            <div class="campaign-card-top">
-              <div class="campaign-icon-wrap">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              </div>
-              <div class="campaign-card-info">
-                <div class="campaign-title-row">
-                  <h4 class="campaign-title" data-i18n="campaigns_1_title"><?php echo esc_html(cha_get_option('campaign_1_title', 'Patient Support Fund')); ?></h4>
-                  <span class="campaign-pct-pill">28%</span>
-                </div>
-                <p class="campaign-desc" data-i18n="campaigns_1_desc"><?php echo esc_html(cha_get_option('campaign_1_desc', 'Help patients access essential treatment and medication.')); ?></p>
-              </div>
-            </div>
-            <div class="campaign-progress-track">
-              <div class="campaign-progress-fill fill-red" style="width: 28%"></div>
-            </div>
-            <div class="campaign-meta-row">
-              <span class="campaign-meta-raised">
-                <span data-i18n="campaigns_raised_label"><?php echo esc_html(cha_get_option('campaigns_raised_lbl', 'Raised')); ?>:</span>
-                <strong>$4,250</strong>
-              </span>
-              <span class="campaign-meta-goal">
-                <span data-i18n="campaigns_goal_label"><?php echo esc_html(cha_get_option('campaigns_goal_lbl', 'Goal')); ?>:</span>
-                <span>$15,000</span>
-              </span>
-            </div>
-          </article>
-
-          <!-- Campaign 2: Education & Awareness -->
-          <article class="campaign-card-v2 campaign-theme-blue">
-            <div class="campaign-card-top">
-              <div class="campaign-icon-wrap">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-              </div>
-              <div class="campaign-card-info">
-                <div class="campaign-title-row">
-                  <h4 class="campaign-title" data-i18n="campaigns_2_title"><?php echo esc_html(cha_get_option('campaign_2_title', 'Education & Awareness')); ?></h4>
-                  <span class="campaign-pct-pill">26%</span>
-                </div>
-                <p class="campaign-desc" data-i18n="campaigns_2_desc"><?php echo esc_html(cha_get_option('campaign_2_desc', 'Support workshops and awareness seminars across provinces.')); ?></p>
-              </div>
-            </div>
-            <div class="campaign-progress-track">
-              <div class="campaign-progress-fill fill-blue" style="width: 26%"></div>
-            </div>
-            <div class="campaign-meta-row">
-              <span class="campaign-meta-raised">
-                <span data-i18n="campaigns_raised_label"><?php echo esc_html(cha_get_option('campaigns_raised_lbl', 'Raised')); ?>:</span>
-                <strong>$2,180</strong>
-              </span>
-              <span class="campaign-meta-goal">
-                <span data-i18n="campaigns_goal_label"><?php echo esc_html(cha_get_option('campaigns_goal_lbl', 'Goal')); ?>:</span>
-                <span>$8,500</span>
-              </span>
-            </div>
-          </article>
-
-          <!-- Campaign 3: Emergency Assistance -->
-          <article class="campaign-card-v2 campaign-theme-purple">
-            <div class="campaign-card-top">
-              <div class="campaign-icon-wrap">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              </div>
-              <div class="campaign-card-info">
-                <div class="campaign-title-row">
-                  <h4 class="campaign-title" data-i18n="campaigns_3_title"><?php echo esc_html(cha_get_option('campaign_3_title', 'Emergency Assistance')); ?></h4>
-                  <span class="campaign-pct-pill">30%</span>
-                </div>
-                <p class="campaign-desc" data-i18n="campaigns_3_desc"><?php echo esc_html(cha_get_option('campaign_3_desc', 'Provide urgent help for patients in critical situations.')); ?></p>
-              </div>
-            </div>
-            <div class="campaign-progress-track">
-              <div class="campaign-progress-fill fill-purple" style="width: 30%"></div>
-            </div>
-            <div class="campaign-meta-row">
-              <span class="campaign-meta-raised">
-                <span data-i18n="campaigns_raised_label"><?php echo esc_html(cha_get_option('campaigns_raised_lbl', 'Raised')); ?>:</span>
-                <strong>$1,500</strong>
-              </span>
-              <span class="campaign-meta-goal">
-                <span data-i18n="campaigns_goal_label"><?php echo esc_html(cha_get_option('campaigns_goal_lbl', 'Goal')); ?>:</span>
-                <span>$5,000</span>
-              </span>
-            </div>
-          </article>
+          <?php
+          $campaigns_query = new WP_Query(array(
+              'post_type'      => 'cha_campaigns',
+              'posts_per_page' => 3,
+              'post_status'    => 'publish',
+              'orderby'        => 'menu_order',
+              'order'          => 'ASC',
+          ));
+          if ($campaigns_query->have_posts()) :
+              while ($campaigns_query->have_posts()) : $campaigns_query->the_post();
+                  $raised = (float) get_post_meta(get_the_ID(), '_cha_campaign_raised', true);
+                  $goal = (float) get_post_meta(get_the_ID(), '_cha_campaign_goal', true);
+                  $color = get_post_meta(get_the_ID(), '_cha_campaign_color', true);
+                  $icon_name = get_post_meta(get_the_ID(), '_cha_campaign_icon', true);
+                  if (!$color) $color = 'red';
+                  if (!$icon_name) $icon_name = 'heart';
+                  $pct = $goal > 0 ? min(100, round(($raised / $goal) * 100)) : 0;
+                  $icon = cha_campaign_icon_svg($icon_name);
+                  ?>
+                  <article class="campaign-card-v2 campaign-theme-<?php echo esc_attr($color); ?>">
+                    <div class="campaign-card-top">
+                      <div class="campaign-icon-wrap"><?php echo $icon; ?></div>
+                      <div class="campaign-card-info">
+                        <?php
+                        $camp_title = get_the_title();
+                        $camp_km_title = get_post_meta(get_the_ID(), '_cha_campaign_title_km', true);
+                        $camp_excerpt = get_the_excerpt();
+                        if (strlen($camp_excerpt) > 100) $camp_excerpt = wp_trim_words($camp_excerpt, 15, '...');
+                        $camp_km_desc = get_post_meta(get_the_ID(), '_cha_campaign_desc_km', true);
+                        ?>
+                        <div class="campaign-title-row">
+                          <h4 class="campaign-title auto-text" data-en="<?php echo esc_attr($camp_title); ?>" data-km="<?php echo esc_attr($camp_km_title); ?>"><?php the_title(); ?></h4>
+                          <span class="campaign-pct-pill"><?php echo esc_html($pct); ?>%</span>
+                        </div>
+                        <p class="campaign-desc auto-text" data-en="<?php echo esc_attr($camp_excerpt); ?>" data-km="<?php echo esc_attr($camp_km_desc); ?>"><?php echo esc_html($camp_excerpt); ?></p>
+                      </div>
+                    </div>
+                    <div class="campaign-progress-track">
+                      <div class="campaign-progress-fill fill-<?php echo esc_attr($color); ?>" style="width: <?php echo esc_attr($pct); ?>%"></div>
+                    </div>
+                    <div class="campaign-meta-row">
+                      <span class="campaign-meta-raised" data-i18n="campaigns_raised_label">
+                        Raised: <strong>$<?php echo esc_html(number_format($raised)); ?></strong>
+                      </span>
+                      <span class="campaign-meta-goal" data-i18n="campaigns_goal_label">
+                        Goal: <span>$<?php echo esc_html(number_format($goal)); ?></span>
+                      </span>
+                    </div>
+                  </article>
+                  <?php
+                  endwhile;
+              wp_reset_postdata();
+          else :
+              $fallback = array(
+                  array('Patient Support Fund', 'Help patients access essential treatment and medication.', 4250, 15000, 'red', 'heart', 'campaigns_1_title', 'campaigns_1_desc'),
+                  array('Education & Awareness', 'Support workshops and awareness seminars across provinces.', 2180, 8500, 'blue', 'graduation', 'campaigns_2_title', 'campaigns_2_desc'),
+                  array('Emergency Assistance', 'Provide urgent help for patients in critical situations.', 1500, 5000, 'purple', 'pulse', 'campaigns_3_title', 'campaigns_3_desc'),
+              );
+              foreach ($fallback as $fi => $fb) :
+                  $pct = $fb[3] > 0 ? round(($fb[2] / $fb[3]) * 100) : 0;
+                  ?>
+                  <article class="campaign-card-v2 campaign-theme-<?php echo esc_attr($fb[4]); ?>">
+                    <div class="campaign-card-top">
+                      <div class="campaign-icon-wrap"><?php echo cha_campaign_icon_svg($fb[5]); ?></div>
+                      <div class="campaign-card-info">
+                        <div class="campaign-title-row">
+                          <h4 class="campaign-title auto-text" data-en="<?php echo esc_attr($fb[0]); ?>" data-km="" data-i18n="<?php echo esc_attr($fb[6]); ?>"><?php echo esc_html($fb[0]); ?></h4>
+                          <span class="campaign-pct-pill"><?php echo esc_html($pct); ?>%</span>
+                        </div>
+                        <p class="campaign-desc auto-text" data-en="<?php echo esc_attr($fb[1]); ?>" data-km="" data-i18n="<?php echo esc_attr($fb[7]); ?>"><?php echo esc_html($fb[1]); ?></p>
+                      </div>
+                    </div>
+                    <div class="campaign-progress-track">
+                      <div class="campaign-progress-fill fill-<?php echo esc_attr($fb[4]); ?>" style="width: <?php echo esc_attr($pct); ?>%"></div>
+                    </div>
+                    <div class="campaign-meta-row">
+                      <span class="campaign-meta-raised" data-i18n="campaigns_raised_label">Raised: <strong>$<?php echo esc_html(number_format($fb[2])); ?></strong></span>
+                      <span class="campaign-meta-goal" data-i18n="campaigns_goal_label">Goal: <span>$<?php echo esc_html(number_format($fb[3])); ?></span></span>
+                    </div>
+                  </article>
+              <?php endforeach;
+          endif;
+          ?>
         </div>
 
         <!-- Corporate Partners Card -->
         <div class="corporate-partners-box">
           <div class="partners-box-header">
-            <span class="partners-box-title"><?php echo esc_html(cha_get_option('campaigns_corporate_heading', 'Corporate Partners')); ?></span>
-            <span class="partners-box-sub">Global Healthcare Allies</span>
+            <span class="partners-box-title" data-i18n="campaigns_partners"><?php echo esc_html(cha_get_option('campaigns_corporate_heading', 'Corporate Partners')); ?></span>
+            <span class="partners-box-sub" data-i18n="campaigns_partners_sub">Global Healthcare Allies</span>
           </div>
-          <div class="partners-strip-v2">
-            <div class="partner-logo-pill" title="World Federation of Hemophilia">
-              <svg viewBox="0 0 100 36" width="90" height="32" aria-label="WFH"><circle cx="14" cy="18" r="9" fill="none" stroke="#0B1D6D" stroke-width="2.2"/><text x="30" y="24" font-family="Poppins, sans-serif" font-size="14" font-weight="800" fill="#0B1D6D" letter-spacing="0.5">WFH</text></svg>
+          <div class="partners-logos-row">
+            <div class="partner-logo-card" title="World Federation of Hemophilia">
+              <div class="partner-icon-ring partner-icon-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+              </div>
+              <span class="partner-logo-text">WFH</span>
             </div>
-            <div class="partner-logo-pill" title="IFAH">
-              <svg viewBox="0 0 90 36" width="80" height="32" aria-label="IFAH"><text x="8" y="24" font-family="Poppins, sans-serif" font-size="16" font-weight="800" fill="#0B1D6D" letter-spacing="1">IFAH</text></svg>
-            </div>
-            <div class="partner-logo-pill" title="PATH">
-              <svg viewBox="0 0 80 36" width="70" height="32" aria-label="PATH"><text x="6" y="25" font-family="Poppins, sans-serif" font-size="17" font-weight="800" fill="#0B1D6D" letter-spacing="1">PATH</text></svg>
+            <div class="partner-logo-card" title="International Federation of Arms for Hemophilia">
+              <div class="partner-icon-ring partner-icon-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <span class="partner-logo-text">IFAH</span>
             </div>
           </div>
         </div>
@@ -446,15 +456,15 @@
         <div class="items">
           <div class="item">
             <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-            <div><span class="label" data-i18n="contact_address">Address</span><span class="value"><?php echo nl2br(esc_html(cha_get_option('contact_address', '#Building 100, Russia Blvd (114), Phnom Penh, Cambodia, P.O Box 700'))); ?></span></div>
+            <div><span class="label" data-i18n="contact_address">Address</span><span class="value"><?php echo nl2br(esc_html(cha_get_option('contact_address', '#100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia'))); ?></span></div>
           </div>
           <div class="item">
             <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-            <div><span class="label" data-i18n="contact_phone">Phone</span><a class="value" href="tel:<?php echo esc_attr(cha_get_option('contact_phone_digits', '+855962605335')); ?>"><?php echo esc_html(cha_get_option('contact_phone', '(+855) 96 260 5335')); ?></a></div>
+            <div><span class="label" data-i18n="contact_phone">Phone</span><a class="value" href="tel:<?php echo esc_attr(cha_get_option('contact_phone_digits', '+85512311033')); ?>"><?php echo esc_html(cha_get_option('contact_phone', '+855 12 311 033')); ?></a></div>
           </div>
           <div class="item">
             <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-            <div><span class="label" data-i18n="contact_email">Email</span><a class="value" href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a></div>
+            <div><span class="label" data-i18n="contact_email">Email</span><a class="value" href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'cha.rithy2016@gmail.com')); ?></a></div>
           </div>
         </div>
         <div class="hours">
@@ -466,7 +476,7 @@
         <div class="socials" aria-label="Social media">
           <a href="https://www.facebook.com/hemophiliacambodian" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg></a>
           <a href="https://www.youtube.com/@cambodiahemophiliaassociation" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
-          <a href="mailto:choryee.hun@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+          <a href="mailto:cha.rithy2016@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
           <a href="https://t.me/Chacambodia_bot" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71l-4.16-3.07-2.01 1.93c-.23.23-.42.42-.84.42z"/></svg></a>
         </div>
       </div>

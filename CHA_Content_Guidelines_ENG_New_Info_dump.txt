@@ -1,0 +1,285 @@
+=== PARAGRAPHS ===
+0: Cambodian Hemophilia Association
+1: Website Content Guides
+2: Please fill in the tables below and return to the Nexus team.
+Leave blank anything that does not apply.
+3: Prepared: July 06, 2026
+5: Organizational Contact
+6: These details appear across your website — homepage, footer, contact page.
+7: Organization (skip if there is no info)
+9: Contact Details
+11: Social Media Link (s)
+13: Website Footer
+15: Homepage
+16: The first page visitors see when they land on your site.
+17: Hero (top of page)
+19: Latest News & Events (3 cards)
+21: About Us
+22: Your story, structure, and the people behind CHA.
+23: Page Intro & Who is CHA
+25: Partnerships
+27: Leadership Team (4 shown on site)
+29: Leadership Team & Groups
+30: CHA’s 5th Mandate (2026–2030) organizational structure. All names and roles from official announcements.
+31: CHA Leadership (13 members)
+33: Siem Reap Chapter (SRC) — 6 members
+35: Youth Group — 7 members
+37: Women’s Group — 12 members
+39: Volunteer Group — 12 members
+41: About Hemophilia
+42: Educational information for patients, families, and the public.
+43: Page Intro & What is Hemophilia
+45: Related Conditions
+47: Treatment Centres on GoogleMap & Explore More
+49: CSR Program
+51: Types & Symptoms (optional)
+53: Become a Member
+54: Membership page — benefits, registration form, and login.
+55: Page Intro & Benefits
+57: Registration & Patient Card
+59: News & Activities
+60: Updates, events, and workshop announcements.
+61: News Articles (3 entries)
+63: Events (3 entries)
+65: Fundraising & Donation
+66: Donation page — impact, donation form, campaign progress, partners.
+67: Page Intro & Impact
+69: Donation Form
+71: Treatment Centres & Contact
+72: Hospital listings and contact page details.
+73: Treatment Centres
+75: Contact Page
+77: Assets Required
+78: Files we need from you. Write ✓ when ready, or "placeholder" if not yet available.
+79: Checklist
+
+=== TABLES ===
+
+--- Table 1 ---
+Topic | Your content
+Organization name | Cambodian Hemophilia Association
+Tagline | Supporting people with bleeding disorders across Cambodia.
+Mission statement | To advocate for quality care, educate communities, support families, and empower caregivers.
+
+--- Table 2 ---
+Topic | Your content
+Office address | #Building 100, Russia Blvd (114), Phnom Penh, Cambodia, P.O Box 700
+Phone number | (+855) 96 260 5335
+Contact email | info@chacambodia.org
+Office hours | Monday–Friday: 8:00–17:00 / Saturday: 9:00–13:00 / Sunday: Closed
+
+--- Table 3 ---
+Channel (s) | Paste link here
+Facebook | https://www.facebook.com/hemophiliacambodian
+Instagram | N/A
+YouTube | https://www.youtube.com/@cambodiahemophiliaassociation
+LinkedIn | N/A
+Telegram | 096 260 5335
+
+--- Table 4 ---
+Channel (s) | Your content
+Privacy (if required) | The Cambodian Hemophilia Association is committed to protecting the privacy of our patients, donors, and members. Any personal or medical information shared with us is handled securely and in strict confidence.
+Disclaimer | The information provided on this website is for educational and awareness purposes only. It is not intended as a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare professional regarding bleeding disorders.
+Contact Us | Cambodian Hemophilia Association (CHA) — Phnom Penh, Cambodia.  Email: choryee.hun@gmail.com Phone: +855 96 260 5335
+
+--- Table 5 ---
+Topic | Your content
+Main heading | Together We Care. / Together We Change Lives.
+Subtext (short sentence below heading) | Supporting and empowering people with bleeding disorders across Cambodia.
+Left button text (e.g. Become a Member) | Get Support
+Right button text (e.g. Donation) | Become a member
+
+--- Table 6 ---
+Topic | Your content
+Article 1 — date, type (Event/Update/Workshop), title, summary | Apr 17, 2025 / Event / World Hemophilia Day 2025 Community Awareness Event / Join us for our annual awareness day in Phnom Penh.
+Article 2 — date, type, title, summary | Apr 16, 2025 / Update / New Treatment Guidelines Now Available in Cambodia / Updated clinical guidelines for hemophilia management.
+Article 3 — date, type, title, summary | Apr 12, 2025 / Workshop / Training Workshop for Healthcare Professionals / Hands-on workshop covering diagnosis and treatment.
+
+--- Table 7 ---
+Topic | Your content
+Page headline | Who is CHA?
+Who is CHA? (several paragraphs) | The Cambodian Hemophilia Association (CHA) is a patient-led organization dedicated to improving the quality of life of people living with bleeding disorders across Cambodia.  Vision: A Cambodia where every person with a bleeding disorder has access to diagnosis, treatment, and support.  Mission: To advocate for quality care, educate communities, support families, and empower caregivers.
+Leadership structure and groups | Leadership Team (President, Vice President, Medical Advisor, Executive Director) + Youth Group + Women’s Group
+SRC — what it stands for and its role | SRC (Student Representative Chapter) — CHA’s commitment to community outreach, volunteer engagement, and public awareness across Cambodia. 12+ provinces reached, 80+ volunteers, 1 chapter (Siem Reap).
+Our History | 2011: CHA Established by patients and families. 2014: Became WFH Member. 2017: Hospital Partnerships to improve treatment access. 2023: National Reach — expanded education and outreach across provinces.
+Our work with WFH & HFA brief | CHA proudly partners with leading global organizations to strengthen hemophilia care across Cambodia.
+
+--- Table 8 ---
+Topic | Your content
+Our work with WFH (World Federation of Hemophilia) | WFH — Member Since 2014, 140+ countries in network. Access to international treatment guidelines, training programs, and humanitarian aid that directly improve patient care.
+Our work with HFA (Haemophilia Foundation Australia) | HFA — Training Partner, 15+ joint programs. Partners on capacity building, clinical training, and patient advocacy. Joint programs connect Cambodian clinicians with Australian expertise.
+
+--- Table 9 ---
+Topic | Your content
+Member 1 — name and role | Mr. Run Chanthearithy — President
+Member 2 — name and role | Mr. Noeurn Syneang — Vice President
+Member 3 — name and role | Mrs. Soung Somaly — Treasurer
+Member 4 — name and role | Mrs. Hun Choryee  — Secretary General
+
+--- Table 10 ---
+Position | Name
+Founder & Medical Advisor | Prof. Chean Sophâl
+Co-Founder & Medical Advisor | Dr. Sing Heng
+Honorary President | Mr. Sem Sokpanha
+President | Mr. Run Chanthearithy
+Vice President | Mr. Noeurn Syneang
+Treasurer | Mrs. Soung Somaly
+Secretary General | Mrs. Hun Choryee
+Head of Siem Reap Supporting Group | Mr. Sreng Sung
+Head of Digital | Mr. Oum Naro
+Head of Reaction Unit | Mr. Kan Sokkhai
+Head of CSR Program | Mrs. Chan Sereyrath
+Head of Volunteers (Phnom Penh) | Mr. Sath Dara
+Volunteer Representative (Siem Reap) | Mr. Sun Khunsa
+
+--- Table 11 ---
+Position | Name
+Medical Advisor | Dr. Sing Heng
+CHA President | Mr. Run Chanthearithy
+Head of Siem Reap Chapter | Mr. Sreng Sung
+Finance | Ms. Keo Sovandy
+Administrator | Mrs. Sun Sokhorn
+Volunteer | Mr. Pach Panhavorinvong
+
+--- Table 12 ---
+Position | Name
+CHA President (Supervisor) | Mr. Run Chanthearithy
+Head of Reaction Unit (Supervisor) | Mr. Kan Sokkhai
+Youth Group Leader | Mr. Keopich Chanda
+Deputy Leader | Mr. Say Ouksaphea
+Finance | Mr. Ky Eangtol
+Administration | Mr. Srim Pengleang
+Volunteer | Mr. Khan Dara
+
+--- Table 13 ---
+Position | Name
+CHA President (Supervisor) | Mr. Run Chanthearithy
+Head of Reaction Unit (Supervisor) | Mr. Kan Sokkhai
+Women Group Leader | Mrs. Sum Roatha
+Deputy Leader | Mrs. Yim Mary
+Finance | Mrs. Him Somala
+Administration | Mrs. Srim Sreypich
+Volunteer | Mrs. Try Kakada
+Volunteer | Mrs. Phon Sokny
+Volunteer | Mrs. Som Phalla
+Volunteer | Mrs. Heng Sim
+Volunteer | Mrs. Touch Socheata
+Volunteer | Mrs. Hou Sreyny
+
+--- Table 14 ---
+Position | Name
+CHA President (Supervisor) | Mr. Run Chanthearithy
+Head of Reaction Unit (Supervisor) | Mr. Kan Sokkhai
+Volunteer Group Leader | Mr. Sath Dara
+Deputy Leader | Ms. Chor Sonita
+Finance | Ms. Srin Vinching
+Administration | Ms. Oeun Sreyneath
+Volunteer | Mr. Pov Lay
+Volunteer | Mr. Phorn Soveat
+Volunteer | Mr. Mom Bunthart
+Volunteer | Mr. Yong Tetyutthuon
+Volunteer | Ms. Noeurn SoVannitta
+Volunteer | Mr. Sun Khunsa
+
+--- Table 15 ---
+Topic | Your content
+Page headline | What is Hemophilia?
+What is Hemophilia? (details & brief paragraphs) | Hemophilia is a rare genetic bleeding disorder that affects a person’s ability to stop bleeding. People with hemophilia can bleed longer than others after an injury or even without a known cause. While there is no cure, modern treatments allow people with hemophilia to live full, active and healthy lives. Early diagnosis, proper treatment and ongoing support are key to preventing complications and joint damage.
+
+--- Table 16 ---
+Topic | Your content
+About VWD — description and any Khmer resources | Von Willebrand Disease is the most common inherited bleeding disorder, affecting both males and females equally. Caused by a deficiency or dysfunction of von Willebrand factor (VWF), a protein that helps blood clot. Three main types: Type 1 (mild), Type 2 (moderate), Type 3 (severe).
+About other bleeding disorders — description and relevance | Rare Factor Deficiencies — deficiencies in factors I, II, V, VII, X, XI, XII, and XIII. Each requires specific diagnosis and treatment. Platelet Function Disorders — conditions where platelets don’t work properly, leading to bleeding despite normal platelet counts.
+
+--- Table 17 ---
+Topic | Your content
+Phnom Penh — hospital details, phone, services | National Pediatric Hospital (NPH) — 012 751 728
+Siem Reap — hospital details, phone, services | Angkor Hospital for Children (AHC) — 012 794 685
+
+--- Table 18 ---
+Topic | Your content
+Fundraising details & brief | Raising funds through community drives, events, and partner campaigns that keep our programs running.
+Online donation details & brief | Donate securely via PayPal or ABA — every contribution changes lives across Cambodia.
+Corporate Partners brief & logo | WFH, Novo Nordisk, Save One Life, and Haemophilia Foundation Australia
+
+--- Table 19 ---
+Topic | Your content
+Hemophilia A — description | Caused by a deficiency of factor VIII. The most common type.
+Hemophilia B — description | Caused by a deficiency of factor IX. Sometimes called Christmas disease.
+Symptom 1 (1-3 words) | Easy Bruising — unexplained bruises from minor bumps or pressure
+Symptom 2 (1-3 words) | Frequent Nosebleeds — recurring nosebleeds that are hard to stop
+Symptom 3 (1-3 words) | Bleeding Gums — gums that bleed during brushing or eating
+Symptom 4 (1-3 words) | Joint Pain or Swelling — painful, swollen joints after minor injury or activity
+Symptom 5 (1-3 words) | Prolonged Bleeding — bleeding that lasts longer than expected after cuts
+
+--- Table 20 ---
+Topic | Your content
+Page headline | Membership Benefits
+Intro paragraph | Join our community to access exclusive resources, events, and peer support across Cambodia.
+Benefit 1 — title and description | Community & Support — Connect with patients, families, and caregivers across Cambodia.
+Benefit 2 — title and description | Access to Resources — Exclusive guides, educational materials, and treatment information.
+Benefit 3 — title and description | Events & Workshops — Attend training sessions, awareness events, and webinars.
+Benefit 4 — title and description | Advocacy & Awareness — Help raise awareness and advocate for better care nationwide.
+Benefit 5 — title and description | Updates & Newsletters — Stay informed with the latest news and CHA announcements.
+
+--- Table 21 ---
+Topic | Your content
+Form fields to include? (list them) | Full Name, Email, Password, Province (dropdown: Phnom Penh/Siem Reap/Battambang/Other), Role (Patient/Family member/Caregiver/Healthcare professional/Supporter), Terms & Conditions checkbox
+Patient card — what information should it include? | Member name, role, province, member since date, membership ID, status (Active)
+Login button text | Sign In
+Terms & conditions — link or note | Terms & Conditions link
+Payment gateway * Stripe or PayPal | PayPal / ABA
+
+--- Table 22 ---
+Topic | Your content
+Article 1 — date, title, short summary | Apr 17, 2025 / World Hemophilia Day 2025 Community Awareness Event / Join us for our annual awareness day in Phnom Penh.
+Article 2 — date, title, short summary | Apr 16, 2025 / New Treatment Guidelines Now Available in Cambodia / Updated clinical guidelines for hemophilia management.
+Article 3 — date, title, short summary | Apr 12, 2025 / Training Workshop for Healthcare Professionals / Hands-on workshop covering diagnosis and treatment.
+
+--- Table 23 ---
+Topic | Your content
+Event 1 — date, title, location, summary | (fill in)
+Event 2 — date, title, location, summary | (fill in)
+Event 3 — date, title, location, summary | (fill in)
+
+--- Table 24 ---
+Topic | Your content
+Page headline | Make a Donation
+Hero subtext | Your donation helps us provide treatment, education and hope to people with bleeding disorders in Cambodia.
+Impact statement 1 (1 sentence) | Provide treatment access for patients
+Impact statement 2 (1 sentence) | Support education and awareness
+Impact statement 3 (1 sentence) | Strengthen healthcare capacity
+Impact statement 4 (1 sentence) | Empower families and communities
+
+--- Table 25 ---
+Topic | Your content
+Suggested donation amounts (e.g. 10, 25, 50, 100) | $10, $25, $50, $100, Other
+Monthly amounts | $5/mo, $10/mo, $25/mo, $50/mo, Other
+Payment method labels (e.g. Credit Card, PayPal) | PayPal, ABA
+Donate button text | Donate Securely
+
+--- Table 26 ---
+Topic | Your content
+Hospital 1 — name, province, phone, services | National Pediatric Hospital (NPH) — 012 751 728
+Hospital 2 — name, province, phone, services | Angkor Hospital for Children (AHC) — 012 794 685
+
+--- Table 27 ---
+Topic | Your content
+Contact page headline | Contact Us
+Any changes to the contact form? | No changes. Current fields: Full Name, Email, Subject, Message
+
+--- Table 28 ---
+Asset | Status
+Logo (primary) | ✓ cha-logo-left.png
+Hero photo — family/community | ✓ Heroo.png
+About Us team photo | ✓ about-team.jpg
+4 leadership headshots | ✓ leader-1.jpg to leader-4.jpg
+3 hospital photos | ✓ hospital-1.jpg, hospital-2.jpg, hospital-3.jpg
+4–6 event/news photos | ✓ 6 photos available
+Donation section photo | ✓ family.jpg
+Members photo | ✓ members.jpg
+Patient card design or spec | ✗ (not yet)
+Brand guidelines document | ✗ (not yet)
+Partner logos | ✗ (placeholder)
+Video links (YouTube, Facebook) | ✗ (none yet)
+Donation account details (PayPal/KHQR Bakong/ABA/ACELEDA) | ✗ (need PayPal/ABA)

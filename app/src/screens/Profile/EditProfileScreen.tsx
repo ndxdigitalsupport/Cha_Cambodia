@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
   avatarWrap: { width: 100, height: 100, borderRadius: 50, overflow: 'hidden', backgroundColor: '#E2E8F0', marginBottom: 12 },
   avatarImage: { width: '100%', height: '100%' },
   avatarPlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  avatarOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' },
+  avatarOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' },
   photoActions: { flexDirection: 'row', gap: 12 },
   photoUploadBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#EAF0FB', paddingHorizontal: 14, paddingVertical: 8, borderRadius: BorderRadius.sm },
   photoUploadText: { fontSize: 13, fontWeight: '700', color: '#0B1D6D', paddingTop: 2 },

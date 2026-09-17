@@ -166,6 +166,8 @@ Every completed phase = git tag `checkpoint-<name>-YYYY-MM-DD`, pushed to GitHub
 | `checkpoint-web-forgot-2026-08-13` | `b0d83a8` |
 | `checkpoint-store-legal-2026-08-13` | `e3c6eb4` |
 | `checkpoint-app-restructure-2026-08-14` | `0564a0f` |
+| `checkpoint-news-cpt-2026-09-08` | `3074ae4` |
+| `checkpoint-payway-compliance-2026-09-17` | (pending commit) |
 
 Rollback: `git checkout <tag> -- cha-cambodia-theme app`. All on GitHub
 `Not-Juicy/Cha_website` (branch `main`). `.gitignore` excludes junk/copy/backup folders,
@@ -196,9 +198,14 @@ Rollback: `git checkout <tag> -- cha-cambodia-theme app`. All on GitHub
    cleaned: no news/"Who is CHA?"; quick actions now Haemophilia / Locations / Membership Card /
    Donate. Tabs: Home · Haemophilia · Locations · Account. `npx tsc --noEmit` clean.
    Tag `checkpoint-app-restructure-2026-08-14`. NOTE: SR chapter address is a placeholder —
-   boss to confirm. Push pending (GitHub auth: cached creds are `ndxdigitalsupport` which lacks
+   boss to confirm.    Push pending (GitHub auth: cached creds are `ndxdigitalsupport` which lacks
    push access to `Not-Juicy/Cha_website`).
-4. **Hardening (low priority)**: secure public `cha-smtp-debug.log`; rate-limit
+4. **News & Events CPT DONE (Sep 8)**: WP Custom Post Type `cha_news` registered — boss can
+   add/edit articles from WP Admin (title, content, featured image, display date, category badge).
+   Homepage shows latest 3 cards (fallback placeholders if no posts). Archive at `/news` with
+   category filter + pagination. Single article template included. Nav + footer links updated to
+   `/news`. Tag `checkpoint-news-cpt-2026-09-08`. ACTION: upload theme zip + purge LiteSpeed Cache.
+5. **Hardening (low priority)**: secure public `cha-smtp-debug.log`; rate-limit
    `/login`, `/register`, `/forgot-password` per IP.
 
 ---

@@ -213,19 +213,19 @@ function cha_customize_register($wp_customize) {
     $wp_customize->add_setting('contact_sub_km', array('default' => 'មានសំណួរឬចង់ចូលរួម? យើងរីករាយស្តាប់ពីអ្នក។', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_sub_km', array('label' => 'Section Subheading (KM)', 'section' => 'cha_contact', 'type' => 'textarea'));
 
-    $wp_customize->add_setting('contact_address', array('default' => '#Building 100, Russia Blvd (114), Phnom Penh, Cambodia, P.O Box 700', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('contact_address', array('default' => '#100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_address', array('label' => 'Address (EN)', 'section' => 'cha_contact', 'type' => 'textarea'));
 
-    $wp_customize->add_setting('contact_address_km', array('default' => '#អាគារ ១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី (១១៤) រាជធានីភ្នំពេញ កម្ពុជា ប្រអប់សំបុត្រ ៧០០', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('contact_address_km', array('default' => '#១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី សង្កាត់ទឹកល្អក់១ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ កម្ពុជា', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_address_km', array('label' => 'Address (KM)', 'section' => 'cha_contact', 'type' => 'textarea'));
 
-    $wp_customize->add_setting('contact_phone', array('default' => '(+855) 96 260 5335', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('contact_phone', array('default' => '+855 12 311 033', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_phone', array('label' => 'Phone (display)', 'section' => 'cha_contact', 'type' => 'text'));
 
-    $wp_customize->add_setting('contact_phone_digits', array('default' => '+855962605335', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('contact_phone_digits', array('default' => '+85512311033', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('contact_phone_digits', array('label' => 'Phone (digits for tel link)', 'section' => 'cha_contact', 'type' => 'text'));
 
-    $wp_customize->add_setting('contact_email', array('default' => 'choryee.hun@gmail.com', 'sanitize_callback' => 'sanitize_email'));
+    $wp_customize->add_setting('contact_email', array('default' => 'cha.rithy2016@gmail.com', 'sanitize_callback' => 'sanitize_email'));
     $wp_customize->add_control('contact_email', array('label' => 'Email', 'section' => 'cha_contact', 'type' => 'email'));
 
     $wp_customize->add_setting('contact_hours_mf', array('default' => '8:00 — 17:00', 'sanitize_callback' => 'sanitize_text_field'));
@@ -265,6 +265,13 @@ function cha_customize_register($wp_customize) {
         'title'    => 'Navigation & Header',
         'priority' => 32,
     ));
+
+    $wp_customize->add_section('cha_logo', array(
+        'title' => 'Site Logo',
+        'panel' => 'cha_nav',
+    ));
+    $wp_customize->add_setting('site_logo', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'site_logo', array('label' => 'Site Logo (Header + Footer)', 'section' => 'cha_logo')));
 
     $wp_customize->add_section('cha_nav_labels', array(
         'title' => 'Menu Labels',
@@ -419,37 +426,6 @@ function cha_customize_register($wp_customize) {
         $wp_customize->add_control("history_{$i}_desc_km", array('label' => "Entry {$i} Description (KM)", 'section' => 'cha_history_page', 'type' => 'textarea'));
     }
 
-    /* ---- Section: Past Presidents ---- */
-    $wp_customize->add_section('cha_presidents', array(
-        'title' => 'Past Presidents',
-        'panel' => 'cha_about_page',
-    ));
-
-    $presidents = array(
-        array('Past President 1', 'អតីតប្រធាន ១', 'President', 'ប្រធាន', '2011 — 2015', '២០១១ — ២០១៥'),
-        array('Past President 2', 'អតីតប្រធាន ២', 'President', 'ប្រធាន', '2015 — 2019', '២០១៥ — ២០១៩'),
-        array('Past President 3', 'អតីតប្រធាន ៣', 'President', 'ប្រធាន', '2019 — 2023', '២០១៩ — ២០២៣'),
-    );
-    $wp_customize->add_setting('president_heading', array('default' => 'Past Presidents', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('president_heading', array('label' => 'Section Heading (EN)', 'section' => 'cha_presidents', 'type' => 'text'));
-    $wp_customize->add_setting('president_heading_km', array('default' => 'អតីតប្រធាន', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('president_heading_km', array('label' => 'Section Heading (KM)', 'section' => 'cha_presidents', 'type' => 'text'));
-    for ($i = 1; $i <= 3; $i++) {
-        $p = $presidents[$i-1];
-        $wp_customize->add_setting("president_{$i}_name", array('default' => $p[0], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("president_{$i}_name", array('label' => "President {$i} Name (EN)", 'section' => 'cha_presidents', 'type' => 'text'));
-        $wp_customize->add_setting("president_{$i}_name_km", array('default' => $p[1], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("president_{$i}_name_km", array('label' => "President {$i} Name (KM)", 'section' => 'cha_presidents', 'type' => 'text'));
-        $wp_customize->add_setting("president_{$i}_role", array('default' => $p[2], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("president_{$i}_role", array('label' => "President {$i} Role (EN)", 'section' => 'cha_presidents', 'type' => 'text'));
-        $wp_customize->add_setting("president_{$i}_role_km", array('default' => $p[3], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("president_{$i}_role_km", array('label' => "President {$i} Role (KM)", 'section' => 'cha_presidents', 'type' => 'text'));
-        $wp_customize->add_setting("president_{$i}_term", array('default' => $p[4], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("president_{$i}_term", array('label' => "President {$i} Term (EN)", 'section' => 'cha_presidents', 'type' => 'text'));
-        $wp_customize->add_setting("president_{$i}_term_km", array('default' => $p[5], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("president_{$i}_term_km", array('label' => "President {$i} Term (KM)", 'section' => 'cha_presidents', 'type' => 'text'));
-    }
-
     /* ---- Section: Leadership ---- */
     $wp_customize->add_section('cha_leadership', array(
         'title' => 'Leadership Team',
@@ -459,7 +435,7 @@ function cha_customize_register($wp_customize) {
     $leaders = array(
         array('Mr. Run Chanthearithy', 'លោក រុន ច័ន្ទរិទ្ធី', 'President', 'ប្រធាន'),
         array('Mr. Noeurn Syneang', 'លោក នឿន ស៊ីនាង', 'Vice President', 'អនុប្រធាន'),
-        array('Mrs. Soung Somaly', 'លោកស្រី ស៊ូង សោម៉ាលី', 'Treasurer', 'ហេរញ្ញិក'),
+        array('Mrs. Soung Somaly', 'លោកស្រី ស៊ូង សោម៉ាលី', 'Head of Finance', 'ប្រធានផ្នែកហិរញ្ញវត្ថុ'),
         array('Mrs. Hun Choryee', 'លោកស្រី ហ៊ុន ជោរយី', 'Secretary General', 'អគ្គលេខាធិការ'),
     );
     $wp_customize->add_setting('leadership_heading', array('default' => 'Leadership Team', 'sanitize_callback' => 'sanitize_text_field'));
@@ -478,7 +454,7 @@ function cha_customize_register($wp_customize) {
     $wp_customize->add_control('youth_title', array('label' => 'Youth Title (EN)', 'section' => 'cha_leadership', 'type' => 'text'));
     $wp_customize->add_setting('youth_title_km', array('default' => 'ក្រុមយុវជន', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('youth_title_km', array('label' => 'Youth Title (KM)', 'section' => 'cha_leadership', 'type' => 'text'));
-    $wp_customize->add_setting('youth_desc', array('default' => 'A network of young patients and supporters driving awareness campaigns, peer mentoring, and youth-led advocacy across Cambodia.', 'sanitize_callback' => 'sanitize_text_field'));
+    $wp_customize->add_setting('youth_desc', array('default' => 'A network of young patients and members driving awareness campaigns, peer mentoring, and youth-led advocacy across Cambodia.', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('youth_desc', array('label' => 'Youth Description (EN)', 'section' => 'cha_leadership', 'type' => 'textarea'));
     $wp_customize->add_setting('youth_desc_km', array('default' => 'បណ្តាញអ្នកជំងឺវ័យក្មេង និងអ្នកគាំទ្រដែលដឹកនាំយុទ្ធនាការភាពដឹង ការណែនាំមិត្តភក្តិ និងការអំពាវនាវដឹកនាំដោយយុវជននៅទូទាំងកម្ពុជា។', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('youth_desc_km', array('label' => 'Youth Description (KM)', 'section' => 'cha_leadership', 'type' => 'textarea'));
@@ -501,6 +477,37 @@ function cha_customize_register($wp_customize) {
         $wp_customize->add_setting("leader_{$i}_role_km", array('default' => $l[3], 'sanitize_callback' => 'sanitize_text_field'));
         $wp_customize->add_control("leader_{$i}_role_km", array('label' => "Leader {$i} Role (KM)", 'section' => 'cha_leadership', 'type' => 'text'));
     }
+
+    /* ---- Leadership & Council Photos ---- */
+    $theme_uri = get_template_directory_uri();
+    $wp_customize->add_setting('leader_advisor_1_img', array('default' => $theme_uri . '/leader-advisor-1.png', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'leader_advisor_1_img', array('label' => 'Advisor 1 Photo (Founder)', 'section' => 'cha_leadership')));
+    $wp_customize->add_setting('leader_advisor_2_img', array('default' => $theme_uri . '/leader-advisor-2.png', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'leader_advisor_2_img', array('label' => 'Advisor 2 Photo (Co-Founder)', 'section' => 'cha_leadership')));
+    $wp_customize->add_setting('leader_advisor_3_img', array('default' => $theme_uri . '/leader-advisor-3.png', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'leader_advisor_3_img', array('label' => 'Advisor 3 Photo (Honorary President)', 'section' => 'cha_leadership')));
+    $leader_photos = array('leader-1.png', 'leader-2.png', 'leader-3.png', 'leader-4.png');
+    for ($i = 1; $i <= 4; $i++) {
+        $wp_customize->add_setting("leader_{$i}_img", array('default' => $theme_uri . '/' . $leader_photos[$i-1], 'sanitize_callback' => 'esc_url_raw'));
+        $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, "leader_{$i}_img", array('label' => "Leader {$i} Photo", 'section' => 'cha_leadership')));
+    }
+    $dept_names = array('CHA Supporting Group', 'Head of Digital', 'Head of Reaction Unit', 'Deputy Secretary General');
+    $dept_photos = array('dept-1.png', 'dept-2.png', 'dept-3.png', 'dept-5.png');
+    $dept_keys = array(1, 2, 3, 5);
+    for ($i = 0; $i < 4; $i++) {
+        $wp_customize->add_setting("council_dept_{$dept_keys[$i]}_img", array('default' => $theme_uri . '/' . $dept_photos[$i], 'sanitize_callback' => 'esc_url_raw'));
+        $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, "council_dept_{$dept_keys[$i]}_img", array('label' => "Dept {$dept_keys[$i]} Photo ({$dept_names[$i]})", 'section' => 'cha_leadership')));
+    }
+
+    /* ---- Hub & Group Banners ---- */
+    $wp_customize->add_setting('hub_youth_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'hub_youth_img', array('label' => 'Youth Group Banner', 'section' => 'cha_leadership')));
+    $wp_customize->add_setting('hub_women_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'hub_women_img', array('label' => "Women's Group Banner", 'section' => 'cha_leadership')));
+    $wp_customize->add_setting('hub_src_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'hub_src_img', array('label' => 'SRC Hub Banner', 'section' => 'cha_leadership')));
+    $wp_customize->add_setting('hub_volunteer_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'hub_volunteer_img', array('label' => 'Volunteer Network Banner', 'section' => 'cha_leadership')));
 
     /* ---- Section: WFH & HFA ---- */
     $wp_customize->add_section('cha_wfh_hfa', array(
@@ -546,6 +553,69 @@ function cha_customize_register($wp_customize) {
         $wp_customize->add_control("{$pref}_link", array('label' => "{$w[1]} Link Text (EN)", 'section' => 'cha_wfh_hfa', 'type' => 'text'));
         $wp_customize->add_setting("{$pref}_link_km", array('default' => $w[12], 'sanitize_callback' => 'sanitize_text_field'));
         $wp_customize->add_control("{$pref}_link_km", array('label' => "{$w[1]} Link Text (KM)", 'section' => 'cha_wfh_hfa', 'type' => 'text'));
+    }
+    $wp_customize->add_setting('wfh_media_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'wfh_media_img', array('label' => 'WFH Media Image', 'section' => 'cha_wfh_hfa')));
+    $wp_customize->add_setting('hfa_media_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'hfa_media_img', array('label' => 'HFA Media Image', 'section' => 'cha_wfh_hfa')));
+
+    /* ---- History Images ---- */
+    $wp_customize->add_setting('history_2011_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'history_2011_img', array('label' => 'History 2011 Image', 'section' => 'cha_history_page')));
+    $wp_customize->add_setting('history_2014_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'history_2014_img', array('label' => 'History 2014 Image', 'section' => 'cha_history_page')));
+    $wp_customize->add_setting('history_2017_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'history_2017_img', array('label' => 'History 2017 Image', 'section' => 'cha_history_page')));
+    $wp_customize->add_setting('history_2023_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'history_2023_img', array('label' => 'History 2023 Image', 'section' => 'cha_history_page')));
+
+    /* ---- SRC Card Background Images ---- */
+    $src_card_names = array('Community Outreach', 'Volunteer Program', 'Siem Reap Chapter');
+    for ($i = 1; $i <= 3; $i++) {
+        $wp_customize->add_setting("src_card_{$i}_img", array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+        $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, "src_card_{$i}_img", array('label' => "Card {$i} Background ({$src_card_names[$i-1]})", 'section' => 'cha_src')));
+    }
+
+    /* ---- Group Member Photos ---- */
+    $wp_customize->add_section('cha_hub_members', array(
+        'title' => 'Group Member Photos',
+        'panel' => 'cha_about_page',
+    ));
+
+    $hub_members = array(
+        'youth_leader' => 'Youth Group Leader',
+        'youth_m1'     => 'Youth — Say Ouksaphea',
+        'youth_m2'     => 'Youth — Ky Eangtol',
+        'youth_m3'     => 'Youth — Srim Pengleang',
+        'youth_m4'     => 'Youth — Khan Dara',
+        'women_leader' => "Women's Group Leader",
+        'women_m1'     => "Women — Yim Mary",
+        'women_m2'     => "Women — Him Somala",
+        'women_m3'     => "Women — Srim Sreypich",
+        'women_m4'     => "Women — Try Kakada",
+        'women_m5'     => "Women — Phon Sokny",
+        'women_m6'     => "Women — Som Phalla",
+        'women_m7'     => "Women — Heng Sim",
+        'women_m8'     => "Women — Touch Socheata",
+        'women_m9'     => "Women — Hou Sreyny",
+        'src_leader'   => 'SRC Chapter Head',
+        'src_m1'       => 'SRC — Run Chanthearithy',
+        'src_m2'       => 'SRC — Keo Sovandy',
+        'src_m3'       => 'SRC — Sun Sokhorn',
+        'src_m4'       => 'SRC — Pach Panhavorinvong',
+        'vol_leader'   => 'Volunteer Network Leader',
+        'vol_m1'       => 'Volunteer — Chor Sonita',
+        'vol_m2'       => 'Volunteer — Srin Vinching',
+        'vol_m3'       => 'Volunteer — Oeun Sreyneath',
+        'vol_m4'       => 'Volunteer — Pov Lay',
+        'vol_m5'       => 'Volunteer — Phorn Soveat',
+        'vol_m6'       => 'Volunteer — Mom Bunthart',
+        'vol_m7'       => 'Volunteer — Yong Tetyutthuon',
+        'vol_m8'       => 'Volunteer — Noeurn SoVannitta',
+    );
+    foreach ($hub_members as $key => $label) {
+        $wp_customize->add_setting("hub_{$key}_img", array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+        $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, "hub_{$key}_img", array('label' => "$label Photo", 'section' => 'cha_hub_members')));
     }
 
     /* ============================================================
@@ -611,6 +681,10 @@ function cha_customize_register($wp_customize) {
         $wp_customize->add_control("hospital_{$i}_tag_3", array('label' => "Hospital {$i} Tag 3 (EN)", 'section' => 'cha_programs_main', 'type' => 'text'));
         $wp_customize->add_setting("hospital_{$i}_tag_3_km", array('default' => $h[10], 'sanitize_callback' => 'sanitize_text_field'));
         $wp_customize->add_control("hospital_{$i}_tag_3_km", array('label' => "Hospital {$i} Tag 3 (KM)", 'section' => 'cha_programs_main', 'type' => 'text'));
+    }
+    for ($i = 1; $i <= 3; $i++) {
+        $wp_customize->add_setting("hospital_{$i}_img", array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+        $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, "hospital_{$i}_img", array('label' => "Hospital {$i} Photo", 'section' => 'cha_programs_main')));
     }
 
     /* ---- Section: Emergency ---- */
@@ -690,6 +764,8 @@ function cha_customize_register($wp_customize) {
         $wp_customize->add_setting($h[0] . '_km', array('default' => $h[2], 'sanitize_callback' => 'sanitize_text_field'));
         $wp_customize->add_control($h[0] . '_km', array('label' => $h[1] . ' (KM)', 'section' => 'cha_haem_intro', 'type' => in_array($h[0], array('haem_intro_p1','haem_intro_p2')) ? 'textarea' : 'text'));
     }
+    $wp_customize->add_setting('haem_hero_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'haem_hero_img', array('label' => 'Haemophilia Hero Image', 'section' => 'cha_haem_intro')));
 
     /* ---- Section: Types ---- */
     $wp_customize->add_section('cha_haem_types', array(
@@ -791,6 +867,8 @@ function cha_customize_register($wp_customize) {
     $wp_customize->add_control('vwd_btn', array('label' => 'Button (EN)', 'section' => 'cha_haem_vwd', 'type' => 'text'));
     $wp_customize->add_setting('vwd_btn_km', array('default' => 'ស្វែងរកការព្យាបាល', 'sanitize_callback' => 'sanitize_text_field'));
     $wp_customize->add_control('vwd_btn_km', array('label' => 'Button (KM)', 'section' => 'cha_haem_vwd', 'type' => 'text'));
+    $wp_customize->add_setting('vwd_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'vwd_img', array('label' => 'VWD Science Image', 'section' => 'cha_haem_vwd')));
 
     /* ---- Section: Other Disorders ---- */
     $wp_customize->add_section('cha_haem_other', array(
@@ -929,7 +1007,7 @@ function cha_customize_register($wp_customize) {
         array('member_forgot_btn', 'Send Reset Link', 'ផ្ញើតំណកំណត់ឡើងវិញ'),
         array('member_signin_btn', 'Sign In', 'ចូល'),
         array('member_register_link', 'Register', 'ចុះឈ្មោះ'),
-        array('member_register_title', 'Join our community of patients, families, and supporters.', 'ចូលរួមសហគមន៍អ្នកជំងឺ គ្រួសារ និងអ្នកគាំទ្ររបស់យើង។'),
+        array('member_register_title', 'Join our community of patients, families, and members.', 'ចូលរួមសហគមន៍អ្នកជំងឺ គ្រួសារ និងសមាជិករបស់យើង។'),
         array('member_register_name_label', 'Full Name', 'ឈ្មោះពេញ'),
         array('member_register_name_placeholder', 'Enter your full name', 'បញ្ចូលឈ្មោះពេញរបស់អ្នក'),
         array('member_register_province', 'Province', 'ខេត្ត'),
@@ -937,7 +1015,7 @@ function cha_customize_register($wp_customize) {
         array('member_register_role_patient', 'Patient', 'អ្នកជំងឺ'),
         array('member_register_role_family', 'Family Member / Caregiver', 'សមាជិកគ្រួសារ / អ្នកថែទាំ'),
         array('member_register_role_professional', 'Healthcare Professional', 'អ្នកជំនាញសុខភាព'),
-        array('member_register_role_supporter', 'Supporter', 'អ្នកគាំទ្រ'),
+        array('member_register_role_member', 'Member', 'សមាជិក'),
         array('member_register_terms', 'I agree to the', 'ខ្ញុំយល់ព្រមនឹង'),
         array('member_register_terms_link', 'Terms & Conditions', 'លក្ខខណ្ឌ'),
         array('member_register_btn', 'Register', 'ចុះឈ្មោះ'),
@@ -1035,49 +1113,8 @@ function cha_customize_register($wp_customize) {
         $wp_customize->add_setting("membership_perk_{$i}_km", array('default' => $perks[$i-1][1], 'sanitize_callback' => 'sanitize_text_field'));
         $wp_customize->add_control("membership_perk_{$i}_km", array('label' => "Perk {$i} (KM)", 'section' => 'cha_membership_section', 'type' => 'text'));
     }
-
-    /* ---- Section: Campaigns ---- */
-    $wp_customize->add_section('cha_campaigns', array(
-        'title' => 'Campaigns Section',
-        'panel' => 'cha_homepage_extras',
-    ));
-
-    $campaigns = array(
-        array('Patient Support Fund', 'មូលនិធិគាំទ្រអ្នកជំងឺ', 'Help patients access essential treatment and medication.', 'ជួយអ្នកជំងឺចូលប្រើការព្យាបាល និងថ្នាំសំខាន់ៗ។', '$4,250', '$15,000'),
-        array('Education & Awareness', 'ការអប់រំ និងការយល់ដឹង', 'Support workshops and awareness seminars across provinces.', 'គាំទ្រសិក្ខាសាលា និងសិក្ខាសាលាយល់ដឹងនៅទូទាំងខេត្ត។', '$2,180', '$8,500'),
-        array('Emergency Assistance', 'ជំនួយបន្ទាន់', 'Provide urgent help for patients in critical situations.', 'ផ្តល់ជំនួយបន្ទាន់ដល់អ្នកជំងឺក្នុងស្ថានភាពធ្ងន់ធ្ងរ។', '$1,500', '$5,000'),
-    );
-    $wp_customize->add_setting('campaigns_heading', array('default' => 'Current Campaigns', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('campaigns_heading', array('label' => 'Heading (EN)', 'section' => 'cha_campaigns', 'type' => 'text'));
-    $wp_customize->add_setting('campaigns_heading_km', array('default' => 'យុទ្ធនាការបច្ចុប្បន្ន', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('campaigns_heading_km', array('label' => 'Heading (KM)', 'section' => 'cha_campaigns', 'type' => 'text'));
-    $wp_customize->add_setting('campaigns_raised_lbl', array('default' => 'Raised', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('campaigns_raised_lbl', array('label' => 'Raised Label (EN)', 'section' => 'cha_campaigns', 'type' => 'text'));
-    $wp_customize->add_setting('campaigns_raised_lbl_km', array('default' => 'បានប្រមូល', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('campaigns_raised_lbl_km', array('label' => 'Raised Label (KM)', 'section' => 'cha_campaigns', 'type' => 'text'));
-    $wp_customize->add_setting('campaigns_goal_lbl', array('default' => 'Goal', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('campaigns_goal_lbl', array('label' => 'Goal Label (EN)', 'section' => 'cha_campaigns', 'type' => 'text'));
-    $wp_customize->add_setting('campaigns_goal_lbl_km', array('default' => 'គោលដៅ', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('campaigns_goal_lbl_km', array('label' => 'Goal Label (KM)', 'section' => 'cha_campaigns', 'type' => 'text'));
-    $wp_customize->add_setting('campaigns_corporate_heading', array('default' => 'Corporate Partners', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('campaigns_corporate_heading', array('label' => 'Corporate Heading (EN)', 'section' => 'cha_campaigns', 'type' => 'text'));
-    $wp_customize->add_setting('campaigns_corporate_heading_km', array('default' => 'ដៃគូធុរកិច្ច', 'sanitize_callback' => 'sanitize_text_field'));
-    $wp_customize->add_control('campaigns_corporate_heading_km', array('label' => 'Corporate Heading (KM)', 'section' => 'cha_campaigns', 'type' => 'text'));
-    for ($i = 1; $i <= 3; $i++) {
-        $c = $campaigns[$i-1];
-        $wp_customize->add_setting("campaign_{$i}_title", array('default' => $c[0], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("campaign_{$i}_title", array('label' => "Campaign {$i} Title (EN)", 'section' => 'cha_campaigns', 'type' => 'text'));
-        $wp_customize->add_setting("campaign_{$i}_title_km", array('default' => $c[1], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("campaign_{$i}_title_km", array('label' => "Campaign {$i} Title (KM)", 'section' => 'cha_campaigns', 'type' => 'text'));
-        $wp_customize->add_setting("campaign_{$i}_desc", array('default' => $c[2], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("campaign_{$i}_desc", array('label' => "Campaign {$i} Description (EN)", 'section' => 'cha_campaigns', 'type' => 'textarea'));
-        $wp_customize->add_setting("campaign_{$i}_desc_km", array('default' => $c[3], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("campaign_{$i}_desc_km", array('label' => "Campaign {$i} Description (KM)", 'section' => 'cha_campaigns', 'type' => 'textarea'));
-        $wp_customize->add_setting("campaign_{$i}_raised", array('default' => $c[4], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("campaign_{$i}_raised", array('label' => "Campaign {$i} Raised Amount", 'section' => 'cha_campaigns', 'type' => 'text'));
-        $wp_customize->add_setting("campaign_{$i}_goal", array('default' => $c[5], 'sanitize_callback' => 'sanitize_text_field'));
-        $wp_customize->add_control("campaign_{$i}_goal", array('label' => "Campaign {$i} Goal Amount", 'section' => 'cha_campaigns', 'type' => 'text'));
-    }
+    $wp_customize->add_setting('membership_cta_img', array('default' => '', 'sanitize_callback' => 'esc_url_raw'));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'membership_cta_img', array('label' => 'Membership CTA Image', 'section' => 'cha_membership_section')));
 
     /* ---- Section: Contact Sub-sections ---- */
     $wp_customize->add_section('cha_contact_sub', array(
