@@ -25,8 +25,44 @@
           </div>
         </div>
 
+        <?php
+        $is_event_filter = (isset($_GET['cat']) && strtolower(sanitize_text_field($_GET['cat'])) === 'event');
+        ?>
+
+        <?php if ($is_event_filter) : ?>
+          <!-- Upcoming Events Notice / Coming Soon Banner -->
+          <div class="events-notice-banner" data-reveal>
+            <div class="events-notice-icon" aria-hidden="true">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+                <path d="M12 14v4"></path>
+                <path d="M10 16h4"></path>
+              </svg>
+            </div>
+            <div class="events-notice-content">
+              <div class="events-notice-tag" data-i18n="events_status_coming_soon">
+                <span class="events-pulse-dot"></span>
+                Coming Soon
+              </div>
+              <h2 class="events-notice-title" data-i18n="events_notice_title">New Upcoming Events Coming Soon</h2>
+              <p class="events-notice-desc" data-i18n="events_notice_desc">We are actively preparing our upcoming community awareness events, youth camps, and medical workshops. Stay tuned or become a member to receive official announcements directly!</p>
+            </div>
+            <div class="events-notice-action">
+              <a href="#" class="btn btn-primary" data-member-trigger data-i18n="events_notice_btn">Get Notified</a>
+            </div>
+          </div>
+
+          <div class="events-section-divider" data-reveal>
+            <h3 class="events-past-heading" data-i18n="events_past_title">Past Events &amp; Highlights</h3>
+            <span class="events-divider-line"></span>
+          </div>
+        <?php endif; ?>
+
         <!-- News Grid -->
-        <div class="grid grid-3" style="margin-top: 32px;">
+        <div class="grid grid-3" style="margin-top: <?php echo $is_event_filter ? '24px' : '32px'; ?>;">
           <?php
           $args = array(
               'post_type'      => 'cha_news',
@@ -84,7 +120,7 @@
           else :
               ?>
               <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
-                <p style="font-size: 1.125rem; color: var(--c-muted);"><?php esc_html_e('No articles found in this category.', 'cha-cambodia'); ?></p>
+                <p style="font-size: 1.125rem; color: var(--c-muted);" data-i18n="news_no_articles"><?php esc_html_e('No articles found in this category.', 'cha-cambodia'); ?></p>
               </div>
           <?php endif; ?>
         </div>
