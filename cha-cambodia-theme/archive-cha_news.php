@@ -8,11 +8,13 @@
           <p data-i18n="news_archive_sub"><?php esc_html_e('Stay updated with the latest from the Cambodian Haemophilia Association.', 'cha-cambodia'); ?></p>
         </div>
 
-        <!-- Category Filter -->
-        <div class="tc-toolbar" data-reveal>
-          <div class="tc-toolbar-filter">
+        <!-- News Category Filter Bar -->
+        <nav class="news-filter-nav" aria-label="Filter news by category" data-reveal>
+          <div class="news-filter-track">
             <a href="<?php echo esc_url(get_post_type_archive_link('cha_news')); ?>"
-               class="btn btn-sm <?php echo (!is_tax('news_category') && !isset($_GET['cat'])) ? 'btn-dark' : 'btn-outline'; ?>" data-i18n="news_filter_all"><?php esc_html_e('All', 'cha-cambodia'); ?></a>
+               class="news-filter-pill <?php echo (!is_tax('news_category') && !isset($_GET['cat'])) ? 'is-active' : ''; ?>" data-i18n="news_filter_all">
+              <span><?php esc_html_e('All', 'cha-cambodia'); ?></span>
+            </a>
             <?php
             $badge_types = array('Event', 'Update', 'Workshop', 'Announcement');
             foreach ($badge_types as $b) :
@@ -20,10 +22,12 @@
                 $filter_key = 'news_filter_' . strtolower($b);
                 ?>
                 <a href="<?php echo esc_url(add_query_arg('cat', strtolower($b), get_post_type_archive_link('cha_news'))); ?>"
-                   class="btn btn-sm <?php echo $current ? 'btn-dark' : 'btn-outline'; ?>" data-i18n="<?php echo esc_attr($filter_key); ?>"><?php echo esc_html($b); ?></a>
+                   class="news-filter-pill <?php echo $current ? 'is-active' : ''; ?>" data-i18n="<?php echo esc_attr($filter_key); ?>">
+                  <span><?php echo esc_html($b); ?></span>
+                </a>
             <?php endforeach; ?>
           </div>
-        </div>
+        </nav>
 
         <?php
         $is_event_filter = (isset($_GET['cat']) && strtolower(sanitize_text_field($_GET['cat'])) === 'event');
@@ -33,7 +37,7 @@
           <!-- Upcoming Events Notice / Coming Soon Banner -->
           <div class="events-notice-banner" data-reveal>
             <div class="events-notice-icon" aria-hidden="true">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="16" y1="2" x2="16" y2="6"></line>
                 <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -48,10 +52,7 @@
                 Coming Soon
               </div>
               <h2 class="events-notice-title" data-i18n="events_notice_title">New Upcoming Events Coming Soon</h2>
-              <p class="events-notice-desc" data-i18n="events_notice_desc">We are actively preparing our upcoming community awareness events, youth camps, and medical workshops. Stay tuned or become a member to receive official announcements directly!</p>
-            </div>
-            <div class="events-notice-action">
-              <a href="#" class="btn btn-primary" data-member-trigger data-i18n="events_notice_btn">Get Notified</a>
+              <p class="events-notice-desc" data-i18n="events_notice_desc">We are actively preparing our upcoming community awareness events, youth camps, and medical workshops. Official dates and venue details will be announced here soon!</p>
             </div>
           </div>
 

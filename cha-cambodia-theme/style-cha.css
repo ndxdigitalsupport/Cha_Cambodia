@@ -10510,14 +10510,80 @@ img.roster-item-avatar {
   }
 }
 /* ==========================================================================
-   Upcoming Events — Coming Soon Notification & Past Events Layout
+   News & Events Category Filter Bar (Modern Segmented Pills)
+   ========================================================================== */
+.news-filter-nav {
+  margin-top: var(--s-4);
+  margin-bottom: var(--s-8);
+  width: 100%;
+}
+
+.news-filter-track {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #F1F5F9;
+  padding: 6px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(11, 29, 109, 0.06);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.news-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 22px;
+  font-size: 0.90625rem;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: none;
+  border-radius: 999px;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.news-filter-pill:hover {
+  color: var(--c-blue);
+  background: rgba(255, 255, 255, 0.75);
+  transform: translateY(-1px);
+}
+
+.news-filter-pill.is-active {
+  background: var(--c-blue);
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(11, 29, 109, 0.22);
+  border-color: var(--c-blue);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .news-filter-track {
+    border-radius: 16px;
+    padding: 6px;
+    gap: 6px;
+    width: 100%;
+  }
+  .news-filter-pill {
+    padding: 7px 14px;
+    font-size: 0.8125rem;
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
+
+/* ==========================================================================
+   Upcoming Events — Coming Soon Notification Banner
    ========================================================================== */
 .events-notice-banner {
   background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
   border: 1.5px solid rgba(11, 29, 109, 0.12);
   border-radius: var(--r-xl);
   padding: var(--s-8) var(--s-10);
-  margin-top: var(--s-8);
+  margin-top: var(--s-4);
   margin-bottom: var(--s-8);
   display: flex;
   align-items: center;
@@ -10532,24 +10598,24 @@ img.roster-item-avatar {
   position: absolute;
   top: -30px;
   right: -30px;
-  width: 140px;
-  height: 140px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(11, 29, 109, 0.05) 0%, transparent 70%);
   pointer-events: none;
 }
 
 .events-notice-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
   background: #FFFFFF;
   color: var(--c-blue);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 14px rgba(11, 29, 109, 0.08);
-  border: 1px solid rgba(11, 29, 109, 0.08);
+  border: 1.5px solid rgba(11, 29, 109, 0.08);
   flex-shrink: 0;
 }
 
@@ -10600,19 +10666,7 @@ img.roster-item-avatar {
   color: #475569;
   line-height: 1.6;
   margin: 0;
-  max-width: 720px;
-}
-
-.events-notice-action {
-  flex-shrink: 0;
-}
-
-.events-notice-action .btn {
-  white-space: nowrap;
-  font-weight: 700;
-  padding: 0.7rem 1.4rem;
-  border-radius: 999px;
-  box-shadow: 0 4px 14px rgba(11, 29, 109, 0.15);
+  max-width: 760px;
 }
 
 .events-section-divider {
@@ -10624,7 +10678,7 @@ img.roster-item-avatar {
 }
 
 .events-past-heading {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 700;
   color: #64748B;
   text-transform: uppercase;
@@ -10641,30 +10695,23 @@ img.roster-item-avatar {
 
 @media (max-width: 768px) {
   .events-notice-banner {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
     padding: var(--s-6);
     gap: var(--s-4);
   }
   .events-notice-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
   }
   .events-notice-icon svg {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
   }
   .events-notice-title {
-    font-size: 1.1875rem;
-  }
-  .events-notice-action {
-    width: 100%;
-  }
-  .events-notice-action .btn {
-    width: 100%;
-    text-align: center;
-    justify-content: center;
+    font-size: 1.15rem;
   }
 }
+
 
