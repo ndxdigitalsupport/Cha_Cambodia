@@ -332,12 +332,12 @@
               $camp_count = $camp_count_q->found_posts;
               wp_reset_postdata();
               if ($camp_count > 0) : ?>
-                <a href="<?php echo esc_url(get_post_type_archive_link('cha_campaigns')); ?>" class="campaigns-pill-btn" data-i18n="campaigns_view_all_count">
-                  <span>View All (<?php echo esc_html($camp_count); ?>)</span>
+                <a href="<?php echo esc_url(get_post_type_archive_link('cha_campaigns')); ?>" class="campaigns-pill-btn">
+                  <span data-i18n="campaigns_view_all_count">View All (<?php echo esc_html($camp_count); ?>)</span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </a>
               <?php else : ?>
-                <span class="campaigns-count-badge">3 Ongoing</span>
+                <span class="campaigns-count-badge" data-i18n="campaigns_ongoing_badge">3 Ongoing</span>
               <?php endif; ?>
             </div>
             <p class="campaigns-main-sub" data-i18n="campaigns_sub"><?php esc_html_e('Support our life-saving missions and emergency patient care.', 'cha-cambodia'); ?></p>
