@@ -321,6 +321,10 @@
       <div class="campaigns-list campaigns-panel-v2" data-reveal>
         <div class="campaigns-header-row">
           <div class="campaigns-title-col">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.1);color:#16A34A;padding:5px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;letter-spacing:0.02em;margin-bottom:10px;align-self:flex-start">
+              <span style="width:7px;height:7px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 2px rgba(34,197,94,0.25)"></span>
+              <span data-i18n="campaigns_badge">Active Missions</span>
+            </div>
             <div class="campaigns-top-bar">
               <h3 class="campaigns-main-title" data-i18n="campaigns_heading"><?php esc_html_e('Current Campaigns', 'cha-cambodia'); ?></h3>
               <?php
