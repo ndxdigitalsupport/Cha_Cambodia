@@ -270,12 +270,13 @@
       <div class="tab-panel is-active" data-tab-panel="csr-donate" style="padding-top:0">
       <div class="donation-wrap">
       <div class="donation-form donate-showcase-card" data-reveal>
-        <div style="text-align:center;margin-bottom:var(--s-5)">
-          <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#E31E24,#0B1D6D);display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <div class="donate-header-opt1" style="margin-bottom:var(--s-5);text-align:left">
+          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(227,30,36,0.08);color:var(--c-red,#E31E24);padding:5px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;letter-spacing:0.02em;margin-bottom:10px">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span data-i18n="donate_badge">Support CHA</span>
           </div>
-          <h3 data-i18n="donate_heading" style="font-size:1.35rem;font-weight:800;color:var(--c-blue);margin:0 0 6px">Make a Donation</h3>
-          <p class="text-muted" data-i18n="donate_sub" style="font-size:0.875rem;max-width:380px;margin:0 auto">Your support helps us provide treatment, education, and hope to people with bleeding disorders in Cambodia.</p>
+          <h3 data-i18n="donate_heading" style="font-size:1.45rem;font-weight:800;color:var(--c-blue);margin:0 0 4px;letter-spacing:-0.01em">Make a Donation</h3>
+          <p class="text-muted" data-i18n="donate_sub" style="font-size:0.875rem;margin:0;line-height:1.45">Direct patient care &amp; life-saving treatment across Cambodia.</p>
         </div>
 
         <form id="donate-form-submit" novalidate>
