@@ -321,19 +321,22 @@
       <div class="campaigns-list campaigns-panel-v2" data-reveal>
         <div class="campaigns-header-row">
           <div class="campaigns-title-col">
-            <h3 class="campaigns-main-title" data-i18n="campaigns_heading"><?php esc_html_e('Current Campaigns', 'cha-cambodia'); ?></h3>
+            <div class="campaigns-top-bar">
+              <h3 class="campaigns-main-title" data-i18n="campaigns_heading"><?php esc_html_e('Current Campaigns', 'cha-cambodia'); ?></h3>
+              <?php
+              $camp_count_q = new WP_Query(array('post_type' => 'cha_campaigns', 'posts_per_page' => 10, 'post_status' => 'publish'));
+              $camp_count = $camp_count_q->found_posts;
+              wp_reset_postdata();
+              if ($camp_count > 0) : ?>
+                <a href="<?php echo esc_url(get_post_type_archive_link('cha_campaigns')); ?>" class="campaigns-pill-btn" data-i18n="campaigns_view_all_count">
+                  <span>View All (<?php echo esc_html($camp_count); ?>)</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              <?php else : ?>
+                <span class="campaigns-count-badge">3 Ongoing</span>
+              <?php endif; ?>
+            </div>
             <p class="campaigns-main-sub" data-i18n="campaigns_sub"><?php esc_html_e('Support our life-saving missions and emergency patient care.', 'cha-cambodia'); ?></p>
-          </div>
-          <?php
-          $camp_count_q = new WP_Query(array('post_type' => 'cha_campaigns', 'posts_per_page' => 10, 'post_status' => 'publish'));
-          $camp_count = $camp_count_q->found_posts;
-          wp_reset_postdata();
-          ?>
-          <div class="campaigns-actions-col">
-            <span class="campaigns-count-badge"><?php echo esc_html($camp_count); ?> <span data-i18n="campaigns_ongoing">Ongoing</span></span>
-            <?php if ($camp_count > 0) : ?>
-              <a href="<?php echo esc_url(get_post_type_archive_link('cha_campaigns')); ?>" class="campaigns-view-all-link" data-i18n="campaigns_view_all">View All &rarr;</a>
-            <?php endif; ?>
           </div>
         </div>
 

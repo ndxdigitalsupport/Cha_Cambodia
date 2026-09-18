@@ -9769,18 +9769,22 @@ img.roster-item-avatar {
 }
 
 .campaigns-header-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 0;
+  margin-bottom: 4px;
 }
 
 .campaigns-title-col {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex: 1;
+  width: 100%;
+}
+
+.campaigns-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .campaigns-main-title {
@@ -9792,63 +9796,46 @@ img.roster-item-avatar {
   line-height: 1.2 !important;
 }
 
+.campaigns-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0B1D6D;
+  background: #F8FAFC;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(11, 29, 109, 0.1);
+  text-decoration: none;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.campaigns-pill-btn svg {
+  width: 13px;
+  height: 13px;
+  transition: transform 0.2s ease;
+}
+
+.campaigns-pill-btn:hover {
+  background: #0B1D6D;
+  color: #FFFFFF;
+  border-color: #0B1D6D;
+  box-shadow: 0 4px 12px rgba(11, 29, 109, 0.15);
+  transform: translateY(-1px);
+}
+
+.campaigns-pill-btn:hover svg {
+  transform: translateX(3px);
+}
+
 .campaigns-main-sub {
   font-size: 0.8125rem !important;
   color: #64748B !important;
   margin: 0 !important;
   line-height: 1.45 !important;
   font-weight: 500 !important;
-  max-width: 290px;
-}
-
-.campaigns-actions-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  flex-shrink: 0;
-  padding-top: 2px;
-}
-
-.campaigns-count-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #0B1D6D;
-  background: #F8FAFC;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(11, 29, 109, 0.08);
-  white-space: nowrap;
-}
-
-.campaigns-count-badge::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22C55E;
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
-}
-
-.campaigns-view-all-link {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #0B1D6D;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  padding: 2px 4px;
-}
-
-.campaigns-view-all-link:hover {
-  color: #E31E24;
-  transform: translateX(2px);
 }
 
 /* Cards Stack */
