@@ -1,5 +1,6 @@
 """
-Script to generate CHA_Cambodia_Website_Admin_Guide.docx using the docgen engine.
+Comprehensive Generator for CHA_Cambodia_Website_Admin_Guide.docx
+Builds an exhaustive, highly detailed, beautifully designed operations manual for CHA leadership.
 """
 
 import os
@@ -9,219 +10,320 @@ import sys
 sys.path.append(os.path.abspath(".agents/skills/docgen/scripts"))
 import docgen_engine
 
-def build_guide():
+def generate_full_manual():
     doc = docgen_engine.create_styled_document()
 
-    # Title Banner
-    meta = {
-        "Organization": "Cambodian Haemophilia Association",
-        "Document": "Website Administrator & Operations Manual",
-        "Version": "1.0.0 (Live)",
-        "Date": "September 2026",
+    # 1. Executive Cover Page with Official Logo
+    logo_path = os.path.abspath("cha-cambodia-theme/cha-logo-left.png")
+    meta_info = {
+        "Organization": "Cambodian Haemophilia Association (CHA Cambodia)",
+        "Document Title": "Website Administrator & Operations Manual",
+        "Document Version": "Version 1.0.0 — Official Operations Manual",
+        "Public Website": "https://chacambodia.org",
+        "Admin Portal": "https://chacambodia.org/wp-admin",
+        "Hosting Environment": "Namecheap Stellar Business (LiteSpeed + cPanel)",
+        "Publication Date": "September 2026",
+        "Authorized Audience": "Executive Leadership, Operations Team & Content Managers",
     }
-    docgen_engine.add_header_banner(
+    docgen_engine.add_executive_cover_page(
         doc,
-        "CHA Cambodia — Website Operations & Admin Guide",
-        "The Complete Master Guide to Logging In, Updating Content, Managing Donations, and Site Operations",
-        meta
+        "CHA Cambodia — Website Administrator & Operations Manual",
+        "The Complete Master Guide to Logging In, Publishing News, Managing Campaigns, Updating Information, Handling Donations, and Maintaining the Website",
+        logo_path=logo_path,
+        meta_table=meta_info
     )
 
-    # Executive Overview Callout
+    # Table of Contents Overview Callout
     docgen_engine.add_callout(
         doc,
-        "This official guide provides complete, step-by-step instructions for organization leadership, staff, and administrators of chacambodia.org. It covers how to log in, create news and campaign updates, edit contact information and site text without touching code, manage ABA PayWay donation gateways, and maintain backup systems.",
-        title="EXECUTIVE SUMMARY & PURPOSE",
+        "This master document serves as the official single source of truth for the ongoing administration and management of chacambodia.org. It is designed to be clear, practical, and accessible to non-technical leadership and staff. Follow the step-by-step visual cards and instructions below to maintain content, approve donations, manage member accounts, and safeguard website operations.",
+        title="EXECUTIVE SUMMARY & OPERATIONAL SCOPE",
         alert_type="note"
     )
 
-    # Part 1: Architecture & Platform Overview
-    docgen_engine.add_heading_1(doc, "1. Executive Overview & Website Platform")
-    docgen_engine.add_body_p(doc, "The Cambodian Haemophilia Association (CHA) public website (chacambodia.org) serves as the primary digital hub for patient care, donor fundraising, awareness, and community education across Cambodia.")
-    
-    docgen_engine.add_heading_2(doc, "1.1 Technical Stack & Hosting Infrastructure")
-    tech_headers = ["Component", "Technology / Provider", "Details & Role"]
+    # -------------------------------------------------------------
+    # SECTION 1: SYSTEM ARCHITECTURE & BRAND SYSTEM
+    # -------------------------------------------------------------
+    docgen_engine.add_heading_1(doc, "1. Executive Overview & Website Architecture")
+    docgen_engine.add_body_p(doc, "The Cambodian Haemophilia Association (CHA Cambodia) website (chacambodia.org) represents the primary digital gateway connecting patients, families, medical specialists, healthcare donors, and international partner federations. The platform is engineered to deliver high availability, rapid load times, multi-currency donation processing, and seamless bilingual support (English and Khmer).")
+
+    docgen_engine.add_heading_2(doc, "1.1 Technical Infrastructure Summary")
+    tech_headers = ["Layer", "Technology Provider", "Configuration & Operational Role"]
     tech_rows = [
-        ["Hosting", "Namecheap Stellar Business", "cPanel, LiteSpeed Web Server, CloudLinux environment"],
-        ["CMS & Backend", "WordPress Core + Custom Theme", "Custom-coded theme: 'cha-cambodia-theme'"],
-        ["Database", "MySQL / MariaDB", "Single unified database (wp_cha_members, wp_cha_donations)"],
-        ["Payment Gateway", "ABA PayWay (ABA Bank)", "Direct REST API with dynamic KHQR & ABA Pay"],
-        ["Email Delivery", "Brevo SMTP (noreply@chacambodia.org)", "Transactional emails, verification, password resets"],
-        ["Automated Backups", "UpdraftPlus -> Google Drive", "Connected to Google Drive (Nexus Digital Support)"],
+        ["Domain & DNS", "Namecheap DNS", "chacambodia.org with automated SSL encryption (HTTPS)"],
+        ["Hosting Server", "Namecheap Stellar Business", "CloudLinux OS, LiteSpeed Enterprise Web Server, cPanel"],
+        ["Content Management", "WordPress 6.x Core", "Custom enterprise theme: 'cha-cambodia-theme'"],
+        ["Database", "MySQL / MariaDB", "Single shared database storing posts, members, and donations"],
+        ["Payment Gateway", "ABA PayWay (ABA Bank)", "REST API endpoint generating real-time KHQR & ABA Pay"],
+        ["Transactional Email", "Brevo SMTP (Port 587)", "Delivers member verification & password resets from noreply@chacambodia.org"],
+        ["Offsite Cloud Backup", "UpdraftPlus -> Google Drive", "Connected to Google Drive (Nexus Digital Support, 5 TB storage)"],
     ]
     docgen_engine.add_styled_table(doc, tech_headers, tech_rows)
 
-    docgen_engine.add_heading_2(doc, "1.2 Official Brand Standards & Colors")
-    docgen_engine.add_body_p(doc, "All pages, buttons, and badges follow official CHA brand identity:")
-    color_headers = ["Color Name", "Hex Code", "Usage in Website"]
+    docgen_engine.add_heading_2(doc, "1.2 Official Color Standards & Brand Tokens")
+    docgen_engine.add_body_p(doc, "To maintain the prestigious, clinical, and compassionate identity of CHA Cambodia, all website elements adhere strictly to these defined brand colors:")
+    color_headers = ["Brand Token", "Hex Code", "RGB Values", "Website Usage & Application"]
     color_rows = [
-        ["CHA Royal Navy", "#0B1D6D", "Primary headings, navigation bar, main CTA buttons, dark cards"],
-        ["CHA Crimson Red", "#E31E24", "Active tabs, donation amount selected states, urgent badges, heart icons"],
-        ["CHA Royal Purple", "#6A2C91", "Gradient accents, community icons, partner badges"],
-        ["Emerald Green", "#22C55E / #16A34A", "Active mission badges, security checkmarks, live status dots"],
-        ["Slate Neutral", "#1E293B / #64748B", "Body typography, subtitles, input borders, neutral cards"],
+        ["CHA Royal Navy", "#0B1D6D", "rgb(11, 29, 109)", "Primary page titles, navigation bar, primary CTA buttons, dark cards"],
+        ["CHA Crimson Red", "#E31E24", "rgb(227, 30, 36)", "Selected donation chips, urgent heart badges, active tab markers"],
+        ["CHA Royal Purple", "#6A2C91", "rgb(106, 44, 145)", "Community features, partner rings, gradient background accents"],
+        ["Emerald Green", "#22C55E", "rgb(34, 197, 94)", "Live mission pulse dots, security checkmarks, successful alerts"],
+        ["Charcoal Slate", "#1E293B", "rgb(30, 41, 59)", "Standard body paragraphs, form input text, card labels"],
+        ["Border Slate", "#CBD5E1", "rgb(203, 213, 225)", "Input borders, table dividers, card outlines"],
     ]
     docgen_engine.add_styled_table(doc, color_headers, color_rows)
 
 
-    # Part 2: WordPress Login & Access
-    docgen_engine.add_heading_1(doc, "2. How to Access & Log In to WordPress")
-    docgen_engine.add_body_p(doc, "Managing content on the website is done through the secure WordPress Administrator Dashboard.")
+    # -------------------------------------------------------------
+    # SECTION 2: ACCESS & USER MANAGEMENT
+    # -------------------------------------------------------------
+    docgen_engine.add_heading_1(doc, "2. Access, Logins & User Security")
+    docgen_engine.add_body_p(doc, "All administrative operations are conducted through the secure WordPress Administration Dashboard. It is imperative that user credentials are guarded and appropriate permission roles are assigned.")
 
-    docgen_engine.add_heading_2(doc, "2.1 Login URL and Steps")
-    docgen_engine.add_body_p(doc, "1. Open your web browser (Chrome, Edge, Safari, or Brave).")
-    docgen_engine.add_body_p(doc, "2. Go to: https://chacambodia.org/wp-admin")
-    docgen_engine.add_body_p(doc, "3. Enter your Username or Email Address and Password.")
-    docgen_engine.add_body_p(doc, "4. Click 'Log In'. You will be taken directly to the main WordPress dashboard.")
+    docgen_engine.add_heading_2(doc, "2.1 Logging In to WordPress Step-by-Step")
+    docgen_engine.add_step_card(
+        doc,
+        "1",
+        "Navigate to the Admin Portal",
+        [
+            "Open your browser (Google Chrome, Safari, Microsoft Edge, or Brave).",
+            "In the URL address bar, enter: https://chacambodia.org/wp-admin",
+            "Bookmark this link for convenient daily access."
+        ]
+    )
+    docgen_engine.add_step_card(
+        doc,
+        "2",
+        "Enter Credentials & Authenticate",
+        [
+            "Type your registered Username or Email Address into the first box.",
+            "Type your secure Password into the second box.",
+            "Check 'Remember Me' if using a personal, password-protected computer.",
+            "Click the blue 'Log In' button to enter the dashboard."
+        ]
+    )
 
     docgen_engine.add_callout(
         doc,
-        "If you ever forget your password, click the 'Lost your password?' link directly beneath the login form on chacambodia.org/wp-admin. Enter your registered email address, and WordPress will send you a secure password reset link.",
-        title="PASSWORD RECOVERY TIP",
+        "Forgotten Password Procedure: If you cannot log in, click 'Lost your password?' below the login fields. Enter your registered email address, and an automated password reset link will be sent to your inbox immediately. If you do not see it within 2 minutes, check your Spam/Junk folder.",
+        title="PASSWORD TROUBLESHOOTING",
         alert_type="note"
     )
 
-    docgen_engine.add_heading_2(doc, "2.2 Recommended User Roles")
-    docgen_engine.add_body_p(doc, "• Administrator: Full access to all settings, themes, payment keys, and plugins (for lead directors & technical managers).")
-    docgen_engine.add_body_p(doc, "• Editor / Author: Can write, edit, and publish News, Events, and Campaigns without risk of breaking site settings or payment configurations.")
+    docgen_engine.add_heading_2(doc, "2.2 Understanding Administrative Roles")
+    docgen_engine.add_body_p(doc, "WordPress provides distinct security levels. Staff should only be granted the minimum permissions required for their job duties:")
+    role_headers = ["Role Name", "Recommended For", "Permissions & Capabilities"]
+    role_rows = [
+        ["Administrator", "Lead Director, IT Manager", "Full control: theme updates, payment credentials, plugins, user creation"],
+        ["Editor", "Senior Communications Staff", "Can publish, edit, and delete any News & Events, Campaigns, and Pages"],
+        ["Author", "Junior Content Writers", "Can write and publish their own articles and upload event photos"],
+        ["Subscriber / Member", "General Public / Patients", "Read-only access; used for member portal digital cards only"],
+    ]
+    docgen_engine.add_styled_table(doc, role_headers, role_rows)
 
 
-    # Part 3: Content Management
-    docgen_engine.add_heading_1(doc, "3. How to Change Anything on the Website")
-    docgen_engine.add_body_p(doc, "The entire website is built to be manageable without writing code. Here are the three main areas to update:")
+    # -------------------------------------------------------------
+    # SECTION 3: CONTENT MANAGEMENT (HOW TO CHANGE ANYTHING)
+    # -------------------------------------------------------------
+    docgen_engine.add_heading_1(doc, "3. Content Management — How to Change Anything Without Code")
+    docgen_engine.add_body_p(doc, "The website has been structured so that all daily communication tasks—from posting emergency medical workshop announcements to changing office phone numbers—require zero coding knowledge.")
 
-    docgen_engine.add_heading_2(doc, "3.1 Adding & Editing News & Events ('cha_news')")
-    docgen_engine.add_body_p(doc, "The website has a dedicated News & Events system. To create a new article:")
-    docgen_engine.add_body_p(doc, "1. In the left sidebar of WordPress Admin, click 'News & Events' -> 'Add New Post'.", bold_prefix="Step 1:")
-    docgen_engine.add_body_p(doc, "2. Enter the Title of the event or article.", bold_prefix="Step 2:")
-    docgen_engine.add_body_p(doc, "3. In the main editor area, type or paste the article content and descriptions.", bold_prefix="Step 3:")
-    docgen_engine.add_body_p(doc, "4. In the right sidebar panel, set the Featured Image (this is the picture that appears on the card).", bold_prefix="Step 4:")
-    docgen_engine.add_body_p(doc, "5. Under 'News Category', choose the badge type: Event, Workshop, Update, or Announcement.", bold_prefix="Step 5:")
-    docgen_engine.add_body_p(doc, "6. Click 'Publish' at the top right.", bold_prefix="Step 6:")
-    docgen_engine.add_body_p(doc, "The homepage automatically displays the 3 newest articles, and the complete archive is available at chacambodia.org/news with category filtering pills.")
+    docgen_engine.add_heading_2(doc, "3.1 Publishing News & Events ('cha_news')")
+    docgen_engine.add_body_p(doc, "The News & Events module enables staff to keep donors, international partners, and patients informed. The homepage displays the 3 latest articles, while the full archive at chacambodia.org/news houses the complete history.")
 
-    docgen_engine.add_heading_2(doc, "3.2 Editing Fundraising Campaigns ('cha_campaigns')")
-    docgen_engine.add_body_p(doc, "The homepage has a 'Current Campaigns' section showing active missions (e.g. Patient Support Fund, Education & Awareness):")
-    docgen_engine.add_body_p(doc, "1. In the WordPress sidebar, click 'Campaigns' -> 'All Campaigns'.")
-    docgen_engine.add_body_p(doc, "2. Click on the campaign you wish to edit.")
-    docgen_engine.add_body_p(doc, "3. Update the Raised Amount and Goal Amount (e.g. Raised $5,000 / Goal $20,000). The progress bar on the homepage updates automatically!")
-    docgen_engine.add_body_p(doc, "4. Choose the Theme Color (Red, Blue, Purple) and Icon (Heart, Graduation, Pulse).")
-    docgen_engine.add_body_p(doc, "5. Click 'Update'.")
+    docgen_engine.add_step_card(
+        doc,
+        "1",
+        "Create a New Article",
+        [
+            "In the left-hand admin menu, hover over 'News & Events' and click 'Add New Post'.",
+            "Enter a clear, descriptive Title at the top (e.g. 'World Hemophilia Day 2026 Awareness Workshop in Siem Reap')."
+        ]
+    )
+    docgen_engine.add_step_card(
+        doc,
+        "2",
+        "Compose Body Content & Upload Photos",
+        [
+            "Click into the main text editor to type or paste your article description.",
+            "To insert photos inside the article, click the '+' icon and choose 'Image', then upload from your computer.",
+            "Keep paragraphs structured with headings and bullet points for easy reading."
+        ]
+    )
+    docgen_engine.add_step_card(
+        doc,
+        "3",
+        "Set the Featured Card Image & Category Badge",
+        [
+            "In the right sidebar panel, scroll down to 'Featured Image' and click 'Set featured image'. (Recommended size: 1200x800px).",
+            "Scroll to 'News Category' and check one of the 4 badges: Event, Workshop, Update, or Announcement.",
+            "Click the blue 'Publish' button at the top right. The article is instantly live on the homepage and /news!"
+        ]
+    )
 
-    docgen_engine.add_heading_2(doc, "3.3 Editing Phone, Email, Address & Stats (WordPress Customizer)")
-    docgen_engine.add_body_p(doc, "You can edit organization contact details, banner titles, and statistics counters without touching any code:")
-    docgen_engine.add_body_p(doc, "1. In WordPress Admin, go to Appearance -> Customize.")
-    docgen_engine.add_body_p(doc, "2. Click on 'CHA Theme Options'.")
-    docgen_engine.add_body_p(doc, "3. Here you can edit:")
-    docgen_engine.add_body_p(doc, "   • Contact Phone (+855 96 260 5335)")
-    docgen_engine.add_body_p(doc, "   • Contact Email (choryee.hun@gmail.com)")
-    docgen_engine.add_body_p(doc, "   • Office Address (#100, Street Russia Blvd, Phnom Penh)")
-    docgen_engine.add_body_p(doc, "   • Statistics Counters (25 Provinces, 500+ Patients, 15+ Healthcare Partners)")
-    docgen_engine.add_body_p(doc, "   • Hero Title & Subtitles")
-    docgen_engine.add_body_p(doc, "4. Click 'Publish' at the top of the Customizer. The website updates instantly.")
+    docgen_engine.add_heading_2(doc, "3.2 Updating Fundraising Campaigns ('cha_campaigns')")
+    docgen_engine.add_body_p(doc, "The homepage features a dynamic 'Current Campaigns' panel showcasing active funding initiatives (e.g. Patient Support Funding, Education & Awareness, Emergency Assistance).")
+    docgen_engine.add_body_p(doc, "To update raised amounts or add a new campaign:", bold_prefix="Instructions:")
+    docgen_engine.add_body_p(doc, "1. In the left admin menu, click 'Campaigns' -> 'All Campaigns'.", bullet=True)
+    docgen_engine.add_body_p(doc, "2. Click on the campaign you want to edit (e.g. 'Patient Support Funding').", bullet=True)
+    docgen_engine.add_body_p(doc, "3. Locate the 'Campaign Target Details' meta box:", bullet=True)
+    docgen_engine.add_body_p(doc, "   • Raised Amount ($): Enter current funds raised (e.g. 5000).", bullet=True)
+    docgen_engine.add_body_p(doc, "   • Goal Amount ($): Enter the target goal (e.g. 20000).", bullet=True)
+    docgen_engine.add_body_p(doc, "   • Theme Color: Select Red, Blue, or Purple.", bullet=True)
+    docgen_engine.add_body_p(doc, "   • Card Icon: Select Heart, Graduation Cap, or Pulse.", bullet=True)
+    docgen_engine.add_body_p(doc, "4. Click 'Update'. The progress bar and percentages on the website recalculate automatically!", bullet=True)
 
-    docgen_engine.add_heading_2(doc, "3.4 Legal & Compliance Pages")
-    docgen_engine.add_body_p(doc, "Under 'Pages' in WordPress Admin, you will find:")
-    docgen_engine.add_body_p(doc, "• Terms of Service & 30-Day Refund Policy (URL: /terms)")
-    docgen_engine.add_body_p(doc, "• Privacy Policy (URL: /privacy)")
-    docgen_engine.add_body_p(doc, "• Disclaimer (URL: /disclaimer)")
-    docgen_engine.add_body_p(doc, "These pages are fully translated in English & Khmer and comply with bank merchant regulations.")
+    docgen_engine.add_heading_2(doc, "3.3 Modifying Organization Contacts & Statistics (Customizer)")
+    docgen_engine.add_body_p(doc, "Whenever CHA changes office locations, phone lines, email addresses, or patient statistics, you can update them in the live visual customizer:")
+    docgen_engine.add_step_card(
+        doc,
+        "1",
+        "Open the Visual Customizer",
+        [
+            "In WordPress Admin, go to: Appearance -> Customize.",
+            "In the customizer sidebar, click on 'CHA Theme Options'."
+        ]
+    )
+    docgen_engine.add_step_card(
+        doc,
+        "2",
+        "Update Contact Info & Statistics Counters",
+        [
+            "Contact Phone: Change to the latest phone number (currently +855 96 260 5335).",
+            "Contact Email: Change to the official email (currently choryee.hun@gmail.com).",
+            "Office Address: Update physical address (currently #100, Street Russia Blvd, Phnom Penh).",
+            "Statistics Counters: Update 'Provinces' (25), 'Hemophilia Patients' (500+), or 'Partners' (15+).",
+            "Click the blue 'Publish' button at the top of the customizer to save."
+        ]
+    )
+
+    docgen_engine.add_heading_2(doc, "3.4 Managing Mandatory Legal Policies")
+    docgen_engine.add_body_p(doc, "Commercial payment gateways (including ABA Bank) mandate that legal terms are published and kept accurate. The site provides 3 dedicated bilingual legal pages:")
+    docgen_engine.add_body_p(doc, "• Terms of Service & 30-Day Refund Policy (URL: chacambodia.org/terms): Explains donation policies, receipt issuance, and contact details for transaction inquiries.", bullet=True)
+    docgen_engine.add_body_p(doc, "• Privacy Policy (URL: chacambodia.org/privacy): Details how member and donor data is protected under Cambodian law.", bullet=True)
+    docgen_engine.add_body_p(doc, "• Medical Disclaimer (URL: chacambodia.org/disclaimer): Clarifies that website guidance does not replace licensed medical consultations.", bullet=True)
 
 
-    # Part 4: Donation System & ABA PayWay
-    docgen_engine.add_heading_1(doc, "4. Donation System & ABA PayWay Gateway")
-    docgen_engine.add_body_p(doc, "The website features an integrated ABA PayWay checkout that lets donors pay directly via KHQR, ABA Mobile, or credit cards.")
+    # -------------------------------------------------------------
+    # SECTION 4: ABA PAYWAY GATEWAY & DONATIONS
+    # -------------------------------------------------------------
+    docgen_engine.add_heading_1(doc, "4. Donation Processing & ABA PayWay Payment Gateway")
+    docgen_engine.add_body_p(doc, "Donations represent the financial lifeblood of CHA Cambodia. The website is connected directly to ABA Bank's official PayWay payment gateway, offering seamless, instant checkout via Bakong KHQR, ABA Mobile, and international bank cards.")
 
-    docgen_engine.add_heading_2(doc, "4.1 How the Donation Checkout Works")
-    docgen_engine.add_body_p(doc, "1. A donor visits chacambodia.org and selects an amount ($10, $25, $50, $100, or Other) on the homepage card or modal.")
-    docgen_engine.add_body_p(doc, "2. They optionally enter their name and phone number.")
-    docgen_engine.add_body_p(doc, "3. They click 'Donate Now'. The website talks directly to ABA PayWay's secure API.")
-    docgen_engine.add_body_p(doc, "4. ABA generates the official KHQR payment code on screen.")
-    docgen_engine.add_body_p(doc, "5. When the donor scans and pays, ABA notifies the website backend, and the donation is permanently saved in the WordPress database under wp_cha_donations.")
+    docgen_engine.add_heading_2(doc, "4.1 The Donor Experience Flow")
+    docgen_engine.add_body_p(doc, "1. The donor visits the homepage and views the 'Make a Donation' card, or clicks 'Donate Now' from any page.")
+    docgen_engine.add_body_p(doc, "2. They choose an amount preset ($10, $25, $50, $100) or click 'Other' to input a custom sum.")
+    docgen_engine.add_body_p(doc, "3. They optionally enter their Name, Email, and Phone number.")
+    docgen_engine.add_body_p(doc, "4. Upon clicking 'Donate Now', the website encrypts the request with an HMAC-SHA512 digital signature and transmits it to ABA PayWay.")
+    docgen_engine.add_body_p(doc, "5. ABA generates the official, secure KHQR payment modal on the donor's screen.")
+    docgen_engine.add_body_p(doc, "6. Once paid, ABA's webhook callback automatically registers the payment approval code (APV) in the WordPress database under wp_cha_donations.")
 
     docgen_engine.add_callout(
         doc,
-        "In Sandbox (testing mode), scanning the QR code with your REAL mobile banking app will say 'Transaction not found'. This is 100% normal because the real bank app only scans LIVE production transactions with real money. The sandbox checkout successfully verifies that ABA accepted your Merchant ID and generated the payment screen.",
-        title="WHY REAL APP CANNOT SCAN SANDBOX QR",
+        "Why Testing Real Apps on Sandbox Fails: During testing in Sandbox mode, scanning the test QR code with your REAL ABA Mobile app will return an error: 'Transaction not found'. This is standard and expected behavior across all banking gateways: real bank applications with real money will only recognize LIVE Production transactions. The successful generation of the branded KHQR modal confirms that your API credentials, keys, and endpoint handshakes are working perfectly.",
+        title="CRITICAL BANKING EXPLANATION: SANDBOX VS. REAL MONEY",
         alert_type="warning"
     )
 
-    docgen_engine.add_heading_2(doc, "4.2 How to Switch to Live Production Mode (Boss Action Required)")
-    docgen_engine.add_body_p(doc, "When ABA Bank issues your official Live Production credentials, activating live payments takes only 60 seconds:")
-    docgen_engine.add_body_p(doc, "1. Log in to WordPress Admin (chacambodia.org/wp-admin).", bold_prefix="Step 1:")
-    docgen_engine.add_body_p(doc, "2. In the left menu, click Settings -> CHA PayWay.", bold_prefix="Step 2:")
-    docgen_engine.add_body_p(doc, "3. Update the fields with your production values:", bold_prefix="Step 3:")
-    docgen_engine.add_body_p(doc, "   • Merchant ID: Enter your Production Merchant ID")
-    docgen_engine.add_body_p(doc, "   • API Key: Enter your Production Public Key")
-    docgen_engine.add_body_p(doc, "   • Mode: Change dropdown from 'Sandbox' to 'Live / Production'")
-    docgen_engine.add_body_p(doc, "4. Click 'Save Changes'.", bold_prefix="Step 4:")
-    docgen_engine.add_body_p(doc, "5. Purge LiteSpeed Cache. Live donations are now active!", bold_prefix="Step 5:")
+    docgen_engine.add_heading_2(doc, "4.2 Activating Live Production Mode (Boss Action Required)")
+    docgen_engine.add_body_p(doc, "When ABA Bank approves your merchant contract and provides your official Live Production credentials, activating live payments on the website takes only 60 seconds:")
+    docgen_engine.add_step_card(
+        doc,
+        "1",
+        "Open PayWay Gateway Settings",
+        [
+            "Log in to WordPress Admin: https://chacambodia.org/wp-admin",
+            "In the left-hand menu, navigate to: Settings -> CHA PayWay."
+        ]
+    )
+    docgen_engine.add_step_card(
+        doc,
+        "2",
+        "Enter Live Merchant Credentials",
+        [
+            "Merchant ID: Paste your official live Merchant ID provided by ABA Bank.",
+            "API Key (Public Key): Paste your official live API Public Key.",
+            "Gateway Environment: Change the dropdown selection from 'Sandbox' to 'Live / Production'.",
+            "Click the blue 'Save Changes' button.",
+            "Purge LiteSpeed Cache (see Section 6.2). Live payments with real money are now instantly active!"
+        ]
+    )
 
-    docgen_engine.add_heading_2(doc, "4.3 Instant Telegram Alerts (PayWay by ABA Bot)")
-    docgen_engine.add_body_p(doc, "You can have transaction receipts sent directly to staff Telegram accounts the second a donation is made:")
-    docgen_engine.add_body_p(doc, "1. Log in to your ABA PayWay Merchant Portal.")
-    docgen_engine.add_body_p(doc, "2. Go to Profile Settings -> Telegram Notification.")
-    docgen_engine.add_body_p(doc, "3. Connect to the official 'PayWay by ABA' Telegram bot.")
-    docgen_engine.add_body_p(doc, "4. Your phone will now receive instant push receipts with the donor's name, amount, date, and APV approval code.")
+    docgen_engine.add_heading_2(doc, "4.3 Instant Telegram Alerts for Leadership (PayWay by ABA Bot)")
+    docgen_engine.add_body_p(doc, "Leadership and accounting staff can receive real-time push alerts on their personal smartphones whenever a donation is completed:")
+    docgen_engine.add_body_p(doc, "1. Log in to the ABA PayWay Merchant Web Portal (sandbox.payway.com.kh or live portal).", bullet=True)
+    docgen_engine.add_body_p(doc, "2. Click on your Profile / Account Settings in the top-right corner.", bullet=True)
+    docgen_engine.add_body_p(doc, "3. Select 'Telegram Notifications' or 'Connect Telegram'.", bullet=True)
+    docgen_engine.add_body_p(doc, "4. The portal will prompt you to open the official Telegram bot: @PayWayNotificationBot.", bullet=True)
+    docgen_engine.add_body_p(doc, "5. Click 'Start' in Telegram and enter the verification token shown in your portal.", bullet=True)
+    docgen_engine.add_body_p(doc, "6. Result: Every time a donor scans and pays, your phone buzzes with a receipt showing Donor Name, Amount (USD or KHR), Date/Time, and Transaction ID!", bullet=True)
 
-    docgen_engine.add_heading_2(doc, "4.4 Standalone PayWay Payment Links")
-    docgen_engine.add_body_p(doc, "In the PayWay portal, click the 'Payment Link' menu to create standalone donation links (e.g. link.payway.com.kh/CHA...). These can be posted on Facebook, Telegram channels, or printed on event flyers.")
-
-
-    # Part 5: Member System & Verification
-    docgen_heading5 = docgen_engine.add_heading_1(doc, "5. Member Portal & Patient Registration")
-    docgen_engine.add_body_p(doc, "CHA Cambodia provides a self-service member registration system for patients, families, and healthcare advocates.")
-
-    docgen_engine.add_heading_2(doc, "5.1 Registration & Email Verification")
-    docgen_engine.add_body_p(doc, "• Members register on the website by providing Name, Email, Password, and role (Member or Patient).")
-    docgen_engine.add_body_p(doc, "• Automated verification emails are delivered via Brevo SMTP (noreply@chacambodia.org) with zero spam triggers.")
-    docgen_engine.add_body_p(doc, "• Unverified accounts cannot log in until they click the verification link sent to their inbox.")
-
-    docgen_engine.add_heading_2(doc, "5.2 Digital Membership Card")
-    docgen_engine.add_body_p(doc, "Once logged in, members can access their dashboard on chacambodia.org:")
-    docgen_engine.add_body_p(doc, "• Displays a digital membership card with patient name, member ID, condition (e.g. Hemophilia A), blood type, and emergency contacts.")
-    docgen_engine.add_body_p(doc, "• Members can print or save their card for medical identification when visiting hospitals.")
-
-    docgen_engine.add_heading_2(doc, "5.3 Viewing Members in WordPress Admin")
-    docgen_engine.add_body_p(doc, "Administrators can view all registered members under the 'CHA Members' menu in WordPress Admin to verify patient details and track community growth.")
+    docgen_engine.add_heading_2(doc, "4.4 Generating Standalone Hosted Payment Links")
+    docgen_engine.add_body_p(doc, "In addition to the website form, staff can generate standalone payment links directly from the PayWay portal:")
+    docgen_engine.add_body_p(doc, "• Click 'Payment Link' on the left menu of the PayWay portal.", bullet=True)
+    docgen_engine.add_body_p(doc, "• Click 'Create Link', upload the CHA logo, set title 'CHA Emergency Patient Support', and choose Open Amount.", bullet=True)
+    docgen_engine.add_body_p(doc, "• ABA will generate a link like: link.payway.com.kh/CHACAMBODIA.", bullet=True)
+    docgen_engine.add_body_p(doc, "• Copy and paste this link anywhere: Facebook posts, WhatsApp/Telegram groups, or convert it to a QR code for printed event posters!", bullet=True)
 
 
-    # Part 6: Maintenance, Backups & Emergency Runbook
-    docgen_engine.add_heading_1(doc, "6. Maintenance, Backups & Emergency Runbook")
-    docgen_engine.add_body_p(doc, "To guarantee 100% uptime and zero data loss, the website is protected by automated cloud backups and version control.")
+    # -------------------------------------------------------------
+    # SECTION 5: MEMBER PORTAL & DIGITAL PATIENT CARDS
+    # -------------------------------------------------------------
+    docgen_engine.add_heading_1(doc, "5. Member Portal & Digital Patient Cards")
+    docgen_engine.add_body_p(doc, "CHA Cambodia provides a self-service membership system allowing patients, families, and healthcare advocates to register, verify their email, and generate a recognized digital identity card.")
 
-    docgen_engine.add_heading_2(doc, "6.1 Automated Backup System (Active)")
+    docgen_engine.add_heading_2(doc, "5.1 Registration & Brevo SMTP Email Flow")
+    docgen_engine.add_body_p(doc, "• Visitors register by clicking 'Become a Member' or 'Register' and filling in their Name, Email, Password, and Role (Member or Patient).")
+    docgen_engine.add_body_p(doc, "• To prevent fraudulent accounts, accounts remain unverified until the user clicks the verification link in their email.")
+    docgen_engine.add_body_p(doc, "• Verification emails are handled by a dedicated Brevo SMTP integration (delivering from noreply@chacambodia.org), ensuring reliable inbox placement with zero spam tagging.")
+
+    docgen_engine.add_heading_2(doc, "5.2 Digital Membership Card Capabilities")
+    docgen_engine.add_body_p(doc, "When a verified member logs in to chacambodia.org:")
+    docgen_engine.add_body_p(doc, "• They can access their personalized Membership Dashboard.", bullet=True)
+    docgen_engine.add_body_p(doc, "• The dashboard renders a Digital Membership Card featuring: Full Patient Name, Unique CHA Member ID, Clinical Diagnosis (e.g. Severe Hemophilia A, Factor VIII Deficiency), Blood Group, and Emergency Hospital Contact numbers.", bullet=True)
+    docgen_engine.add_body_p(doc, "• Members can click 'Print Card' or save a digital image on their smartphone for immediate presentation during medical emergencies at treatment centres.", bullet=True)
+
+
+    # -------------------------------------------------------------
+    # SECTION 6: BACKUPS, CACHE & DISASTER RECOVERY
+    # -------------------------------------------------------------
+    docgen_engine.add_heading_1(doc, "6. Maintenance, Backups & Disaster Recovery")
+    docgen_engine.add_body_p(doc, "Website stability, security, and continuous uptime are protected by automated cloud backups, LiteSpeed acceleration, and strict deployment protocols.")
+
+    docgen_engine.add_heading_2(doc, "6.1 Automated Google Drive Backups (Active & Confirmed)")
     docgen_engine.add_callout(
         doc,
-        "Backups are automatically saved offsite to Google Drive (Nexus Digital Support account with 5 TB storage). Database backups run DAILY with 14-day retention. File backups run WEEKLY with 4-week retention. Even if the hosting server were damaged, the entire site can be restored in minutes.",
-        title="AUTOMATED BACKUP CONFIRMATION",
+        "Automated Offsite Backup Status: UpdraftPlus is actively authenticated and connected to Google Drive under the account 'Nexus Digital Support' (5 TB storage capacity). Database backups run DAILY with a 14-day rolling retention. Core website files run WEEKLY with a 4-week rolling retention. Even in the catastrophic event of a total server hardware failure, the entire website and donor database can be fully restored in under 15 minutes.",
+        title="CLOUD BACKUP VERIFICATION",
         alert_type="success"
     )
 
     docgen_engine.add_heading_2(doc, "6.2 The Golden Rule: Purging LiteSpeed Cache")
     docgen_engine.add_callout(
         doc,
-        "Whenever a theme update is uploaded, a page is edited, or Customizer settings are changed, ALWAYS click 'Purge All' under the LiteSpeed Cache icon in the top WordPress admin bar. LiteSpeed caches static pages for speed; purging ensures visitors see updates immediately.",
-        title="MANDATORY RULE AFTER ANY UPDATE",
+        "MANDATORY PROTOCOL AFTER ANY UPDATE: The website utilizes LiteSpeed Enterprise caching to load in under one second. However, this means web pages are saved in a static cache. Whenever you upload a new theme zip, publish news, or edit phone numbers in the Customizer, you MUST click 'Purge All' under the LiteSpeed Cache icon in the top WordPress admin toolbar. Failing to purge cache will cause visitors to see old/stale content.",
+        title="MANDATORY RULE FOR ALL ADMINISTRATORS",
         alert_type="warning"
     )
 
-    docgen_engine.add_heading_2(doc, "6.3 Quick Reference Summary")
-    summary_headers = ["Action / Task", "Where to Go", "Key Instruction"]
-    summary_rows = [
-        ["Log in to Website", "chacambodia.org/wp-admin", "Use admin username and password"],
-        ["Add News or Event", "News & Events -> Add New", "Add title, content, image, category badge"],
-        ["Update Campaigns", "Campaigns -> All Campaigns", "Update raised amount, goal, and icon"],
-        ["Change Phone/Email", "Appearance -> Customize", "Edit under CHA Theme Options"],
-        ["Activate Live ABA", "Settings -> CHA PayWay", "Paste Live Merchant ID and Key, set to Live"],
-        ["View Donations", "WordPress -> Donations menu", "View transaction ID, amount, APV code"],
-        ["Clear Cache", "Top bar -> LiteSpeed icon", "Click 'Purge All'"],
+    docgen_engine.add_heading_2(doc, "6.3 Quick-Reference Administrative Cheat Sheet")
+    cheat_headers = ["Operational Task", "WordPress Admin Location", "Required Action & Summary"]
+    cheat_rows = [
+        ["Access Admin Dashboard", "chacambodia.org/wp-admin", "Enter username and password, click Log In"],
+        ["Publish News / Workshop", "News & Events -> Add New", "Add title, write body, upload featured image, select category"],
+        ["Update Campaign Progress", "Campaigns -> All Campaigns", "Update Raised and Goal dollar amounts, click Update"],
+        ["Change Phone / Email", "Appearance -> Customize", "Open 'CHA Theme Options', edit contacts, click Publish"],
+        ["Switch ABA to Live Mode", "Settings -> CHA PayWay", "Paste Live Merchant ID & Key, change mode to Live"],
+        ["Review Donation Log", "WordPress -> Donations menu", "Inspect donor name, amount, date, APV approval code"],
+        ["View Member Roster", "WordPress -> CHA Members", "Inspect registered patients, blood types, conditions"],
+        ["Clear Browser/Site Cache", "Top Toolbar -> LiteSpeed icon", "Click 'Purge All' immediately after saving changes"],
     ]
-    docgen_engine.add_styled_table(doc, summary_headers, summary_rows)
+    docgen_engine.add_styled_table(doc, cheat_headers, cheat_rows)
 
-    # Save document
-    output_filename = "CHA_Cambodia_Website_Admin_Guide.docx"
-    doc.save(output_filename)
-    print(f"Successfully generated: {output_filename}")
+    # Save to file
+    output_docx = "CHA_Cambodia_Website_Admin_Guide.docx"
+    doc.save(output_docx)
+    print(f"Master manual successfully created: {output_docx}")
 
 if __name__ == "__main__":
-    build_guide()
+    generate_full_manual()
