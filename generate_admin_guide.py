@@ -249,22 +249,6 @@ def generate_full_manual():
         ]
     )
 
-    docgen_engine.add_heading_2(doc, "4.3 Instant Telegram Alerts for Leadership (PayWay by ABA Bot)")
-    docgen_engine.add_body_p(doc, "Leadership and accounting staff can receive real-time push alerts on their personal smartphones whenever a donation is completed:")
-    docgen_engine.add_body_p(doc, "1. Log in to the ABA PayWay Merchant Web Portal (sandbox.payway.com.kh or live portal).", bullet=True)
-    docgen_engine.add_body_p(doc, "2. Click on your Profile / Account Settings in the top-right corner.", bullet=True)
-    docgen_engine.add_body_p(doc, "3. Select 'Telegram Notifications' or 'Connect Telegram'.", bullet=True)
-    docgen_engine.add_body_p(doc, "4. The portal will prompt you to open the official Telegram bot: @PayWayNotificationBot.", bullet=True)
-    docgen_engine.add_body_p(doc, "5. Click 'Start' in Telegram and enter the verification token shown in your portal.", bullet=True)
-    docgen_engine.add_body_p(doc, "6. Result: Every time a donor scans and pays, your phone buzzes with a receipt showing Donor Name, Amount (USD or KHR), Date/Time, and Transaction ID!", bullet=True)
-
-    docgen_engine.add_heading_2(doc, "4.4 Generating Standalone Hosted Payment Links")
-    docgen_engine.add_body_p(doc, "In addition to the website form, staff can generate standalone payment links directly from the PayWay portal:")
-    docgen_engine.add_body_p(doc, "• Click 'Payment Link' on the left menu of the PayWay portal.", bullet=True)
-    docgen_engine.add_body_p(doc, "• Click 'Create Link', upload the CHA logo, set title 'CHA Emergency Patient Support', and choose Open Amount.", bullet=True)
-    docgen_engine.add_body_p(doc, "• ABA will generate a link like: link.payway.com.kh/CHACAMBODIA.", bullet=True)
-    docgen_engine.add_body_p(doc, "• Copy and paste this link anywhere: Facebook posts, WhatsApp/Telegram groups, or convert it to a QR code for printed event posters!", bullet=True)
-
 
     # -------------------------------------------------------------
     # SECTION 5: MEMBER PORTAL & DIGITAL PATIENT CARDS

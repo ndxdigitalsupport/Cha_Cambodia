@@ -168,24 +168,6 @@ When ABA Bank approves your merchant contract and provides your official Live Pr
   * Click the blue **Save Changes** button.
   * **Purge LiteSpeed Cache** (see Section 6.2). Live payments with real money are now instantly active!
 
-### 4.3 Instant Telegram Alerts for Leadership (PayWay by ABA Bot)
-
-Leadership and accounting staff can receive real-time push alerts on their personal smartphones whenever a donation is completed:
-1. Log in to the ABA PayWay Merchant Web Portal (`sandbox.payway.com.kh` or live portal).
-2. Click on your Profile / Account Settings in the top-right corner.
-3. Select **Telegram Notifications** or **Connect Telegram**.
-4. The portal will prompt you to open the official Telegram bot: `@PayWayNotificationBot`.
-5. Click **Start** in Telegram and enter the verification token shown in your portal.
-6. **Result:** Every time a donor scans and pays, your phone buzzes with a receipt showing Donor Name, Amount (USD or KHR), Date/Time, and Transaction ID!
-
-### 4.4 Generating Standalone Hosted Payment Links
-
-In addition to the website form, staff can generate standalone payment links directly from the PayWay portal:
-* Click **Payment Link** on the left menu of the PayWay portal.
-* Click **Create Link**, upload the CHA logo, set title *"CHA Emergency Patient Support"*, and choose Open Amount.
-* ABA will generate a link like: `link.payway.com.kh/CHACAMBODIA`.
-* Copy and paste this link anywhere: Facebook posts, WhatsApp/Telegram groups, or convert it to a QR code for printed event posters!
-
 ---
 
 ## 5. Member Portal & Digital Patient Cards
