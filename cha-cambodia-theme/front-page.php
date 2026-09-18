@@ -306,10 +306,15 @@
             <button type="submit" class="btn btn-primary btn-block" data-i18n="donate_btn"><?php echo esc_html(cha_get_option('donate_btn', 'Donate Now')); ?></button>
           </div>
         </form>
-        <p class="secure-note" style="margin-top:var(--s-4);text-align:center;font-size:0.8125rem;color:var(--c-muted);display:flex;align-items:center;justify-content:center;gap:6px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#22C55E"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-          <span data-i18n="donate_secure_note">Secure &amp; encrypted via PayWay (ABA Bank)</span>
-        </p>
+        <div class="donate-compliance-note" style="margin-top:var(--s-4);text-align:center;font-size:0.8125rem;color:var(--c-muted);line-height:1.5">
+          <p class="secure-note" style="margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:6px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#22C55E"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            <span data-i18n="donate_secure_note">Secure &amp; encrypted via PayWay (ABA Bank)</span>
+          </p>
+          <p style="margin:0;font-size:0.75rem;color:#64748b">
+            By continuing, you agree to our <a href="<?php echo esc_url(home_url('/terms')); ?>" target="_blank" style="color:var(--c-blue);text-decoration:underline">Terms &amp; Refund Policy</a>.
+          </p>
+        </div>
         <div class="form-success" data-form-success hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><h3>Thank You!</h3><p>Your generous donation will help change lives across Cambodia.</p></div>
       </div>
       <div class="campaigns-list campaigns-panel-v2" data-reveal>

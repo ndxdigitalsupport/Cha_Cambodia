@@ -60,8 +60,7 @@
             <?php echo esc_html(cha_get_option('donate_footer_note', 'Secure & encrypted checkout powered by ABA PayWay (Cards / ABA / KHQR)')); ?>
           </p>
           <p style="margin: 0; font-size: 0.75rem; color: #64748b;">
-            By donating, you agree to our <a href="<?php echo esc_url(home_url('/terms')); ?>" target="_blank" style="color: var(--c-blue); text-decoration: underline;">Terms &amp; 30-Day Refund Policy</a>.
-            For transaction inquiries or refund requests, please contact CHA Cambodia directly.
+            By continuing, you agree to our <a href="<?php echo esc_url(home_url('/terms')); ?>" target="_blank" style="color: var(--c-blue); text-decoration: underline;">Terms &amp; Refund Policy</a>.
           </p>
         </div>
       </div>
