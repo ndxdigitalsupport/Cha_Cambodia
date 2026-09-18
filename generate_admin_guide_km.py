@@ -1,7 +1,8 @@
 """
 Khmer Generator for CHA_Cambodia_Website_Admin_Guide_KM.docx
-Builds an exhaustive, highly detailed, beautifully designed operations manual in Khmer for CHA leadership.
-Strictly covers website-only capabilities (no mobile app, no Telegram bots, no standalone links).
+Builds an exhaustive, beautifully designed operations manual in Khmer for CHA leadership.
+Uses official brand typography (Siemreap & Battambang/Koulen) with explicit w:cs and w:szCs
+OpenXML tags to ensure large, crisp, legible Khmer glyphs in Microsoft Word.
 """
 
 import os
@@ -10,15 +11,15 @@ from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.oxml import parse_xml
-from docx.oxml.ns import nsdecls
+from docx.oxml import parse_xml, OxmlElement
+from docx.oxml.ns import nsdecls, qn
 
 # Brand Colors (Hex & RGB)
 COLOR_PRIMARY = "0B1D6D"     # Deep Royal Navy
 COLOR_SECONDARY = "E31E24"   # Crimson Red
 COLOR_PURPLE = "6A2C91"      # Royal Purple
 COLOR_TEXT = "1E293B"        # Slate 800
-COLOR_MUTED = "64748B"       # Slate 500
+COLOR_MUTED = "475569"       # Slate 600
 COLOR_SURFACE = "F8FAFC"     # Slate 50
 COLOR_BORDER = "CBD5E1"      # Slate 300
 COLOR_SUCCESS = "16A34A"     # Emerald Green
@@ -27,25 +28,54 @@ COLOR_WARNING = "D97706"     # Amber
 RGB_PRIMARY = RGBColor(11, 29, 109)
 RGB_SECONDARY = RGBColor(227, 30, 36)
 RGB_TEXT = RGBColor(30, 41, 59)
-RGB_MUTED = RGBColor(100, 116, 139)
+RGB_MUTED = RGBColor(71, 85, 105)
 RGB_WHITE = RGBColor(255, 255, 255)
 
-FONT_KHMER = "Kantumruy Pro"
-FONT_FALLBACK = "Khmer OS Siemreap"
+# Standard Khmer Fonts installed on Windows
+FONT_HEADING = "Siemreap"
+FONT_BODY = "Siemreap"
 
-def set_khmer_font(run, font_name=FONT_KHMER):
-    """Assigns font for both standard Latin/ASCII and Complex Script (Khmer Unicode)."""
+def apply_khmer_style(run, font_name, pt_size, is_bold=False, color_rgb=None):
+    """
+    Applies font name and size to both Latin (w:ascii, w:hAnsi) and Complex Script (w:cs, w:szCs).
+    This ensures Microsoft Word displays Khmer characters in the exact font and enlarged size
+    instead of falling back to 10pt Cambria or Arial.
+    """
     run.font.name = font_name
+    run.font.size = Pt(pt_size)
+    run.font.bold = is_bold
+    if color_rgb:
+        run.font.color.rgb = color_rgb
+
     rPr = run._r.get_or_add_rPr()
-    xml = f'<w:rFonts {nsdecls("w")} w:ascii="{font_name}" w:hAnsi="{font_name}" w:cs="{font_name}"/>'
-    rPr.append(parse_xml(xml))
+
+    # Font tags
+    rFonts = OxmlElement('w:rFonts')
+    rFonts.set(qn('w:ascii'), font_name)
+    rFonts.set(qn('w:hAnsi'), font_name)
+    rFonts.set(qn('w:cs'), font_name)
+    rPr.append(rFonts)
+
+    # Size tags in half-points (e.g. 12pt = 24 half-points)
+    half_pts = str(int(pt_size * 2))
+    sz = OxmlElement('w:sz')
+    sz.set(qn('w:val'), half_pts)
+    rPr.append(sz)
+
+    szCs = OxmlElement('w:szCs')
+    szCs.set(qn('w:val'), half_pts)
+    rPr.append(szCs)
+
+    if is_bold:
+        bCs = OxmlElement('w:bCs')
+        rPr.append(bCs)
 
 def set_cell_background(cell, hex_color):
     tcPr = cell._element.get_or_add_tcPr()
     shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{hex_color}"/>')
     tcPr.append(shd)
 
-def set_cell_margins(cell, top=120, bottom=120, left=160, right=160):
+def set_cell_margins(cell, top=140, bottom=140, left=180, right=180):
     tcPr = cell._element.get_or_add_tcPr()
     tcMar = parse_xml(f'''
         <w:tcMar {nsdecls("w")}>
@@ -93,18 +123,14 @@ def create_khmer_document():
         hp = header.paragraphs[0]
         hp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
         hrun = hp.add_run("សមាគមគាំទ្រអ្នកជំងឺហេម៉ូហ្វីលាកម្ពុជា (CHA Cambodia)  •  chacambodia.org")
-        set_khmer_font(hrun)
-        hrun.font.size = Pt(8.5)
-        hrun.font.color.rgb = RGB_MUTED
+        apply_khmer_style(hrun, FONT_BODY, 9.5, False, RGB_MUTED)
 
         # Footer
         footer = section.footer
         fp = footer.paragraphs[0]
         fp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
         frun = fp.add_run("សៀវភៅណែនាំស្តីពីការគ្រប់គ្រង និងប្រតិបត្តិការគេហទំព័រ  |  ឯកសារសម្ងាត់ផ្លូវការ  |  ទំព័រ ")
-        set_khmer_font(frun)
-        frun.font.size = Pt(8.5)
-        frun.font.color.rgb = RGB_MUTED
+        apply_khmer_style(frun, FONT_BODY, 9.5, False, RGB_MUTED)
 
     return doc
 
@@ -112,41 +138,33 @@ def add_executive_cover_page_km(doc, title, subtitle, logo_path=None, meta_table
     if logo_path and os.path.exists(logo_path):
         p_logo = doc.add_paragraph()
         p_logo.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        p_logo.paragraph_format.space_before = Pt(20)
-        p_logo.paragraph_format.space_after = Pt(24)
+        p_logo.paragraph_format.space_before = Pt(16)
+        p_logo.paragraph_format.space_after = Pt(20)
         run_logo = p_logo.add_run()
-        run_logo.add_picture(logo_path, width=Inches(3.2))
+        run_logo.add_picture(logo_path, width=Inches(3.3))
 
     # Divider bar
     p_div = doc.add_paragraph()
-    p_div.paragraph_format.space_before = Pt(10)
+    p_div.paragraph_format.space_before = Pt(8)
     p_div.paragraph_format.space_after = Pt(16)
     r_div = p_div.add_run("―" * 32)
-    set_khmer_font(r_div)
-    r_div.font.size = Pt(14)
-    r_div.font.bold = True
-    r_div.font.color.rgb = RGB_SECONDARY
+    apply_khmer_style(r_div, FONT_HEADING, 16, True, RGB_SECONDARY)
 
     # Title
     p_title = doc.add_paragraph()
     p_title.paragraph_format.space_before = Pt(0)
-    p_title.paragraph_format.space_after = Pt(12)
-    p_title.paragraph_format.line_spacing = 1.15
+    p_title.paragraph_format.space_after = Pt(14)
+    p_title.paragraph_format.line_spacing = 1.3
     run_title = p_title.add_run(title)
-    set_khmer_font(run_title)
-    run_title.font.size = Pt(24)
-    run_title.font.bold = True
-    run_title.font.color.rgb = RGB_PRIMARY
+    apply_khmer_style(run_title, FONT_HEADING, 26, True, RGB_PRIMARY)
 
     # Subtitle
     p_sub = doc.add_paragraph()
     p_sub.paragraph_format.space_before = Pt(0)
     p_sub.paragraph_format.space_after = Pt(26)
-    p_sub.paragraph_format.line_spacing = 1.25
+    p_sub.paragraph_format.line_spacing = 1.4
     run_sub = p_sub.add_run(subtitle)
-    set_khmer_font(run_sub)
-    run_sub.font.size = Pt(11.5)
-    run_sub.font.color.rgb = RGB_MUTED
+    apply_khmer_style(run_sub, FONT_BODY, 13, False, RGB_MUTED)
 
     # Meta table
     if meta_table:
@@ -159,81 +177,65 @@ def add_executive_cover_page_km(doc, title, subtitle, logo_path=None, meta_table
             
             # Left cell
             c0 = row.cells[0]
-            c0.width = Inches(2.2)
+            c0.width = Inches(2.3)
             set_cell_background(c0, "F1F5F9")
+            set_cell_margins(c0, top=100, bottom=100, left=140, right=140)
             set_cell_borders(c0, left="single", color=COLOR_PRIMARY, size="16", bottom="single")
             p0 = c0.paragraphs[0]
             p0.paragraph_format.space_before = Pt(0)
             p0.paragraph_format.space_after = Pt(0)
             r0 = p0.add_run(k)
-            set_khmer_font(r0)
-            r0.font.size = Pt(9.5)
-            r0.font.bold = True
-            r0.font.color.rgb = RGB_PRIMARY
+            apply_khmer_style(r0, FONT_BODY, 11, True, RGB_PRIMARY)
 
             # Right cell
             c1 = row.cells[1]
-            c1.width = Inches(4.5)
+            c1.width = Inches(4.4)
             set_cell_background(c1, "FFFFFF")
-            set_cell_margins(c1, top=90, bottom=90, left=140, right=140)
+            set_cell_margins(c1, top=100, bottom=100, left=140, right=140)
             set_cell_borders(c1, bottom="single", color="E2E8F0")
             p1 = c1.paragraphs[0]
             p1.paragraph_format.space_before = Pt(0)
             p1.paragraph_format.space_after = Pt(0)
             r1 = p1.add_run(v)
-            set_khmer_font(r1)
-            r1.font.size = Pt(9.5)
-            r1.font.color.rgb = RGB_TEXT
+            apply_khmer_style(r1, FONT_BODY, 11, False, RGB_TEXT)
 
     doc.add_page_break()
 
 def add_heading_1(doc, text):
     p = doc.add_paragraph()
-    p.paragraph_format.space_before = Pt(22)
-    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.space_before = Pt(24)
+    p.paragraph_format.space_after = Pt(8)
+    p.paragraph_format.line_spacing = 1.3
     p.paragraph_format.keep_with_next = True
     run = p.add_run(text)
-    set_khmer_font(run)
-    run.font.size = Pt(16)
-    run.font.bold = True
-    run.font.color.rgb = RGB_PRIMARY
+    apply_khmer_style(run, FONT_HEADING, 18, True, RGB_PRIMARY)
     return p
 
 def add_heading_2(doc, text):
     p = doc.add_paragraph()
-    p.paragraph_format.space_before = Pt(14)
-    p.paragraph_format.space_after = Pt(4)
+    p.paragraph_format.space_before = Pt(16)
+    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.line_spacing = 1.3
     p.paragraph_format.keep_with_next = True
     run = p.add_run(text)
-    set_khmer_font(run)
-    run.font.size = Pt(12.5)
-    run.font.bold = True
-    run.font.color.rgb = RGB_TEXT
+    apply_khmer_style(run, FONT_HEADING, 14.5, True, RGB_TEXT)
     return p
 
 def add_body_p(doc, text, bold_prefix=None, bullet=False):
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(0)
-    p.paragraph_format.space_after = Pt(5)
-    p.paragraph_format.line_spacing = 1.25
+    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.line_spacing = 1.35
     if bullet:
         p.paragraph_format.left_indent = Inches(0.25)
         r_bullet = p.add_run("•  ")
-        set_khmer_font(r_bullet)
-        r_bullet.font.size = Pt(10)
-        r_bullet.font.bold = True
-        r_bullet.font.color.rgb = RGB_SECONDARY
+        apply_khmer_style(r_bullet, FONT_BODY, 12, True, RGB_SECONDARY)
 
     if bold_prefix:
         r_pre = p.add_run(bold_prefix + " ")
-        set_khmer_font(r_pre)
-        r_pre.font.size = Pt(10)
-        r_pre.font.bold = True
-        r_pre.font.color.rgb = RGB_TEXT
+        apply_khmer_style(r_pre, FONT_BODY, 12, True, RGB_TEXT)
     run = p.add_run(text)
-    set_khmer_font(run)
-    run.font.size = Pt(10)
-    run.font.color.rgb = RGB_TEXT
+    apply_khmer_style(run, FONT_BODY, 12, False, RGB_TEXT)
     return p
 
 def add_step_card(doc, step_num, title, instructions):
@@ -243,44 +245,38 @@ def add_step_card(doc, step_num, title, instructions):
 
     # Step badge cell
     c0 = table.rows[0].cells[0]
-    c0.width = Inches(1.1)
+    c0.width = Inches(1.15)
     set_cell_background(c0, "0B1D6D")
-    set_cell_margins(c0, top=140, bottom=140, left=100, right=100)
+    set_cell_margins(c0, top=160, bottom=160, left=100, right=100)
     p0 = c0.paragraphs[0]
     p0.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p0.paragraph_format.space_before = Pt(0)
     p0.paragraph_format.space_after = Pt(0)
+    p0.paragraph_format.line_spacing = 1.2
     r0 = p0.add_run(f"ជំហាន\nទី {step_num}")
-    set_khmer_font(r0)
-    r0.font.size = Pt(10.5)
-    r0.font.bold = True
-    r0.font.color.rgb = RGB_WHITE
+    apply_khmer_style(r0, FONT_HEADING, 12, True, RGB_WHITE)
 
     # Instruction cell
     c1 = table.rows[0].cells[1]
-    c1.width = Inches(5.6)
+    c1.width = Inches(5.55)
     set_cell_background(c1, "F8FAFC")
-    set_cell_margins(c1, top=120, bottom=120, left=160, right=160)
-    set_cell_borders(c1, top="single", bottom="single", right="single", color="E2E8F0")
+    set_cell_margins(c1, top=140, bottom=140, left=160, right=160)
+    set_cell_borders(c1, top="single", bottom="single", right="single", color="CBD5E1")
 
     p1 = c1.paragraphs[0]
     p1.paragraph_format.space_before = Pt(0)
-    p1.paragraph_format.space_after = Pt(4)
+    p1.paragraph_format.space_after = Pt(5)
+    p1.paragraph_format.line_spacing = 1.3
     r_title = p1.add_run(title)
-    set_khmer_font(r_title)
-    r_title.font.size = Pt(10.5)
-    r_title.font.bold = True
-    r_title.font.color.rgb = RGB_PRIMARY
+    apply_khmer_style(r_title, FONT_HEADING, 13, True, RGB_PRIMARY)
 
     for inst in instructions:
         p_sub = c1.add_paragraph()
         p_sub.paragraph_format.space_before = Pt(0)
-        p_sub.paragraph_format.space_after = Pt(2)
-        p_sub.paragraph_format.line_spacing = 1.2
+        p_sub.paragraph_format.space_after = Pt(3)
+        p_sub.paragraph_format.line_spacing = 1.3
         r_inst = p_sub.add_run(f"→  {inst}")
-        set_khmer_font(r_inst)
-        r_inst.font.size = Pt(9.5)
-        r_inst.font.color.rgb = RGB_TEXT
+        apply_khmer_style(r_inst, FONT_BODY, 11.5, False, RGB_TEXT)
 
     # Spacer
     sp = doc.add_paragraph()
@@ -307,27 +303,22 @@ def add_callout(doc, text, title=None, alert_type="note"):
     cell = table.cell(0, 0)
     cell.width = Inches(6.7)
     set_cell_background(cell, bg_color)
-    set_cell_margins(cell, top=140, bottom=140, left=180, right=180)
-    set_cell_borders(cell, left="single", color=border_color, size="28",
-                     top="single", bottom="single", right="single", top_color="E2E8F0",
-                     bottom_color="E2E8F0", right_color="E2E8F0")
+    set_cell_margins(cell, top=160, bottom=160, left=180, right=180)
+    set_cell_borders(cell, left="single", color=border_color, size="32",
+                     top="single", bottom="single", right="single", top_color="CBD5E1",
+                     bottom_color="CBD5E1", right_color="CBD5E1")
 
     cp = cell.paragraphs[0]
     cp.paragraph_format.space_before = Pt(0)
-    cp.paragraph_format.space_after = Pt(3)
-    cp.paragraph_format.line_spacing = 1.25
+    cp.paragraph_format.space_after = Pt(4)
+    cp.paragraph_format.line_spacing = 1.35
 
     if title:
         rt = cp.add_run(icon + title + "\n")
-        set_khmer_font(rt)
-        rt.font.size = Pt(10)
-        rt.font.bold = True
-        rt.font.color.rgb = RGB_PRIMARY if alert_type != "important" and alert_type != "warning" else RGB_SECONDARY
+        apply_khmer_style(rt, FONT_HEADING, 12.5, True, RGB_PRIMARY if alert_type != "important" and alert_type != "warning" else RGB_SECONDARY)
 
     rb = cp.add_run(text)
-    set_khmer_font(rb)
-    rb.font.size = Pt(9.5)
-    rb.font.color.rgb = RGB_TEXT
+    apply_khmer_style(rb, FONT_BODY, 11.5, False, RGB_TEXT)
 
     sp = doc.add_paragraph()
     sp.paragraph_format.space_before = Pt(0)
@@ -345,13 +336,11 @@ def add_styled_table(doc, headers, rows):
         p = hdr_cells[i].paragraphs[0]
         p.paragraph_format.space_before = Pt(0)
         p.paragraph_format.space_after = Pt(0)
+        p.paragraph_format.line_spacing = 1.25
         run = p.add_run(h_text)
-        set_khmer_font(run)
-        run.font.size = Pt(9.5)
-        run.font.bold = True
-        run.font.color.rgb = RGB_WHITE
+        apply_khmer_style(run, FONT_HEADING, 11.5, True, RGB_WHITE)
         set_cell_background(hdr_cells[i], COLOR_PRIMARY)
-        set_cell_margins(hdr_cells[i], top=100, bottom=100, left=140, right=140)
+        set_cell_margins(hdr_cells[i], top=120, bottom=120, left=140, right=140)
         set_cell_borders(hdr_cells[i], bottom="single", color=COLOR_SECONDARY, size="16")
 
     # Data Rows
@@ -363,13 +352,11 @@ def add_styled_table(doc, headers, rows):
             p = row_cells[c_idx].paragraphs[0]
             p.paragraph_format.space_before = Pt(0)
             p.paragraph_format.space_after = Pt(0)
-            p.paragraph_format.line_spacing = 1.2
+            p.paragraph_format.line_spacing = 1.3
             run = p.add_run(str(val))
-            set_khmer_font(run)
-            run.font.size = Pt(9)
-            run.font.color.rgb = RGB_TEXT
+            apply_khmer_style(run, FONT_BODY, 11, False, RGB_TEXT)
             set_cell_background(row_cells[c_idx], bg_color)
-            set_cell_margins(row_cells[c_idx], top=80, bottom=80, left=140, right=140)
+            set_cell_margins(row_cells[c_idx], top=90, bottom=90, left=140, right=140)
             set_cell_borders(row_cells[c_idx], bottom="single", color="E2E8F0")
 
     sp = doc.add_paragraph()
