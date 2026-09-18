@@ -9802,32 +9802,37 @@ img.roster-item-avatar {
   gap: 6px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #0B1D6D;
-  background: #F8FAFC;
-  padding: 6px 12px;
+  color: #FFFFFF;
+  background: #0B1D6D;
+  padding: 6px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(11, 29, 109, 0.1);
+  border: 1px solid #0B1D6D;
   text-decoration: none;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(11, 29, 109, 0.16);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
 }
 
 .campaigns-pill-btn svg {
   width: 13px;
   height: 13px;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .campaigns-pill-btn:hover {
-  background: #0B1D6D;
+  background: #132A8A;
   color: #FFFFFF;
-  border-color: #0B1D6D;
-  box-shadow: 0 4px 12px rgba(11, 29, 109, 0.15);
-  transform: translateY(-1px);
+  border-color: #132A8A;
+  box-shadow: 0 6px 18px rgba(11, 29, 109, 0.28);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .campaigns-pill-btn:hover svg {
-  transform: translateX(3px);
+  transform: translateX(4px);
+}
+
+.campaigns-pill-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .campaigns-main-sub {
