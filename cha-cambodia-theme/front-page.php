@@ -276,7 +276,7 @@
             <span data-i18n="donate_badge">Support CHA</span>
           </div>
           <h3 data-i18n="donate_heading" style="font-size:1.45rem;font-weight:800;color:var(--c-blue);margin:0 0 4px;letter-spacing:-0.01em">Make a Donation</h3>
-          <p class="text-muted" data-i18n="donate_sub" style="font-size:0.875rem;margin:0;line-height:1.45">Direct patient care &amp; life-saving treatment across Cambodia.</p>
+          <p class="text-muted" data-i18n="donate_sub" style="font-size:0.875rem;margin:0;line-height:1.45">Your support provides treatment, education, and hope to people with bleeding disorders in Cambodia.</p>
         </div>
 
         <form id="donate-form-submit" novalidate>
