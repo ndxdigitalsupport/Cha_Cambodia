@@ -6086,6 +6086,33 @@ img.roster-item-avatar {
 .donate-modal-title-block { display: flex; align-items: center; gap: var(--s-3); }
 .donate-modal-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--c-blue-100); color: var(--c-blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .donate-modal-icon svg { width: 18px; height: 18px; }
+/* Option 2: Soft Glassmorphism Heart Badge */
+.donate-modal-icon-heart {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #FFF5F5 0%, #FEE2E2 100%) !important;
+  border: 1px solid rgba(227, 30, 36, 0.18) !important;
+  box-shadow: 0 4px 12px -2px rgba(227, 30, 36, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #E31E24 !important;
+  transition: transform 250ms ease, box-shadow 250ms ease;
+}
+.donate-modal-icon-heart svg {
+  width: 20px !important;
+  height: 20px !important;
+  fill: #E31E24 !important;
+  fill-opacity: 0.15 !important;
+  stroke: #E31E24 !important;
+  stroke-width: 2 !important;
+  filter: drop-shadow(0 1px 2px rgba(227, 30, 36, 0.2));
+}
+.donate-modal-icon-heart:hover {
+  transform: scale(1.06);
+  box-shadow: 0 6px 16px -2px rgba(227, 30, 36, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
 .donate-modal-title { font-size: 1.0625rem; font-weight: 700; color: var(--c-blue); letter-spacing: -0.01em; }
 .donate-modal-close {
   width: 36px;
