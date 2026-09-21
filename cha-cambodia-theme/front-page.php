@@ -195,13 +195,44 @@
     </div></section>
 
     <!-- ===== YOUR IMPACT ===== -->
-    <div class="section"><div class="container">
-      <div class="section-heading" data-reveal><h2 data-i18n="impact_heading"><?php echo esc_html(cha_get_option('impact_heading', 'Your Impact')); ?></h2></div>
+    <div class="section impact-section"><div class="container">
+      <div class="section-heading text-center" data-reveal>
+        <span class="section-eyebrow" data-i18n="impact_eyebrow" style="color:var(--c-blue);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;font-size:0.8125rem;display:inline-block;margin-bottom:8px;">How Donations Help</span>
+        <h2 data-i18n="impact_heading"><?php echo esc_html(cha_get_option('impact_heading', 'Your Impact')); ?></h2>
+      </div>
       <div class="impact-grid">
-        <div class="impact-card" data-reveal><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><p data-i18n="impact_treatment"><?php echo esc_html(cha_get_option('impact_1', 'Provide treatment access for patients')); ?></p></div>
-        <div class="impact-card" data-reveal><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div><p data-i18n="impact_education"><?php echo esc_html(cha_get_option('impact_2', 'Support education and awareness')); ?></p></div>
-        <div class="impact-card" data-reveal><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><p data-i18n="impact_healthcare"><?php echo esc_html(cha_get_option('impact_3', 'Strengthen healthcare capacity')); ?></p></div>
-        <div class="impact-card" data-reveal><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><p data-i18n="impact_families"><?php echo esc_html(cha_get_option('impact_4', 'Empower families and communities')); ?></p></div>
+        <div class="impact-card impact-card-blue" data-reveal>
+          <div class="impact-card-top-bar"></div>
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <h3 class="impact-title" data-i18n="impact_t1_title">Treatment Access</h3>
+          <p data-i18n="impact_treatment"><?php echo esc_html(cha_get_option('impact_1', 'Provide treatment access for patients')); ?></p>
+        </div>
+        <div class="impact-card impact-card-red" data-reveal>
+          <div class="impact-card-top-bar"></div>
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <h3 class="impact-title" data-i18n="impact_t2_title">Education & Care</h3>
+          <p data-i18n="impact_education"><?php echo esc_html(cha_get_option('impact_2', 'Support education and awareness')); ?></p>
+        </div>
+        <div class="impact-card impact-card-purple" data-reveal>
+          <div class="impact-card-top-bar"></div>
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <h3 class="impact-title" data-i18n="impact_t3_title">Healthcare Capacity</h3>
+          <p data-i18n="impact_healthcare"><?php echo esc_html(cha_get_option('impact_3', 'Strengthen healthcare capacity')); ?></p>
+        </div>
+        <div class="impact-card impact-card-amber" data-reveal>
+          <div class="impact-card-top-bar"></div>
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3 class="impact-title" data-i18n="impact_t4_title">Community & Families</h3>
+          <p data-i18n="impact_families"><?php echo esc_html(cha_get_option('impact_4', 'Empower families and communities')); ?></p>
+        </div>
       </div>
     </div></div>
 

@@ -1725,9 +1725,14 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       csr_become_partner: "Become a partner",
       /* Impact */
       impact_heading: "Your Impact",
+      impact_eyebrow: "How Donations Help",
+      impact_t1_title: "Treatment Access",
       impact_treatment: "Provide treatment access for patients",
+      impact_t2_title: "Education & Care",
       impact_education: "Support education and awareness",
+      impact_t3_title: "Healthcare Capacity",
       impact_healthcare: "Strengthen healthcare capacity",
+      impact_t4_title: "Community & Families",
       impact_families: "Empower families and communities",
       /* Membership */
       tab_membership: "Membership",
@@ -2418,9 +2423,14 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       csr_become_partner: "ក្លាយជាដៃគូ",
       /* Impact */
       impact_heading: "ផលប៉ះពាល់របស់អ្នក",
+      impact_eyebrow: "ការចូលរួមចំណែករបស់អ្នកជួយដល់",
+      impact_t1_title: "ការទទួលបានការព្យាបាល",
       impact_treatment: "ផ្តល់ការចូលប្រើប្រាស់ការព្យាបាលដល់អ្នកជំងឺ",
+      impact_t2_title: "ការអប់រំ និងការថែទាំ",
       impact_education: "គាំទ្រការអប់រំ និងការដឹងគុណ",
+      impact_t3_title: "សមត្ថភាពថែទាំសុខភាព",
       impact_healthcare: "ពង្រឹងសមត្ថភាពថែទាំសុខភាព",
+      impact_t4_title: "សហគមន៍ និងក្រុមគ្រួសារ",
       impact_families: "ផ្តល់សមត្ថភាពដល់គ្រួសារ និងសហគមន៍",
       /* Membership */
       tab_membership: "សមាជិកភាព",
