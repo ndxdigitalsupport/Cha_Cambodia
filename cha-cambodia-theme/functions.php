@@ -201,7 +201,7 @@ function cha_register_news_cpt() {
 }
 add_action('init', 'cha_register_news_cpt');
 
-define('CHA_CPT_VERSION', '1.4');
+define('CHA_CPT_VERSION', '1.5');
 
 function cha_flush_rewrite_on_upgrade() {
     $stored = get_option('cha_cpt_version', '0');
@@ -209,6 +209,21 @@ function cha_flush_rewrite_on_upgrade() {
         cha_register_news_cpt();
         cha_register_campaigns_cpt();
         flush_rewrite_rules();
+
+        // Reset any stale 404 upload URLs for leadership portraits so theme defaults apply
+        $mod_keys = array(
+            'leader_advisor_1_img', 'leader_advisor_2_img', 'leader_advisor_3_img',
+            'leader_1_img', 'leader_2_img', 'leader_3_img', 'leader_4_img',
+            'council_dept_1_img', 'council_dept_2_img', 'council_dept_3_img', 'council_dept_5_img',
+            'about_team_img', 'history_2011_img', 'history_2014_img', 'history_2017_img', 'history_2023_img'
+        );
+        foreach ($mod_keys as $k) {
+            $val = get_theme_mod($k, '');
+            if (!empty($val) && strpos($val, '/wp-content/uploads/') !== false) {
+                remove_theme_mod($k);
+            }
+        }
+
         update_option('cha_cpt_version', CHA_CPT_VERSION);
     }
 }
