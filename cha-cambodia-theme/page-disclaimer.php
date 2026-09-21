@@ -22,7 +22,7 @@ get_header(); ?>
     </div>
 
     <!-- ================= ENGLISH ================= -->
-    <section class="legal-section" data-reveal>
+    <section class="legal-section lang-en" data-reveal>
       <h2>1. Medical information</h2>
       <p>The health and medical information on this website and in the CHA mobile app is provided for general educational and support purposes only. It is <strong>not a substitute for professional medical advice, diagnosis, or treatment</strong>.</p>
       <p>Always seek the advice of a qualified healthcare provider with any questions you may have regarding a medical condition. Never disregard professional medical advice or delay in seeking it because of something you have read on this website or in the app.</p>

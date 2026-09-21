@@ -22,7 +22,7 @@ get_header(); ?>
     </div>
 
     <!-- ================= ENGLISH ================= -->
-    <section class="legal-section" data-reveal>
+    <section class="legal-section lang-en" data-reveal>
       <h2>1. Acceptance of terms</h2>
       <p>By creating an account, downloading the CHA mobile app, using our website, or making a donation, you agree to be bound by these Terms of Service. If you do not agree, please do not use our services.</p>
 

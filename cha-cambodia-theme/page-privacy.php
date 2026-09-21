@@ -22,7 +22,7 @@ get_header(); ?>
     </div>
 
     <!-- ================= ENGLISH ================= -->
-    <section class="legal-section" data-reveal>
+    <section class="legal-section lang-en" data-reveal>
       <h2>1. Who we are</h2>
       <p>The Cambodian Haemophilia Association (CHA) is a patient-led, non-profit organisation supporting people with bleeding disorders across Cambodia. Our registered office is at #100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia. Throughout this policy, "we", "us", and "our" refer to CHA. You can contact us at <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a>.</p>
 
