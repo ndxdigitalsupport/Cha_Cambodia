@@ -49,6 +49,7 @@ gen_docx.py
 read_docx.py
 *.png
 !images/logo icon CHA.png
+!cha-cambodia-theme/*.png
 
 # Expo / React Native (app)
 app/node_modules/
