@@ -1148,10 +1148,12 @@ function cha_rest_payway_purchase($request) {
     if (!empty($fields['view_type'])) $post_fields['view_type'] = $fields['view_type'];
     if (isset($fields['payment_gate'])) $post_fields['payment_gate'] = $fields['payment_gate'];
 
+    $donor_full_name = trim(($params['firstname'] ?? '') . ' ' . ($params['lastname'] ?? ''));
+
     $wpdb->insert($table, array(
         'tran_id'       => $tran_id,
         'member_id'     => '',
-        'name'          => trim($firstname . ' ' . $lastname),
+        'name'          => $donor_full_name,
         'email'         => $email,
         'phone'         => $phone,
         'amount'        => $amount,
@@ -3005,6 +3007,9 @@ function cha_render_donations_page() {
         }
     }
 
+    // Clean legacy 'Friend' placeholder from older test records
+    $wpdb->query("UPDATE $don_table SET name = '' WHERE name = 'Friend'");
+
     $per_page = 10;
     $current_page = max(1, intval($_GET['don_page'] ?? 1));
     $total_rows = $wpdb->get_var("SELECT COUNT(*) FROM $don_table");
@@ -3164,97 +3169,72 @@ function cha_render_donations_page() {
             color: #0B1D6D !important;
         }
 
-        /* 4 Modern Executive Fintech KPI Cards */
+        /* 4 Compact Modern KPI Cards */
         .cha-fintech-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 26px;
+            gap: 14px;
+            margin-bottom: 22px;
         }
 
         .cha-fintech-stat-card {
             background: #ffffff;
-            border-radius: 20px;
-            padding: 24px 26px;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
+            border-radius: 14px;
+            padding: 16px 18px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
             position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 142px;
-            box-sizing: border-box;
-            transition: all 0.26s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .cha-fintech-stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.04);
-            border-color: rgba(203, 213, 225, 0.9);
-        }
-
-        /* Ambient background glow inside cards */
-        .cha-fintech-stat-card::before {
-            content: '';
-            position: absolute;
-            top: -40px;
-            right: -40px;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 0.65;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        .cha-fintech-stat-card:hover::before {
-            opacity: 1;
-            transform: scale(1.15);
-        }
-
-        .stat-green::before  { background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, transparent 70%); }
-        .stat-blue::before   { background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, transparent 70%); }
-        .stat-amber::before  { background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%); }
-        .stat-purple::before { background: radial-gradient(circle, rgba(106, 44, 145, 0.18) 0%, transparent 70%); }
-
-        /* Left Accent Indicator Bar */
-        .cha-fintech-stat-card::after {
-            content: '';
-            position: absolute;
-            top: 18px;
-            bottom: 18px;
-            left: 0;
-            width: 4px;
-            border-radius: 0 4px 4px 0;
-        }
-
-        .stat-green::after  { background: linear-gradient(180deg, #10b981, #059669); }
-        .stat-blue::after   { background: linear-gradient(180deg, #3b82f6, #1d4ed8); }
-        .stat-amber::after  { background: linear-gradient(180deg, #f59e0b, #d97706); }
-        .stat-purple::after { background: linear-gradient(180deg, #a855f7, #6A2C91); }
-
-        .cha-fintech-stat-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
+            gap: 12px;
+            box-sizing: border-box;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .cha-fintech-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.08);
+            border-color: #cbd5e1;
+        }
+
+        .cha-fintech-stat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
         .cha-fintech-stat-title {
-            font-size: 0.775rem;
+            font-size: 0.72rem;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.05em;
+            line-height: 1;
+        }
+
+        .cha-fintech-stat-value {
+            font-size: 1.55rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.025em;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin: 2px 0;
+        }
+
+        .cha-fintech-stat-sub {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: #94a3b8;
+            line-height: 1;
         }
 
         .cha-fintech-stat-badge {
-            width: 46px;
-            height: 46px;
-            border-radius: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -3263,73 +3243,32 @@ function cha_render_donations_page() {
         }
 
         .cha-fintech-stat-card:hover .cha-fintech-stat-badge {
-            transform: scale(1.06);
+            transform: scale(1.05);
         }
 
         .stat-green .cha-fintech-stat-badge {
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            background: #ecfdf5;
             color: #059669;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+            border: 1px solid #d1fae5;
         }
 
         .stat-blue .cha-fintech-stat-badge {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            color: #1d4ed8;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #dbeafe;
         }
 
         .stat-amber .cha-fintech-stat-badge {
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            background: #fffbeb;
             color: #d97706;
-            border: 1px solid rgba(245, 158, 11, 0.22);
-            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+            border: 1px solid #fef3c7;
         }
 
         .stat-purple .cha-fintech-stat-badge {
-            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-            color: #6A2C91;
-            border: 1px solid rgba(106, 44, 145, 0.22);
-            box-shadow: 0 4px 12px rgba(106, 44, 145, 0.15);
+            background: #faf5ff;
+            color: #7c3aed;
+            border: 1px solid #f3e8ff;
         }
-
-        .cha-fintech-stat-body {
-            position: relative;
-            z-index: 1;
-        }
-
-        .cha-fintech-stat-value {
-            font-size: 2.15rem;
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -0.035em;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-        }
-
-        .cha-fintech-stat-sub {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .cha-fintech-stat-sub-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .stat-green .cha-fintech-stat-sub-dot { background: #10b981; }
-        .stat-blue .cha-fintech-stat-sub-dot  { background: #3b82f6; }
-        .stat-amber .cha-fintech-stat-sub-dot { background: #f59e0b; }
-        .stat-purple .cha-fintech-stat-sub-dot{ background: #a855f7; }
 
         /* PayWay Settings Slide-Down Panel */
         .cha-don-settings {
@@ -3840,95 +3779,71 @@ function cha_render_donations_page() {
             </div>
         </div>
 
-        <!-- 4 Executive KPI Stat Cards -->
+        <!-- 4 Compact Modern KPI Cards -->
         <div class="cha-fintech-stats">
             <div class="cha-fintech-stat-card stat-green">
-                <div class="cha-fintech-stat-top">
+                <div class="cha-fintech-stat-info">
                     <span class="cha-fintech-stat-title">Total Raised</span>
-                    <div class="cha-fintech-stat-badge">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="1" x2="12" y2="23"/>
-                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="cha-fintech-stat-body">
                     <div class="cha-fintech-stat-value" style="color:#059669;">
                         <span>$<?php echo esc_html(number_format((float) $totals->completed_sum, 2)); ?></span>
-                        <span style="font-size:0.75rem;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:0.04em;">USD</span>
                     </div>
-                    <div class="cha-fintech-stat-sub">
-                        <span class="cha-fintech-stat-sub-dot"></span>
-                        <span>Cleared funds in ABA PayWay</span>
-                    </div>
+                    <div class="cha-fintech-stat-sub">Cleared funds in USD</div>
+                </div>
+                <div class="cha-fintech-stat-badge">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="1" x2="12" y2="23"/>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
                 </div>
             </div>
 
             <div class="cha-fintech-stat-card stat-blue">
-                <div class="cha-fintech-stat-top">
+                <div class="cha-fintech-stat-info">
                     <span class="cha-fintech-stat-title">Completed Orders</span>
-                    <div class="cha-fintech-stat-badge">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22 4 12 14.01 9 11.01"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="cha-fintech-stat-body">
-                    <div class="cha-fintech-stat-value" style="color:#1d4ed8;">
+                    <div class="cha-fintech-stat-value" style="color:#2563eb;">
                         <span><?php echo (int) $totals->completed_count; ?></span>
-                        <span style="font-size:0.75rem;font-weight:600;color:#60a5fa;">txns</span>
                     </div>
-                    <div class="cha-fintech-stat-sub">
-                        <span class="cha-fintech-stat-sub-dot"></span>
-                        <span>Successfully cleared</span>
-                    </div>
+                    <div class="cha-fintech-stat-sub">Successful checkouts</div>
+                </div>
+                <div class="cha-fintech-stat-badge">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
                 </div>
             </div>
 
             <div class="cha-fintech-stat-card stat-amber">
-                <div class="cha-fintech-stat-top">
+                <div class="cha-fintech-stat-info">
                     <span class="cha-fintech-stat-title">Pending / In-Flight</span>
-                    <div class="cha-fintech-stat-badge">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="cha-fintech-stat-body">
                     <div class="cha-fintech-stat-value" style="color:#d97706;">
                         <span><?php echo (int) $totals->pending_count; ?></span>
-                        <span style="font-size:0.75rem;font-weight:600;color:#fbbf24;">active</span>
                     </div>
-                    <div class="cha-fintech-stat-sub">
-                        <span class="cha-fintech-stat-sub-dot"></span>
-                        <span>Auto-purges after 12 hours</span>
-                    </div>
+                    <div class="cha-fintech-stat-sub">Expires after 12h</div>
+                </div>
+                <div class="cha-fintech-stat-badge">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
                 </div>
             </div>
 
             <div class="cha-fintech-stat-card stat-purple">
-                <div class="cha-fintech-stat-top">
+                <div class="cha-fintech-stat-info">
                     <span class="cha-fintech-stat-title">Total Donors</span>
-                    <div class="cha-fintech-stat-badge">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="cha-fintech-stat-body">
-                    <div class="cha-fintech-stat-value" style="color:#6A2C91;">
+                    <div class="cha-fintech-stat-value" style="color:#7c3aed;">
                         <span><?php echo (int) $totals->total; ?></span>
-                        <span style="font-size:0.75rem;font-weight:600;color:#c084fc;">patrons</span>
                     </div>
-                    <div class="cha-fintech-stat-sub">
-                        <span class="cha-fintech-stat-sub-dot"></span>
-                        <span>Lifetime supporters</span>
-                    </div>
+                    <div class="cha-fintech-stat-sub">Lifetime records</div>
+                </div>
+                <div class="cha-fintech-stat-badge">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
                 </div>
             </div>
         </div>
