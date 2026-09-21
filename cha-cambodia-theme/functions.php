@@ -623,15 +623,20 @@ function cha_member_count() {
     return (int) $wpdb->get_var("SELECT COUNT(*) FROM " . cha_get_members_table());
 }
 
-function cha_get_members_page($page = 1, $per_page = 20, $role_filter = '') {
+function cha_get_members_page($page = 1, $per_page = 20, $role_filter = '', $status_filter = '') {
     global $wpdb;
     cha_ensure_members_table();
     $table = cha_get_members_table();
-    $where = '';
+    $where_clauses = array();
     $valid_roles = array('Patient', 'Family member / Caregiver', 'Healthcare professional', 'Member');
     if ($role_filter && in_array($role_filter, $valid_roles)) {
-        $where = $wpdb->prepare(" WHERE role = %s", $role_filter);
+        $where_clauses[] = $wpdb->prepare("role = %s", $role_filter);
     }
+    $valid_statuses = array('pending', 'active');
+    if ($status_filter && in_array($status_filter, $valid_statuses)) {
+        $where_clauses[] = $wpdb->prepare("status = %s", $status_filter);
+    }
+    $where = !empty($where_clauses) ? " WHERE " . implode(" AND ", $where_clauses) : "";
     $offset = max(0, ($page - 1) * $per_page);
     $total = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table" . $where);
     $rows = $wpdb->get_results($wpdb->prepare(
@@ -1912,8 +1917,24 @@ add_action('wp_ajax_cha_view_smtp_log', function() {
 
 function cha_render_admin_page() {
     global $wpdb;
-    $table = cha_get_members_table();
-    cha_ensure_members_table();
+    // Handle SMTP settings save
+    if (isset($_POST['cha_update_smtp']) && current_user_can('manage_options')) {
+        if (!isset($_POST['cha_smtp_nonce']) || !wp_verify_nonce($_POST['cha_smtp_nonce'], 'cha_save_smtp')) {
+            wp_die('Security check failed.');
+        }
+        update_option('cha_smtp_settings', array(
+            'host'                 => sanitize_text_field($_POST['smtp_host'] ?? ''),
+            'port'                 => intval($_POST['smtp_port'] ?? 587),
+            'username'             => sanitize_text_field($_POST['smtp_user'] ?? ''),
+            'password'             => sanitize_text_field($_POST['smtp_pass'] ?? ''),
+            'from_email'           => sanitize_email($_POST['smtp_from'] ?? ''),
+            'from_name'            => sanitize_text_field($_POST['smtp_from_name'] ?? ''),
+            'enabled'              => isset($_POST['smtp_enabled']),
+            'admin_notify_enabled' => isset($_POST['admin_notify_enabled']),
+            'admin_notify_email'   => sanitize_text_field($_POST['admin_notify_email'] ?? ''),
+        ));
+        echo '<div class="cha-notice cha-notice-success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> SMTP configuration saved successfully.</div>';
+    }
 
     // Handle update form submission
     if (isset($_POST['cha_update_member']) && current_user_can('manage_options')) {
@@ -2027,9 +2048,10 @@ function cha_render_admin_page() {
     }
 
     $active_filter = isset($_GET['role_filter']) ? sanitize_text_field($_GET['role_filter']) : '';
+    $active_status = isset($_GET['status_filter']) ? sanitize_text_field($_GET['status_filter']) : '';
     $current_page = isset($_GET['paged']) ? max(1, (int) $_GET['paged']) : 1;
     $per_page = 20;
-    $paged_data = cha_get_members_page($current_page, $per_page, $active_filter);
+    $paged_data = cha_get_members_page($current_page, $per_page, $active_filter, $active_status);
     $rows = $paged_data['rows'];
     $total_members = $paged_data['total'];
     $total_pages = $paged_data['pages'];
@@ -2204,22 +2226,42 @@ function cha_render_admin_page() {
     .cha-notice-error { background:#FEF2F2; color:#991B1B; border:1px solid #FECACA; }
     .cha-notice svg { flex-shrink:0; }
 
-    /* SMTP Settings Sections */
-    .cha-smtp-section { padding:16px 20px; border-radius:12px; margin-bottom:12px; }
-    .cha-smtp-section:last-of-type { margin-bottom:0; }
-    .cha-smtp-blue { background:#f0f7ff; }
-    .cha-smtp-white { background:#fff; }
-    .cha-smtp-gold { background:#fff9eb; }
-    .cha-smtp-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-    .cha-smtp-label { font-size:0.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--cha-blue); }
-    .cha-smtp-toggle { display:flex; align-items:center; gap:10px; cursor:pointer; }
-    .cha-smtp-toggle-track { display:inline-block; width:40px; height:22px; border-radius:22px; background:#D1D5DB; position:relative; transition:background 0.2s ease; flex-shrink:0; }
-    .cha-smtp-toggle-track::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; transition:transform 0.2s ease; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+    /* SMTP Settings Modern Styles */
+    .cha-smtp-card { background:#fff; border:1px solid #E2E8F0; border-radius:20px; padding:32px 36px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.04), 0 8px 10px -6px rgba(0,0,0,0.02); }
+    @media (max-width:768px) { .cha-smtp-card { padding:24px 20px; } }
+    .cha-smtp-hero { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid #F1F5F9; flex-wrap:wrap; }
+    .cha-smtp-hero-left { display:flex; align-items:center; gap:14px; }
+    .cha-smtp-brand-icon { width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg, #0B1D6D 0%, #1e3a8a 100%); display:flex; align-items:center; justify-content:center; color:#fff; box-shadow:0 4px 12px rgba(11,29,109,0.2); flex-shrink:0; }
+    .cha-smtp-brand-icon svg { width:24px; height:24px; }
+    .cha-smtp-hero-title { font-size:1.375rem; font-weight:800; color:var(--cha-blue); margin:0 0 4px; letter-spacing:-0.01em; display:flex; align-items:center; gap:10px; }
+    .cha-smtp-hero-sub { font-size:0.8125rem; color:#64748B; margin:0; }
+    .cha-smtp-status-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:999px; font-size:0.75rem; font-weight:700; }
+    .cha-smtp-status-badge.is-active { background:#ECFDF5; color:#15803D; border:1px solid #BBF7D0; }
+    .cha-smtp-status-badge.is-inactive { background:#F3F4F6; color:#6B7280; border:1px solid #E5E7EB; }
+    .cha-smtp-status-badge::before { content:''; width:7px; height:7px; border-radius:50%; }
+    .cha-smtp-status-badge.is-active::before { background:#16A34A; box-shadow:0 0 0 3px rgba(22,163,74,0.2); }
+    .cha-smtp-status-badge.is-inactive::before { background:#9CA3AF; }
+
+    .cha-smtp-group { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:14px; padding:20px 22px; margin-bottom:18px; transition:border-color 0.2s ease; }
+    .cha-smtp-group:hover { border-color:#CBD5E1; }
+    .cha-smtp-group-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #EDF2F7; }
+    .cha-smtp-group-title { display:flex; align-items:center; gap:8px; font-size:0.8125rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--cha-blue); margin:0; }
+    .cha-smtp-group-icon { width:24px; height:24px; border-radius:6px; background:rgba(11,29,109,0.08); color:var(--cha-blue); display:flex; align-items:center; justify-content:center; }
+    .cha-smtp-group-icon svg { width:13px; height:13px; }
+
+    .cha-smtp-toggle { display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
+    .cha-smtp-toggle-track { display:inline-block; width:42px; height:24px; border-radius:24px; background:#CBD5E1; position:relative; transition:background 0.2s cubic-bezier(0.16,1,0.3,1); flex-shrink:0; }
+    .cha-smtp-toggle-track::after { content:""; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform 0.2s cubic-bezier(0.16,1,0.3,1); box-shadow:0 2px 4px rgba(0,0,0,0.15); }
     .cha-smtp-toggle input[type="checkbox"] { display:none !important; }
     .cha-smtp-toggle input[type="checkbox"]:checked + .cha-smtp-toggle-track { background:#166534; }
     .cha-smtp-toggle input[type="checkbox"]:checked + .cha-smtp-toggle-track::after { transform:translateX(18px); }
-    .cha-smtp-toggle-text { font-size:0.75rem; font-weight:600; color:#374151; }
-    .cha-smtp-footer { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 0; border-top:1px solid var(--cha-border); margin-top:16px; }
+    .cha-smtp-toggle-text { font-size:0.8125rem; font-weight:600; color:#334155; }
+
+    .cha-smtp-footer { display:flex; align-items:center; justify-content:space-between; padding-top:20px; border-top:1px solid #F1F5F9; margin-top:24px; flex-wrap:wrap; gap:12px; }
+    .cha-smtp-log-btn { display:inline-flex; align-items:center; gap:6px; background:#F1F5F9; color:#475569; border:1px solid #E2E8F0; border-radius:9px; padding:9px 14px; font-size:0.8125rem; font-weight:600; cursor:pointer; transition:all 0.15s ease; text-decoration:none; }
+    .cha-smtp-log-btn:hover { background:#E2E8F0; color:#0F172A; }
+    .cha-smtp-save-btn { display:inline-flex; align-items:center; gap:8px; padding:11px 26px; border-radius:10px; font-size:0.875rem; font-weight:700; color:#fff !important; background:linear-gradient(135deg,#166534 0%,#15803D 100%) !important; border:none !important; cursor:pointer; transition:all 0.2s ease; box-shadow:0 4px 12px rgba(22,101,52,0.25); text-decoration:none; }
+    .cha-smtp-save-btn:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(22,101,52,0.35); filter:brightness(1.05); }
 
     /* Action buttons as pills */
     .cha-action-btn { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:999px; font-size:0.75rem; font-weight:700; text-decoration:none; transition:all .15s ease; border:none; cursor:pointer; }
@@ -2320,63 +2362,129 @@ function cha_render_admin_page() {
 
         <?php if (isset($_GET['smtp'])): ?>
             <?php $smtp = cha_get_smtp_settings(); ?>
-            <div class="cha-edit-wrap" style="max-width:700px;">
-                <div class="cha-edit-card">
-                    <h2>SMTP Email Settings (Brevo)</h2>
-                    <p class="cha-edit-sub">Configure outgoing email for verification emails and notifications.</p>
+            <div class="cha-edit-wrap" style="max-width:740px;">
+                <div class="cha-smtp-card">
+                    <div class="cha-smtp-hero">
+                        <div class="cha-smtp-hero-left">
+                            <div class="cha-smtp-brand-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            </div>
+                            <div>
+                                <h2 class="cha-smtp-hero-title">
+                                    SMTP Email Settings
+                                    <span style="font-size:0.75rem;font-weight:700;padding:2px 8px;border-radius:6px;background:#EFF6FF;color:var(--cha-blue);letter-spacing:0.02em;">Brevo Relay</span>
+                                </h2>
+                                <p class="cha-smtp-hero-sub">Manage transactional email delivery for member verification and admin alerts.</p>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="cha-smtp-status-badge <?php echo !empty($smtp['enabled']) ? 'is-active' : 'is-inactive'; ?>">
+                                <?php echo !empty($smtp['enabled']) ? 'SMTP Active' : 'SMTP Disabled'; ?>
+                            </span>
+                        </div>
+                    </div>
+
                     <form method="post" action="admin.php?page=cha-members&smtp=1">
                         <?php wp_nonce_field('cha_save_smtp', 'cha_smtp_nonce'); ?>
 
-                        <div class="cha-smtp-section cha-smtp-blue">
-                            <div class="cha-smtp-header">
-                                <span class="cha-smtp-label">SMTP Connection</span>
+                        <!-- Section 1: Server Connection -->
+                        <div class="cha-smtp-group">
+                            <div class="cha-smtp-group-header">
+                                <h3 class="cha-smtp-group-title">
+                                    <span class="cha-smtp-group-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                                    </span>
+                                    Server Connection
+                                </h3>
                                 <label class="cha-smtp-toggle">
                                     <input type="checkbox" name="smtp_enabled" value="1" <?php checked($smtp['enabled']); ?>>
                                     <span class="cha-smtp-toggle-track"></span>
-                                    <span class="cha-smtp-toggle-text">Enable</span>
+                                    <span class="cha-smtp-toggle-text">Enable Outgoing SMTP</span>
                                 </label>
                             </div>
-                            <div class="cha-edit-grid">
-                                <div class="cha-edit-field"><label>SMTP Host</label><input type="text" name="smtp_host" value="<?php echo esc_attr($smtp['host']); ?>"></div>
-                                <div class="cha-edit-field"><label>Port</label><input type="number" name="smtp_port" value="<?php echo esc_attr($smtp['port']); ?>"></div>
-                                <div class="cha-edit-field"><label>Username</label><input type="text" name="smtp_user" value="<?php echo esc_attr($smtp['username']); ?>"></div>
-                                <div class="cha-edit-field"><label>Password / API Key</label><div style="position:relative;"><input type="password" name="smtp_pass" id="smtp_pass" value="<?php echo esc_attr($smtp['password']); ?>" style="padding-right:36px;width:100%;box-sizing:border-box;"><button type="button" onclick="var p=document.getElementById('smtp_pass');p.type=p.type==='password'?'text':'password';this.innerHTML=p.type==='password'?'<svg width=16 height=16 viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#64748b\' stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d=\'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\'/><circle cx=\'12\' cy=\'12\' r=\'3\'/></svg>':'<svg width=16 height=16 viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#64748b\' stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d=\'M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24\'/><line x1=\'1\' y1=\'1\' x2=\'23\' y2=\'23\'/></svg>';this.blur();" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+                            <div class="cha-edit-grid-2">
+                                <div class="cha-edit-field">
+                                    <label>SMTP Host <span class="field-hint">e.g. smtp-relay.brevo.com</span></label>
+                                    <input type="text" name="smtp_host" value="<?php echo esc_attr($smtp['host']); ?>" placeholder="smtp-relay.brevo.com" required>
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label>Port <span class="field-hint">TLS: 587 or 465</span></label>
+                                    <input type="number" name="smtp_port" value="<?php echo esc_attr($smtp['port']); ?>" placeholder="587" required>
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label>SMTP Username / Login</label>
+                                    <input type="text" name="smtp_user" value="<?php echo esc_attr($smtp['username']); ?>" placeholder="Brevo login or SMTP user" required>
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label>Password / Master API Key</label>
+                                    <div style="position:relative;">
+                                        <input type="password" name="smtp_pass" id="smtp_pass" value="<?php echo esc_attr($smtp['password']); ?>" style="padding-right:40px;" placeholder="Brevo SMTP key">
+                                        <button type="button" onclick="var p=document.getElementById('smtp_pass');p.type=p.type==='password'?'text':'password';this.innerHTML=p.type==='password'?'<svg width=16 height=16 viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#64748b\' stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d=\'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\'/><circle cx=\'12\' cy=\'12\' r=\'3\'/></svg>':'<svg width=16 height=16 viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#64748b\' stroke-width=2 stroke-linecap=round stroke-linejoin=round><path d=\'M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24\'/><line x1=\'1\' y1=\'1\' x2=\'23\' y2=\'23\'/></svg>';this.blur();" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;color:#64748B;" title="Toggle visibility">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="cha-smtp-section cha-smtp-white">
-                            <div class="cha-smtp-header">
-                                <span class="cha-smtp-label">Email Settings</span>
+                        <!-- Section 2: Sender Identity -->
+                        <div class="cha-smtp-group">
+                            <div class="cha-smtp-group-header">
+                                <h3 class="cha-smtp-group-title">
+                                    <span class="cha-smtp-group-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    Sender Identity
+                                </h3>
                             </div>
-                            <div class="cha-edit-grid">
-                                <div class="cha-edit-field"><label>From Email</label><input type="email" name="smtp_from" value="<?php echo esc_attr($smtp['from_email']); ?>"></div>
-                                <div class="cha-edit-field"><label>From Name</label><input type="text" name="smtp_from_name" value="<?php echo esc_attr($smtp['from_name']); ?>"></div>
+                            <div class="cha-edit-grid-2">
+                                <div class="cha-edit-field">
+                                    <label>From Email Address <span class="field-hint">Authorized Brevo sender</span></label>
+                                    <input type="email" name="smtp_from" value="<?php echo esc_attr($smtp['from_email']); ?>" placeholder="noreply@chacambodia.org" required>
+                                </div>
+                                <div class="cha-edit-field">
+                                    <label>From Name <span class="field-hint">Displayed in inbox</span></label>
+                                    <input type="text" name="smtp_from_name" value="<?php echo esc_attr($smtp['from_name']); ?>" placeholder="CHA Cambodia" required>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="cha-smtp-section cha-smtp-gold">
-                            <div class="cha-smtp-header">
-                                <span class="cha-smtp-label">Notifications</span>
+                        <!-- Section 3: Admin Notifications -->
+                        <div class="cha-smtp-group">
+                            <div class="cha-smtp-group-header">
+                                <h3 class="cha-smtp-group-title">
+                                    <span class="cha-smtp-group-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                                    </span>
+                                    Admin Notifications
+                                </h3>
+                                <label class="cha-smtp-toggle">
+                                    <input type="checkbox" name="admin_notify_enabled" value="1" <?php checked($smtp['admin_notify_enabled']); ?>>
+                                    <span class="cha-smtp-toggle-track"></span>
+                                    <span class="cha-smtp-toggle-text">Notify Admin on Registration</span>
+                                </label>
                             </div>
-                            <div class="cha-edit-field" style="margin-bottom:12px;">
-                                <label>Admin Notification Email</label>
-                                <input type="text" name="admin_notify_email" value="<?php echo esc_attr($smtp['admin_notify_email']); ?>" placeholder="Leave blank to use WordPress admin email">
+                            <div class="cha-edit-field">
+                                <label>Recipient Email Address <span class="field-hint">Leave blank to use WordPress default admin email</span></label>
+                                <input type="email" name="admin_notify_email" value="<?php echo esc_attr($smtp['admin_notify_email']); ?>" placeholder="<?php echo esc_attr(get_option('admin_email')); ?>">
                             </div>
-                            <label class="cha-smtp-toggle">
-                                <input type="checkbox" name="admin_notify_enabled" value="1" <?php checked($smtp['admin_notify_enabled']); ?>>
-                                <span class="cha-smtp-toggle-track"></span>
-                                <span class="cha-smtp-toggle-text">Send email on new member registration</span>
-                            </label>
                         </div>
 
+                        <!-- Footer Actions -->
                         <div class="cha-smtp-footer">
-                            <button type="button" id="cha-view-log-btn" style="background:none;border:none;color:#64748b;font-size:0.8125rem;font-weight:600;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px;">
-                                View Debug Log
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            <button type="button" id="cha-view-log-btn" class="cha-smtp-log-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                View SMTP Debug Log
                             </button>
                             <div style="display:flex;align-items:center;gap:12px;">
-                                <button type="submit" name="cha_update_smtp" class="cha-btn" style="background:#166534;color:#fff;">Save Settings</button>
-                                <a href="admin.php?page=cha-members" class="cha-back-link" style="font-size:0.8125rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back</a>
+                                <a href="<?php echo admin_url('admin.php?page=cha-members'); ?>" class="cha-btn-back-clean">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                                    Back to Members
+                                </a>
+                                <button type="submit" name="cha_update_smtp" class="cha-smtp-save-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Save Settings
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -2389,25 +2497,6 @@ function cha_render_admin_page() {
             });
             </script>
         <?php endif; ?>
-
-        <?php if (isset($_POST['cha_update_smtp']) && current_user_can('manage_options')):
-            if (!isset($_POST['cha_smtp_nonce']) || !wp_verify_nonce($_POST['cha_smtp_nonce'], 'cha_save_smtp')) {
-                wp_die('Security check failed.');
-            }
-            update_option('cha_smtp_settings', array(
-                'host'      => sanitize_text_field($_POST['smtp_host']),
-                'port'      => intval($_POST['smtp_port']),
-                'username'  => sanitize_text_field($_POST['smtp_user']),
-                'password'  => sanitize_text_field($_POST['smtp_pass']),
-                'from_email'=> sanitize_email($_POST['smtp_from']),
-                'from_name' => sanitize_text_field($_POST['smtp_from_name']),
-                'enabled'   => isset($_POST['smtp_enabled']),
-                'admin_notify_enabled' => isset($_POST['admin_notify_enabled']),
-                'admin_notify_email'   => sanitize_text_field($_POST['admin_notify_email'] ?? ''),
-            ));
-            echo '<div class="updated"><p>SMTP settings saved.</p></div>';
-            $smtp = cha_get_smtp_settings();
-        endif; ?>
 
         <?php if ($editing && $edit_member): ?>
             <div class="cha-edit-wrap">
@@ -2722,15 +2811,18 @@ function cha_render_admin_page() {
             </div>
         <?php else: ?>
             <div class="cha-tabs">
-                <a href="admin.php?page=cha-members" class="cha-tab <?php echo $active_filter === '' ? 'cha-active' : ''; ?>">
+                <a href="<?php echo admin_url('admin.php?page=cha-members'); ?>" class="cha-tab <?php echo ($active_filter === '' && $active_status === '') ? 'cha-active' : ''; ?>">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     All Members <span class="cha-tab-count"><?php echo $count; ?></span>
-                    <?php
-                    $pending_count = $wpdb->get_var("SELECT COUNT(*) FROM $table WHERE status = 'pending'");
-                    if ($pending_count > 0): ?>
-                        <span style="background:#f59e0b;color:#fff;font-size:0.7rem;padding:2px 8px;border-radius:999px;font-weight:700;margin-left:4px;"><?php echo (int) $pending_count; ?> pending</span>
-                    <?php endif; ?>
                 </a>
+                <?php
+                $pending_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table WHERE status = 'pending'");
+                if ($pending_count > 0): ?>
+                    <a href="<?php echo admin_url('admin.php?page=cha-members&status_filter=pending'); ?>" class="cha-tab <?php echo $active_status === 'pending' ? 'cha-active' : ''; ?>" style="<?php echo $active_status === 'pending' ? 'background:#FFFBEB;color:#B45309;border:1px solid #FCD34D;' : ''; ?>" title="Show only unverified members">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="<?php echo $active_status === 'pending' ? 'stroke:#D97706;' : ''; ?>"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Pending Verification <span class="cha-tab-count" style="background:#F59E0B;color:#fff;font-weight:700;"><?php echo $pending_count; ?></span>
+                    </a>
+                <?php endif; ?>
             </div>
 
             <div style="margin-bottom:16px;">
@@ -2752,8 +2844,11 @@ function cha_render_admin_page() {
                 <div class="cha-table-wrap">
                     <div class="cha-empty">
                         <div class="cha-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-                        <p>No members in this category yet</p>
-                        <p class="cha-empty-sub">Members will appear here once they register.</p>
+                        <p><?php echo $active_status === 'pending' ? 'No pending unverified members found' : 'No members in this category yet'; ?></p>
+                        <p class="cha-empty-sub"><?php echo $active_status === 'pending' ? 'All members are currently verified.' : 'Members will appear here once they register.'; ?></p>
+                        <?php if ($active_status || $active_filter): ?>
+                            <p style="margin-top:12px;"><a href="<?php echo admin_url('admin.php?page=cha-members'); ?>" class="cha-btn" style="background:var(--cha-blue);color:#fff;font-size:0.75rem;padding:6px 14px;">View All Members</a></p>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php else: ?>
@@ -2824,7 +2919,7 @@ function cha_render_admin_page() {
                 <?php if ($total_pages > 1): ?>
                 <div class="cha-pagination">
                     <?php
-                    $page_url = admin_url('admin.php?page=cha-members') . ($active_filter ? '&role_filter=' . urlencode($active_filter) : '');
+                    $page_url = admin_url('admin.php?page=cha-members') . ($active_filter ? '&role_filter=' . urlencode($active_filter) : '') . ($active_status ? '&status_filter=' . urlencode($active_status) : '');
                     for ($i = 1; $i <= $total_pages; $i++):
                         if ($i === $current_page):
                             echo '<span class="cha-page cha-page-current">' . $i . '</span>';
