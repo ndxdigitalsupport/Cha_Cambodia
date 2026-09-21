@@ -3016,90 +3016,667 @@ function cha_render_donations_page() {
     $payway = cha_get_payway_settings();
     ?>
     <style>
-        .cha-don-header{background:linear-gradient(135deg,#0B1D6D 0%,#1a3a8a 50%,#6A2C91 100%);border-radius:12px;padding:28px 32px;color:#fff;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
-        .cha-don-header h1{font-size:1.5rem;font-weight:700;margin:0;display:flex;align-items:center;gap:10px;}
-        .cha-don-header p{font-size:0.8125rem;margin:4px 0 0;opacity:0.8;}
-        .cha-don-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-        .cha-don-stat{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:18px 20px;display:flex;align-items:center;gap:14px;transition:box-shadow .15s;}
-        .cha-don-stat:hover{box-shadow:0 2px 8px rgba(0,0,0,0.06);}
-        .cha-don-stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-        .cha-don-stat-value{font-size:1.4rem;font-weight:700;line-height:1.2;}
-        .cha-don-stat-label{font-size:0.75rem;color:#6b7280;margin-top:2px;}
-        .cha-don-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
-        .cha-don-card h2{font-size:1rem;font-weight:700;margin:0 0 16px;display:flex;align-items:center;gap:8px;}
-        .cha-don-toggle{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;user-select:none;margin-bottom:16px;}
-        .cha-don-toggle:hover{background:#f1f5f9;}
-        .cha-don-toggle svg{transition:transform .2s;flex-shrink:0;}
-        .cha-don-toggle-label{font-weight:600;font-size:0.875rem;}
-        .cha-don-toggle-desc{font-size:0.75rem;color:#6b7280;margin-top:2px;}
-        .cha-don-settings{display:none;max-height:0;overflow:hidden;transition:max-height .3s ease,opacity .2s ease;opacity:0;}
-        .cha-don-settings.open{display:block;max-height:600px;opacity:1;}
-        .cha-don-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-        .cha-don-field label{display:block;font-size:0.75rem;font-weight:600;color:#374151;margin-bottom:4px;}
-        .cha-don-field input,.cha-don-field select{width:100%;box-sizing:border-box;}
-        .cha-don-table{width:100%;border-collapse:separate;border-spacing:0;}
-        .cha-don-table th{text-align:left;font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;padding:10px 14px;border-bottom:2px solid #e5e7eb;background:#f9fafb;}
-        .cha-don-table td{padding:12px 14px;border-bottom:1px solid #f3f4f6;font-size:0.8125rem;vertical-align:middle;}
-        .cha-don-table tr:hover td{background:#f9fafb;}
-        .cha-don-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.6875rem;font-weight:600;}
-        .cha-don-empty{text-align:center;padding:48px 20px;color:#9CA3AF;}
-        .cha-don-pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;}
-        .cha-don-pagination a,.cha-don-pagination span{padding:6px 12px;border-radius:6px;font-size:0.8125rem;text-decoration:none;border:1px solid #e5e7eb;color:#374151;background:#fff;transition:all .15s;}
-        .cha-don-pagination a:hover{background:#f3f4f6;}
-        .cha-don-pagination .current{background:#0B1D6D;color:#fff;border-color:#0B1D6D;}
-        @media(max-width:900px){.cha-don-stats{grid-template-columns:1fr 1fr;}.cha-don-grid{grid-template-columns:1fr;}}
-        @media(max-width:600px){.cha-don-stats{grid-template-columns:1fr;}.cha-don-header{flex-direction:column;align-items:flex-start;}}
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+
+        .cha-fintech-wrap {
+            max-width: 1180px;
+            margin: 24px 20px 40px 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #0f172a;
+            letter-spacing: -0.01em;
+        }
+
+        /* Ambient Hero Header */
+        .cha-fintech-hero {
+            position: relative;
+            background: linear-gradient(135deg, #0B1D6D 0%, #152C8A 48%, #4A1970 100%);
+            border-radius: 18px;
+            padding: 34px 38px;
+            color: #ffffff;
+            margin-bottom: 24px;
+            box-shadow: 0 16px 36px -12px rgba(11, 29, 109, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .cha-fintech-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(227, 30, 36, 0.28) 0%, rgba(106, 44, 145, 0.15) 50%, transparent 70%);
+            filter: blur(50px);
+            pointer-events: none;
+        }
+
+        .cha-fintech-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: 20%;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, transparent 70%);
+            filter: blur(45px);
+            pointer-events: none;
+        }
+
+        .cha-fintech-title-group {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .cha-fintech-icon-orb {
+            width: 54px;
+            height: 54px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18), 0 0 16px rgba(227, 30, 36, 0.35) inset;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .cha-fintech-hero h1 {
+            font-family: inherit;
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cha-fintech-hero p {
+            font-size: 0.875rem;
+            margin: 6px 0 0;
+            color: rgba(255, 255, 255, 0.82);
+            font-weight: 400;
+        }
+
+        .cha-fintech-hero-actions {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .cha-fintech-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 11px;
+            font-size: 0.825rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid transparent;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .cha-fintech-btn-glass {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .cha-fintech-btn-glass:hover {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.38);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            color: #ffffff !important;
+        }
+
+        .cha-fintech-btn-primary {
+            background: #ffffff;
+            color: #0B1D6D !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        }
+
+        .cha-fintech-btn-primary:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+            color: #0B1D6D !important;
+        }
+
+        /* 4 Modern KPI Cards */
+        .cha-fintech-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .cha-fintech-stat-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 22px 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04), 0 8px 24px -6px rgba(15, 23, 42, 0.05);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .cha-fintech-stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.12);
+            border-color: #cbd5e1;
+        }
+
+        .cha-fintech-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e2e8f0;
+        }
+
+        .cha-fintech-stat-card.stat-green::before { background: linear-gradient(90deg, #10b981, #059669); }
+        .cha-fintech-stat-card.stat-blue::before  { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+        .cha-fintech-stat-card.stat-amber::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .cha-fintech-stat-card.stat-purple::before{ background: linear-gradient(90deg, #8b5cf6, #6A2C91); }
+
+        .cha-fintech-stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .cha-fintech-stat-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .cha-fintech-stat-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .stat-green .cha-fintech-stat-badge { background: #ecfdf5; color: #059669; }
+        .stat-blue .cha-fintech-stat-badge  { background: #eff6ff; color: #2563eb; }
+        .stat-amber .cha-fintech-stat-badge { background: #fffbeb; color: #d97706; }
+        .stat-purple .cha-fintech-stat-badge{ background: #fbf5ff; color: #6A2C91; }
+
+        .cha-fintech-stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 4px;
+        }
+
+        .cha-fintech-stat-sub {
+            font-size: 0.775rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* PayWay Settings Slide-Down Panel */
+        .cha-don-settings {
+            display: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, opacity 0.25s ease;
+            opacity: 0;
+            margin-bottom: 24px;
+        }
+
+        .cha-don-settings.open {
+            display: block;
+            max-height: 900px;
+            opacity: 1;
+        }
+
+        .cha-pw-panel {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 28px 32px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
+        }
+
+        .cha-pw-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            margin-bottom: 22px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .cha-pw-header h2 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin: 0;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cha-mode-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .cha-mode-chip.live { background: #dcfce7; color: #15803d; }
+        .cha-mode-chip.test { background: #fef3c7; color: #b45309; }
+        .cha-mode-chip.off  { background: #fee2e2; color: #b91c1c; }
+
+        .cha-don-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .cha-don-field label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .cha-don-field input, .cha-don-field select {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            padding: 9px 13px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            color: #0f172a;
+            background: #ffffff;
+            transition: all 0.15s;
+        }
+
+        .cha-don-field input:focus, .cha-don-field select:focus {
+            border-color: #0B1D6D;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(11, 29, 109, 0.12);
+        }
+
+        /* Transaction History Container */
+        .cha-tx-card {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04), 0 8px 24px -6px rgba(15, 23, 42, 0.05);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .cha-tx-header {
+            padding: 22px 28px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            background: #fafbfd;
+        }
+
+        .cha-tx-header h2 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cha-tx-count-pill {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Fintech Table */
+        .cha-fintech-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .cha-fintech-table th {
+            text-align: left;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #64748b;
+            padding: 13px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+            white-space: nowrap;
+        }
+
+        .cha-fintech-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.85rem;
+            vertical-align: middle;
+            color: #1e293b;
+            transition: background 0.15s;
+        }
+
+        .cha-fintech-table tbody tr:hover td {
+            background: #f8fafc;
+        }
+
+        .cha-fintech-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cha-tran-mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.775rem;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #0B1D6D;
+            padding: 4px 9px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            display: inline-block;
+            letter-spacing: 0.01em;
+        }
+
+        .cha-donor-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cha-donor-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #0B1D6D 0%, #6A2C91 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(11, 29, 109, 0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .cha-donor-name {
+            font-weight: 600;
+            color: #0f172a;
+            line-height: 1.25;
+        }
+
+        .cha-donor-meta {
+            font-size: 0.775rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .cha-amount-primary {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .cha-amount-sub {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* Status Pills with Glowing Dot */
+        .cha-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            line-height: 1;
+        }
+
+        .cha-status-pill.status-completed {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .cha-status-pill.status-pending {
+            background: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .cha-status-pill.status-failed {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .cha-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .status-completed .cha-status-dot {
+            background: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+        }
+
+        .status-pending .cha-status-dot {
+            background: #f59e0b;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.7);
+        }
+
+        .status-failed .cha-status-dot {
+            background: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+        }
+
+        /* Empty state */
+        .cha-tx-empty {
+            text-align: center;
+            padding: 60px 24px;
+            color: #94a3b8;
+        }
+
+        .cha-tx-empty-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: #94a3b8;
+        }
+
+        /* Pagination */
+        .cha-tx-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 20px 24px;
+            border-top: 1px solid #f1f5f9;
+            background: #fafbfd;
+        }
+
+        .cha-tx-pagination a, .cha-tx-pagination span {
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            background: #ffffff;
+            transition: all 0.15s;
+        }
+
+        .cha-tx-pagination a:hover {
+            background: #f1f5f9;
+            color: #0B1D6D;
+            border-color: #cbd5e1;
+        }
+
+        .cha-tx-pagination .current {
+            background: #0B1D6D;
+            color: #ffffff;
+            border-color: #0B1D6D;
+            box-shadow: 0 2px 6px rgba(11, 29, 109, 0.25);
+        }
+
+        @media (max-width: 1024px) {
+            .cha-fintech-stats { grid-template-columns: repeat(2, 1fr); }
+            .cha-don-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .cha-fintech-stats { grid-template-columns: 1fr; }
+            .cha-fintech-hero { padding: 24px; }
+            .cha-fintech-hero-actions { width: 100%; justify-content: stretch; }
+            .cha-fintech-btn { flex: 1; justify-content: center; }
+        }
     </style>
 
-    <div style="max-width:1100px;margin:20px auto;">
-        <!-- Header -->
-        <div class="cha-don-header">
-            <div>
-                <h1 style="color:#fff;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    Donations
-                </h1>
-                <p>Track donations and manage PayWay payment gateway</p>
+    <div class="cha-fintech-wrap">
+        <!-- Hero Header -->
+        <div class="cha-fintech-hero">
+            <div class="cha-fintech-title-group">
+                <div class="cha-fintech-icon-orb">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>Donations Dashboard</h1>
+                    <p>Financial ledger &amp; PayWay gateway operations for CHA Cambodia</p>
+                </div>
             </div>
-            <div style="display:flex;gap:10px;align-items:center;">
-                <button type="button" id="cha-pw-toggle-btn" onclick="document.getElementById('cha-pw-settings').classList.toggle('open');" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:0.8125rem;font-weight:600;cursor:pointer;white-space:nowrap;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                    PayWay Settings
+            <div class="cha-fintech-hero-actions">
+                <button type="button" id="cha-pw-toggle-btn" class="cha-fintech-btn cha-fintech-btn-glass" onclick="document.getElementById('cha-pw-settings').classList.toggle('open');">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                        <line x1="1" y1="10" x2="23" y2="10"/>
+                    </svg>
+                    PayWay Gateway Settings
                 </button>
-                <a href="admin.php?page=cha-donations&cha_don_export_csv=1" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:0.8125rem;font-weight:600;text-decoration:none;white-space:nowrap;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Export CSV
+                <a href="admin.php?page=cha-donations&cha_don_export_csv=1" class="cha-fintech-btn cha-fintech-btn-primary">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Export CSV Ledger
                 </a>
             </div>
         </div>
 
-        <!-- PayWay Settings (slides down from header) -->
-        <div class="cha-don-settings" id="cha-pw-settings" style="margin-bottom:24px;">
-            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-                    <h2 style="font-size:1rem;font-weight:700;margin:0;display:flex;align-items:center;gap:8px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B1D6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                        PayWay Gateway (ABA) &mdash; <?php echo $payway['enabled'] ? '<span style="color:#166534;">Enabled</span>' : '<span style="color:#dc2626;">Disabled</span>'; ?>
+        <!-- PayWay Settings (Slide-Down Drawer) -->
+        <div class="cha-don-settings" id="cha-pw-settings">
+            <div class="cha-pw-panel">
+                <div class="cha-pw-header">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B1D6D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                            <line x1="1" y1="10" x2="23" y2="10"/>
+                        </svg>
+                        PayWay Gateway Configuration (ABA Bank)
+                        <?php if (!$payway['enabled']): ?>
+                            <span class="cha-mode-chip off">Disabled</span>
+                        <?php elseif ($payway['mode'] === 'production'): ?>
+                            <span class="cha-mode-chip live">&#9679; Production Live</span>
+                        <?php else: ?>
+                            <span class="cha-mode-chip test">&#9679; Sandbox Mode</span>
+                        <?php endif; ?>
                     </h2>
-                    <button type="button" onclick="document.getElementById('cha-pw-settings').classList.remove('open');" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;color:#9CA3AF;" title="Close">
+                    <button type="button" onclick="document.getElementById('cha-pw-settings').classList.remove('open');" style="background:none;border:none;cursor:pointer;padding:6px;display:flex;align-items:center;color:#94a3b8;border-radius:8px;transition:background 0.15s;" title="Close" onmouseover="this.style.background='#f1f5f9';" onmouseout="this.style.background='none';">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                 </div>
                 <form method="post" action="admin.php?page=cha-donations">
                     <?php wp_nonce_field('cha_save_payway', 'cha_payway_nonce'); ?>
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block;font-size:0.75rem;font-weight:600;color:#374151;margin-bottom:6px;">Mode</label>
-                        <select name="payway_mode" style="width:280px;" onchange="document.getElementById('pw-sandbox-fields').style.display=this.value==='sandbox'?'block':'none';document.getElementById('pw-production-fields').style.display=this.value==='production'?'block':'none';">
-                            <option value="sandbox" <?php selected($payway['mode'], 'sandbox'); ?>>Sandbox (testing)</option>
-                            <option value="production" <?php selected($payway['mode'], 'production'); ?>>Production (live)</option>
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block;font-size:0.8rem;font-weight:700;color:#334155;margin-bottom:6px;">Environment Mode</label>
+                        <select name="payway_mode" style="max-width:320px;" onchange="document.getElementById('pw-sandbox-fields').style.display=this.value==='sandbox'?'block':'none';document.getElementById('pw-production-fields').style.display=this.value==='production'?'block':'none';">
+                            <option value="sandbox" <?php selected($payway['mode'], 'sandbox'); ?>>Sandbox (Testing / Safe Mode)</option>
+                            <option value="production" <?php selected($payway['mode'], 'production'); ?>>Production (Live ABA Merchant)</option>
                         </select>
                     </div>
 
                     <div id="pw-sandbox-fields" style="display:<?php echo $payway['mode'] === 'sandbox' ? 'block' : 'none'; ?>;">
-                        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin-bottom:12px;">
-                            <div style="font-weight:600;font-size:0.8125rem;color:#166534;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                Sandbox Credentials
+                        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin-bottom:18px;">
+                            <div style="font-weight:700;font-size:0.85rem;color:#166534;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Sandbox API Credentials
                             </div>
                             <div class="cha-don-grid">
                                 <div class="cha-don-field">
@@ -3109,8 +3686,8 @@ function cha_render_donations_page() {
                                 <div class="cha-don-field">
                                     <label>API Key</label>
                                     <div style="position:relative;">
-                                        <input type="password" name="payway_sandbox_api_key" id="pw_sb_key" value="<?php echo esc_attr($payway['sandbox_api_key']); ?>" style="padding-right:36px;">
-                                        <button type="button" onclick="var p=document.getElementById('pw_sb_key');p.type=p.type==='password'?'text':'password';this.blur();" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                                        <input type="password" name="payway_sandbox_api_key" id="pw_sb_key" value="<?php echo esc_attr($payway['sandbox_api_key']); ?>" style="padding-right:40px;">
+                                        <button type="button" onclick="var p=document.getElementById('pw_sb_key');p.type=p.type==='password'?'text':'password';this.blur();" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
                                     </div>
                                 </div>
                             </div>
@@ -3118,10 +3695,10 @@ function cha_render_donations_page() {
                     </div>
 
                     <div id="pw-production-fields" style="display:<?php echo $payway['mode'] === 'production' ? 'block' : 'none'; ?>;">
-                        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:16px;margin-bottom:12px;">
-                            <div style="font-weight:600;font-size:0.8125rem;color:#991b1b;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                Production Credentials
+                        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px;margin-bottom:18px;">
+                            <div style="font-weight:700;font-size:0.85rem;color:#991b1b;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                Production API Credentials (Live Transactions)
                             </div>
                             <div class="cha-don-grid">
                                 <div class="cha-don-field">
@@ -3131,26 +3708,26 @@ function cha_render_donations_page() {
                                 <div class="cha-don-field">
                                     <label>API Key</label>
                                     <div style="position:relative;">
-                                        <input type="password" name="payway_production_api_key" id="pw_prod_key" value="<?php echo esc_attr($payway['production_api_key']); ?>" style="padding-right:36px;">
-                                        <button type="button" onclick="var p=document.getElementById('pw_prod_key');p.type=p.type==='password'?'text':'password';this.blur();" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                                        <input type="password" name="payway_production_api_key" id="pw_prod_key" value="<?php echo esc_attr($payway['production_api_key']); ?>" style="padding-right:40px;">
+                                        <button type="button" onclick="var p=document.getElementById('pw_prod_key');p.type=p.type==='password'?'text':'password';this.blur();" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6;">
-                        <div style="display:flex;align-items:center;gap:16px;">
-                            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.8125rem;font-weight:500;">
-                                <input type="checkbox" name="payway_enabled" value="1" <?php checked($payway['enabled']); ?>>
-                                Enable donations
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:18px;border-top:1px solid #f1f5f9;flex-wrap:wrap;gap:14px;">
+                        <div style="display:flex;align-items:center;gap:20px;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.875rem;font-weight:600;color:#1e293b;">
+                                <input type="checkbox" name="payway_enabled" value="1" <?php checked($payway['enabled']); ?> style="border-radius:4px;width:17px;height:17px;">
+                                Enable PayWay donations checkout
                             </label>
-                            <button type="button" id="cha-test-hash-btn" style="background:none;border:none;color:#6b7280;font-size:0.8125rem;font-weight:600;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px;">
-                                Test API Key
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            <button type="button" id="cha-test-hash-btn" style="background:none;border:none;color:#64748b;font-size:0.825rem;font-weight:600;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:5px;transition:color 0.15s;" onmouseover="this.style.color='#0B1D6D';" onmouseout="this.style.color='#64748b';">
+                                Test Hash Signature
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                             </button>
                         </div>
-                        <button type="submit" name="cha_update_payway" class="button button-primary" style="background:#166534;border-color:#166534;border-radius:6px;">Save Settings</button>
+                        <button type="submit" name="cha_update_payway" class="button button-primary" style="background:#0B1D6D;border-color:#0B1D6D;border-radius:8px;padding:5px 20px;font-weight:600;height:auto;line-height:28px;">Save Gateway Configuration</button>
                     </div>
                 </form>
                 <script>
@@ -3174,9 +3751,9 @@ function cha_render_donations_page() {
                         }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
                           .then(function(res){
                               if (res.ok && res.d.success) {
-                                  alert('API key works. Sample hash: ' + res.d.sample_hash.slice(0, 24) + '...');
+                                  alert('API key verified successfully. Sample hash: ' + res.d.sample_hash.slice(0, 24) + '...');
                               } else {
-                                  alert((res.d && res.d.message) || 'Test failed. Check the API key.');
+                                  alert((res.d && res.d.message) || 'Test failed. Please verify your Merchant ID and API Key.');
                               }
                           }).catch(function(){ alert('Network error. Please try again.'); })
                           .finally(function(){ btn.disabled = false; btn.innerHTML = orig; });
@@ -3186,109 +3763,183 @@ function cha_render_donations_page() {
             </div>
         </div>
 
-        <!-- Stats -->
-        <div class="cha-don-stats">
-            <div class="cha-don-stat">
-                <div class="cha-don-stat-icon" style="background:#ECFDF5;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <!-- 4 Executive KPI Stat Cards -->
+        <div class="cha-fintech-stats">
+            <div class="cha-fintech-stat-card stat-green">
+                <div class="cha-fintech-stat-top">
+                    <span class="cha-fintech-stat-title">Total Raised</span>
+                    <div class="cha-fintech-stat-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
                 </div>
                 <div>
-                    <div class="cha-don-stat-value" style="color:#166534;">$<?php echo esc_html(number_format((float) $totals->completed_sum, 0)); ?></div>
-                    <div class="cha-don-stat-label">Total Raised</div>
+                    <div class="cha-fintech-stat-value" style="color:#059669;">$<?php echo esc_html(number_format((float) $totals->completed_sum, 2)); ?></div>
+                    <div class="cha-fintech-stat-sub">
+                        <span>Cleared funds in USD</span>
+                    </div>
                 </div>
             </div>
-            <div class="cha-don-stat">
-                <div class="cha-don-stat-icon" style="background:#EFF6FF;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+
+            <div class="cha-fintech-stat-card stat-blue">
+                <div class="cha-fintech-stat-top">
+                    <span class="cha-fintech-stat-title">Completed Orders</span>
+                    <div class="cha-fintech-stat-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                    </div>
                 </div>
                 <div>
-                    <div class="cha-don-stat-value" style="color:#1d4ed8;"><?php echo (int) $totals->completed_count; ?></div>
-                    <div class="cha-don-stat-label">Completed</div>
+                    <div class="cha-fintech-stat-value" style="color:#2563eb;"><?php echo (int) $totals->completed_count; ?></div>
+                    <div class="cha-fintech-stat-sub">
+                        <span>Successful checkouts</span>
+                    </div>
                 </div>
             </div>
-            <div class="cha-don-stat">
-                <div class="cha-don-stat-icon" style="background:#FEF3C7;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+
+            <div class="cha-fintech-stat-card stat-amber">
+                <div class="cha-fintech-stat-top">
+                    <span class="cha-fintech-stat-title">Pending / In-Flight</span>
+                    <div class="cha-fintech-stat-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
                 </div>
                 <div>
-                    <div class="cha-don-stat-value" style="color:#92400E;"><?php echo (int) $totals->pending_count; ?></div>
-                    <div class="cha-don-stat-label">Pending</div>
+                    <div class="cha-fintech-stat-value" style="color:#d97706;"><?php echo (int) $totals->pending_count; ?></div>
+                    <div class="cha-fintech-stat-sub">
+                        <span>Expires after 12 hours</span>
+                    </div>
                 </div>
             </div>
-            <div class="cha-don-stat">
-                <div class="cha-don-stat-icon" style="background:#F3E8FF;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A2C91" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+
+            <div class="cha-fintech-stat-card stat-purple">
+                <div class="cha-fintech-stat-top">
+                    <span class="cha-fintech-stat-title">Total Donors</span>
+                    <div class="cha-fintech-stat-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
                 </div>
                 <div>
-                    <div class="cha-don-stat-value" style="color:#6A2C91;"><?php echo (int) $totals->total; ?></div>
-                    <div class="cha-don-stat-label">Total Donors</div>
+                    <div class="cha-fintech-stat-value" style="color:#6A2C91;"><?php echo (int) $totals->total; ?></div>
+                    <div class="cha-fintech-stat-sub">
+                        <span>Lifetime records</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Transactions Table -->
-        <div class="cha-don-card">
-            <h2>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B1D6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                Transaction History
-            </h2>
+        <!-- Transactions Ledger Card -->
+        <div class="cha-tx-card">
+            <div class="cha-tx-header">
+                <h2>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B1D6D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    Transaction Ledger
+                    <span class="cha-tx-count-pill"><?php echo (int) $total_rows; ?> total</span>
+                </h2>
+                <div style="font-size:0.8rem;color:#64748b;">
+                    Showing <?php echo count($don_rows); ?> of <?php echo (int) $total_rows; ?> records
+                </div>
+            </div>
+
             <?php if (empty($don_rows)): ?>
-                <div class="cha-don-empty">
-                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 16px;display:block;color:#D1D5DB;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    <p style="font-weight:600;font-size:1rem;margin:0;">No donations yet</p>
-                    <p style="font-size:0.8125rem;margin:6px 0 0;">Donations will appear here once donors complete a PayWay checkout.</p>
+                <div class="cha-tx-empty">
+                    <div class="cha-tx-empty-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                    </div>
+                    <p style="font-weight:700;font-size:1.05rem;color:#1e293b;margin:0 0 6px;">No transactions recorded yet</p>
+                    <p style="font-size:0.85rem;margin:0;color:#64748b;">Donations will populate this ledger once donors complete an ABA PayWay checkout.</p>
                 </div>
             <?php else: ?>
                 <div style="overflow-x:auto;">
-                    <table class="cha-don-table">
+                    <table class="cha-fintech-table">
                         <thead>
                             <tr>
-                                <th>Receipt</th>
+                                <th>Receipt ID</th>
                                 <th>Donor</th>
-                                <th>Amount</th>
+                                <th>Contribution</th>
                                 <th>Status</th>
-                                <th>APV</th>
-                                <th>Date</th>
+                                <th>APV Code</th>
+                                <th>Timestamp</th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php foreach ($don_rows as $d): ?>
                             <tr>
-                                <td><code style="font-size:0.75rem;background:#f1f5f9;padding:3px 8px;border-radius:4px;font-family:monospace;"><?php echo esc_html($d->tran_id); ?></code></td>
                                 <td>
-                                    <div style="display:flex;align-items:center;gap:10px;">
-                                        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0B1D6D,#6A2C91);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.6875rem;font-weight:700;flex-shrink:0;"><?php echo esc_html(mb_strtoupper(mb_substr($d->name ?: '?', 0, 1))); ?></div>
+                                    <span class="cha-tran-mono"><?php echo esc_html($d->tran_id); ?></span>
+                                </td>
+                                <td>
+                                    <div class="cha-donor-cell">
+                                        <div class="cha-donor-avatar">
+                                            <?php echo esc_html(mb_strtoupper(mb_substr($d->name ?: '?', 0, 1))); ?>
+                                        </div>
                                         <div>
-                                            <div style="font-weight:600;"><?php echo esc_html($d->name ?: '—'); ?></div>
-                                            <div style="font-size:0.75rem;color:#6b7280;"><?php echo esc_html($d->email ?: ''); ?></div>
-                                            <?php if (!empty($d->phone)): ?>
-                                                <div style="font-size:0.75rem;color:#9CA3AF;"><?php echo esc_html($d->phone); ?></div>
-                                            <?php endif; ?>
+                                            <div class="cha-donor-name"><?php echo esc_html($d->name ?: 'Anonymous Donor'); ?></div>
+                                            <div class="cha-donor-meta">
+                                                <?php echo esc_html($d->email ?: 'No email recorded'); ?>
+                                                <?php if (!empty($d->phone)): ?>
+                                                    &bull; <?php echo esc_html($d->phone); ?>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div style="font-weight:700;color:#166534;">$<?php echo esc_html(number_format((float) $d->amount, 2)); ?></div>
-                                    <div style="font-size:0.6875rem;color:#9CA3AF;"><?php echo esc_html($d->currency); ?></div>
+                                    <div class="cha-amount-primary">$<?php echo esc_html(number_format((float) $d->amount, 2)); ?></div>
+                                    <div class="cha-amount-sub"><?php echo esc_html($d->currency ?: 'USD'); ?></div>
                                 </td>
                                 <td>
                                     <?php
-                                    $st = $d->status;
-                                    $bg = $st === 'completed' ? '#ECFDF5' : ($st === 'pending' ? '#FEF3C7' : '#FEF2F2');
-                                    $fg = $st === 'completed' ? '#166534' : ($st === 'pending' ? '#92400E' : '#991B1B');
-                                    $dot = $st === 'completed' ? '#166534' : ($st === 'pending' ? '#D97706' : '#DC2626');
+                                    $st = strtolower($d->status);
+                                    $status_class = $st === 'completed' ? 'status-completed' : ($st === 'pending' ? 'status-pending' : 'status-failed');
                                     ?>
-                                    <span class="cha-don-badge" style="background:<?php echo $bg; ?>;color:<?php echo $fg; ?>;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:<?php echo $dot; ?>;margin-right:5px;"></span><?php echo esc_html(ucfirst($st)); ?></span>
+                                    <span class="cha-status-pill <?php echo esc_attr($status_class); ?>">
+                                        <span class="cha-status-dot"></span>
+                                        <?php echo esc_html(ucfirst($st)); ?>
+                                    </span>
                                 </td>
-                                <td style="color:#6b7280;font-family:monospace;font-size:0.75rem;"><?php echo esc_html($d->apv ?: '—'); ?></td>
-                                <td style="color:#6b7280;"><?php echo esc_html($d->created_at ?: '—'); ?></td>
+                                <td>
+                                    <?php if (!empty($d->apv)): ?>
+                                        <span style="font-family:'JetBrains Mono',monospace;font-size:0.775rem;font-weight:600;color:#334155;background:#f8fafc;padding:3px 7px;border-radius:5px;border:1px solid #e2e8f0;"><?php echo esc_html($d->apv); ?></span>
+                                    <?php else: ?>
+                                        <span style="color:#cbd5e1;">&mdash;</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div style="font-size:0.825rem;font-weight:500;color:#334155;">
+                                        <?php echo esc_html($d->created_at ? date('M j, Y', strtotime($d->created_at)) : '—'); ?>
+                                    </div>
+                                    <div style="font-size:0.75rem;color:#94a3b8;">
+                                        <?php echo esc_html($d->created_at ? date('g:i A', strtotime($d->created_at)) : ''); ?>
+                                    </div>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
+
                 <?php if ($total_pages > 1): ?>
-                <div class="cha-don-pagination">
+                <div class="cha-tx-pagination">
                     <?php if ($current_page > 1): ?>
                         <a href="admin.php?page=cha-donations&don_page=<?php echo $current_page - 1; ?>">&larr; Prev</a>
                     <?php endif; ?>
@@ -3297,20 +3948,22 @@ function cha_render_donations_page() {
                     $end_page = min($total_pages, $current_page + 2);
                     if ($start_page > 1): ?>
                         <a href="admin.php?page=cha-donations&don_page=1">1</a>
-                        <?php if ($start_page > 2): ?><span style="color:#9CA3AF;padding:0 4px;">&hellip;</span><?php endif; ?>
+                        <?php if ($start_page > 2): ?><span style="color:#94a3b8;padding:0 4px;border:none;background:none;">&hellip;</span><?php endif; ?>
                     <?php endif; ?>
                     <?php for ($p = $start_page; $p <= $end_page; $p++): ?>
                         <a href="admin.php?page=cha-donations&don_page=<?php echo $p; ?>" class="<?php echo $p === $current_page ? 'current' : ''; ?>"><?php echo $p; ?></a>
                     <?php endfor; ?>
                     <?php if ($end_page < $total_pages): ?>
-                        <?php if ($end_page < $total_pages - 1): ?><span style="color:#9CA3AF;padding:0 4px;">&hellip;</span><?php endif; ?>
+                        <?php if ($end_page < $total_pages - 1): ?><span style="color:#94a3b8;padding:0 4px;border:none;background:none;">&hellip;</span><?php endif; ?>
                         <a href="admin.php?page=cha-donations&don_page=<?php echo $total_pages; ?>"><?php echo $total_pages; ?></a>
                     <?php endif; ?>
                     <?php if ($current_page < $total_pages): ?>
                         <a href="admin.php?page=cha-donations&don_page=<?php echo $current_page + 1; ?>">Next &rarr;</a>
                     <?php endif; ?>
                 </div>
-                <p style="text-align:center;font-size:0.75rem;color:#9CA3AF;margin-top:8px;">Page <?php echo $current_page; ?> of <?php echo $total_pages; ?> (<?php echo $total_rows; ?> total)</p>
+                <div style="text-align:center;font-size:0.775rem;color:#94a3b8;padding:12px;background:#fafbfd;border-top:1px solid #f1f5f9;">
+                    Page <?php echo $current_page; ?> of <?php echo $total_pages; ?> (<?php echo $total_rows; ?> total transactions)
+                </div>
                 <?php endif; ?>
             <?php endif; ?>
         </div>
