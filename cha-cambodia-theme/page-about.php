@@ -26,7 +26,7 @@
       <div class="page-hero-art" data-reveal>
         <div class="page-art-frame">
           <div class="page-art">
-            <img src="<?php echo esc_url(cha_get_option('about_team_img', get_template_directory_uri() . '/about-team.jpg')); ?>" alt="CHA leadership and team">
+            <img src="<?php echo esc_url(cha_get_option('about_team_img', get_template_directory_uri() . '/who-is-cha.png')); ?>" alt="CHA leadership and team">
             <div class="page-art-badge">
               <div class="page-art-badge-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -273,7 +273,7 @@
                     <span class="badge-dot"></span>
                     <span data-i18n="history_badge_2011">Founding Era · 2011</span>
                   </div>
-                   <img src="<?php echo esc_url(cha_get_option('history_2011_img', get_template_directory_uri() . '/family.jpg')); ?>" alt="CHA Founding Families" loading="lazy">
+                   <img src="<?php echo esc_url(cha_get_option('history_2011_img', get_template_directory_uri() . '/history-2011.jpg')); ?>" alt="CHA Founding Families" loading="lazy">
                   <div class="frame-caption">
                     <p class="caption-title" data-i18n="history_c1_title">United by Hope</p>
                     <p class="caption-text" data-i18n="history_c1_desc">Patient support circle during CHA's inaugural foundation meeting.</p>
@@ -321,7 +321,7 @@
                     <span class="badge-dot"></span>
                     <span data-i18n="history_badge_2014">Global Alignment · 2014</span>
                   </div>
-                   <img src="<?php echo esc_url(cha_get_option('history_2014_img', get_template_directory_uri() . '/news-partner.jpg')); ?>" alt="WFH Partnership" loading="lazy">
+                   <img src="<?php echo esc_url(cha_get_option('history_2014_img', get_template_directory_uri() . '/history-2014.jpg')); ?>" alt="WFH Partnership" loading="lazy">
                   <div class="frame-caption">
                     <p class="caption-title" data-i18n="history_c2_title">World Federation of Hemophilia</p>
                     <p class="caption-text" data-i18n="history_c2_desc">Connecting Cambodian patients to the global community of care.</p>
@@ -369,7 +369,7 @@
                     <span class="badge-dot"></span>
                     <span data-i18n="history_badge_2017">Hospital Units · 2017</span>
                   </div>
-                   <img src="<?php echo esc_url(cha_get_option('history_2017_img', get_template_directory_uri() . '/doctor training.png')); ?>" alt="Clinical Doctor Training" loading="lazy">
+                   <img src="<?php echo esc_url(cha_get_option('history_2017_img', get_template_directory_uri() . '/history-2017.jpg')); ?>" alt="Clinical Doctor Training" loading="lazy">
                   <div class="frame-caption">
                     <p class="caption-title" data-i18n="history_c3_title">Clinical Capacity Building</p>
                     <p class="caption-text" data-i18n="history_c3_desc">Collaborating with hospital clinical teams to expedite acute care.</p>
@@ -417,7 +417,7 @@
                     <span class="badge-dot"></span>
                     <span data-i18n="history_badge_2023">Nationwide · 2023</span>
                   </div>
-                   <img src="<?php echo esc_url(cha_get_option('history_2023_img', get_template_directory_uri() . '/about-team.jpg')); ?>" alt="CHA Nationwide Community" loading="lazy">
+                   <img src="<?php echo esc_url(cha_get_option('history_2023_img', get_template_directory_uri() . '/history-2023.jpg')); ?>" alt="CHA Nationwide Community" loading="lazy">
                   <div class="frame-caption">
                     <p class="caption-title" data-i18n="history_c4_title">Nationwide Family</p>
                     <p class="caption-text" data-i18n="history_c4_desc">Empowering bleeding disorder patients and families across Cambodia.</p>

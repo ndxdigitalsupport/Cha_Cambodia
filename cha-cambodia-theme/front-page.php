@@ -175,7 +175,7 @@
       <div class="page-hero-art" data-reveal>
         <div class="page-art-frame">
           <div class="page-art">
-            <img src="<?php echo esc_url(cha_get_option('about_team_img', get_template_directory_uri() . '/about-team.jpg')); ?>" alt="CHA leadership and team">
+            <img src="<?php echo esc_url(cha_get_option('about_team_img', get_template_directory_uri() . '/who-is-cha.png')); ?>" alt="CHA leadership and team">
             <div class="page-art-badge">
               <div class="page-art-badge-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
