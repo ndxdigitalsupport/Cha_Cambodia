@@ -65,12 +65,31 @@ function buildCheckoutHtml(checkoutUrl: string, fields: Record<string, string>) 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PayWay Checkout</title>
+<style>body{margin:0;font-family:system-ui,sans-serif;background:#fff}</style>
 </head>
-<body onload="document.getElementById('pw-form').submit()">
+<body>
 <form id="pw-form" method="POST" action="${escapeHtml(checkoutUrl)}">
 ${inputs}
-<noscript>JavaScript is required for checkout.</noscript>
+<p style="padding:24px;color:#0B1D6D;font-weight:600">Opening secure ABA checkout…</p>
+<button type="submit" style="padding:12px 20px;font-size:16px">Open payment page</button>
+<noscript>JavaScript is required for checkout. Tap the button above.</noscript>
 </form>
+<script>
+(function () {
+  function submitForm() {
+    var f = document.getElementById('pw-form');
+    if (f && !f.dataset.submitted) {
+      f.dataset.submitted = '1';
+      f.submit();
+    }
+  }
+  if (document.readyState === 'complete') {
+    setTimeout(submitForm, 50);
+  } else {
+    window.addEventListener('load', function () { setTimeout(submitForm, 50); });
+  }
+})();
+</script>
 </body>
 </html>`;
 }
@@ -88,10 +107,13 @@ export default function DonateScreen({ navigation }: any) {
   const [campaignsLoading, setCampaignsLoading] = useState(true);
   const [amountText, setAmountText] = useState('10');
   const [checkoutHtml, setCheckoutHtml] = useState<string | null>(null);
+  const [webviewKey, setWebviewKey] = useState(0);
   const [paying, setPaying] = useState(false);
   const [checking, setChecking] = useState(false);
   const tranIdRef = useRef<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const loadedRef = useRef(false);
+  const errorShownRef = useRef(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const isKm = i18n.language === 'km';
 
@@ -198,6 +220,9 @@ export default function DonateScreen({ navigation }: any) {
         throw new Error(res?.message || 'Could not start payment.');
       }
       tranIdRef.current = res.tran_id;
+      loadedRef.current = false;
+      errorShownRef.current = false;
+      setWebviewKey((k) => k + 1);
       setCheckoutHtml(buildCheckoutHtml(res.checkout_url, res.fields));
     } catch (e: any) {
       Alert.alert(
@@ -219,6 +244,8 @@ export default function DonateScreen({ navigation }: any) {
   const closeCheckout = (options?: { poll?: boolean }) => {
     const tranId = tranIdRef.current;
     setCheckoutHtml(null);
+    loadedRef.current = false;
+    errorShownRef.current = false;
     if (options?.poll === false || !tranId) {
       setChecking(false);
       stopPolling();
@@ -227,13 +254,35 @@ export default function DonateScreen({ navigation }: any) {
     startStatusPoll(tranId);
   };
 
-  const handleWebViewError = () => {
+  const handleWebViewError = (e: any) => {
+    const desc = String(e?.nativeEvent?.description || '');
+    const benign =
+      desc.includes('ERR_ABORTED') ||
+      desc.includes('ERR_UNKNOWN_URL_SCHEME') ||
+      desc.includes('about:blank') ||
+      desc.includes('ERR_CACHE_MISS') ||
+      desc === '';
+    if (benign) return;
+    if (errorShownRef.current) return;
+    errorShownRef.current = true;
     Alert.alert(
       t('donate.payWay', 'Pay with PayWay (ABA)'),
       t('donate.webviewError', 'Could not load the payment page. Please try again.'),
-      [{ text: 'OK' }]
+      [
+        {
+          text: t('common.retry', 'Retry'),
+          onPress: () => {
+            errorShownRef.current = false;
+            startCheckout();
+          },
+        },
+        {
+          text: t('common.cancel', 'Cancel'),
+          onPress: () => closeCheckout({ poll: false }),
+          style: 'cancel',
+        },
+      ]
     );
-    closeCheckout({ poll: false });
   };
 
   return (
@@ -271,49 +320,6 @@ export default function DonateScreen({ navigation }: any) {
         scrollEventThrottle={16}
       >
         <View style={styles.contentWrapper}>
-          {/* Campaigns */}
-          <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>{t('donate.campaignsHeading', 'Current Campaigns')}</Text>
-            {campaignsLoading ? (
-              <ActivityIndicator color={Colors.secondary} style={{ marginVertical: 16 }} />
-            ) : campaigns.length === 0 ? (
-              <Text style={styles.campaignEmpty}>
-                {t('donate.campaignEmpty', 'No active campaigns right now. Your donation still helps!')}
-              </Text>
-            ) : (
-              campaigns.map((c) => {
-                const pct = typeof c.pct === 'number' ? c.pct : 0;
-                const barColor = colorHex[c.color] || colorHex.red;
-                return (
-                  <View key={c.id} style={styles.campaignCard}>
-                    <View style={styles.campaignTitleRow}>
-                      <Text style={styles.campaignTitle} numberOfLines={2}>
-                        {decodeEntities(isKm && c.title_km ? c.title_km : c.title)}
-                      </Text>
-                      <View style={[styles.pctPill, { backgroundColor: barColor + '15' }]}>
-                        <Text style={[styles.pctPillText, { color: barColor }]}>{pct}%</Text>
-                      </View>
-                    </View>
-                    <Text style={styles.campaignDesc} numberOfLines={3}>
-                      {decodeEntities(isKm && c.excerpt_km ? c.excerpt_km : c.excerpt)}
-                    </Text>
-                    <View style={styles.progressTrack}>
-                      <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: barColor }]} />
-                    </View>
-                    <View style={styles.campaignMetaRow}>
-                      <Text style={styles.campaignMeta}>
-                        {t('donate.campaignRaised', 'Raised')}: <Text style={styles.campaignMetaStrong}>${Number(c.raised || 0).toLocaleString()}</Text>
-                      </Text>
-                      <Text style={styles.campaignMeta}>
-                        {t('donate.campaignGoal', 'Goal')}: <Text style={styles.campaignMetaStrong}>${Number(c.goal || 0).toLocaleString()}</Text>
-                      </Text>
-                    </View>
-                  </View>
-                );
-              })
-            )}
-          </View>
-
           {/* PayWay amount */}
           <View style={styles.sectionCard}>
             <View style={styles.payWayHeader}>
@@ -386,6 +392,49 @@ export default function DonateScreen({ navigation }: any) {
             <Ionicons name="lock-closed" size={14} color={Colors.textMuted} />
             <Text style={styles.securityText}>{t('donate.securityNote', 'Payments are processed securely via ABA Bank KHQR.')}</Text>
           </View>
+
+          {/* Campaigns */}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>{t('donate.campaignsHeading', 'Current Campaigns')}</Text>
+            {campaignsLoading ? (
+              <ActivityIndicator color={Colors.secondary} style={{ marginVertical: 16 }} />
+            ) : campaigns.length === 0 ? (
+              <Text style={styles.campaignEmpty}>
+                {t('donate.campaignEmpty', 'No active campaigns right now. Your donation still helps!')}
+              </Text>
+            ) : (
+              campaigns.map((c) => {
+                const pct = typeof c.pct === 'number' ? c.pct : 0;
+                const barColor = colorHex[c.color] || colorHex.red;
+                return (
+                  <View key={c.id} style={styles.campaignCard}>
+                    <View style={styles.campaignTitleRow}>
+                      <Text style={styles.campaignTitle} numberOfLines={2}>
+                        {decodeEntities(isKm && c.title_km ? c.title_km : c.title)}
+                      </Text>
+                      <View style={[styles.pctPill, { backgroundColor: barColor + '15' }]}>
+                        <Text style={[styles.pctPillText, { color: barColor }]}>{pct}%</Text>
+                      </View>
+                    </View>
+                    <Text style={styles.campaignDesc} numberOfLines={3}>
+                      {decodeEntities(isKm && c.excerpt_km ? c.excerpt_km : c.excerpt)}
+                    </Text>
+                    <View style={styles.progressTrack}>
+                      <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: barColor }]} />
+                    </View>
+                    <View style={styles.campaignMetaRow}>
+                      <Text style={styles.campaignMeta}>
+                        {t('donate.campaignRaised', 'Raised')}: <Text style={styles.campaignMetaStrong}>${Number(c.raised || 0).toLocaleString()}</Text>
+                      </Text>
+                      <Text style={styles.campaignMeta}>
+                        {t('donate.campaignGoal', 'Goal')}: <Text style={styles.campaignMetaStrong}>${Number(c.goal || 0).toLocaleString()}</Text>
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })
+            )}
+          </View>
         </View>
       </Animated.ScrollView>
 
@@ -399,19 +448,32 @@ export default function DonateScreen({ navigation }: any) {
         </View>
         {checkoutHtml ? (
           <WebView
+            key={webviewKey}
             originWhitelist={['*']}
             source={{ html: checkoutHtml, baseUrl: 'https://chacambodia.org' }}
-            userAgent="Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
             javaScriptEnabled
             domStorageEnabled
             thirdPartyCookiesEnabled
             sharedCookiesEnabled
             setSupportMultipleWindows={false}
+            allowsBackForwardNavigationGestures
             startInLoadingState
+            onLoadStart={() => {
+              loadedRef.current = false;
+            }}
+            onLoadEnd={() => {
+              loadedRef.current = true;
+            }}
             onNavigationStateChange={(nav) => {
               if (nav.url && isReturnUrl(nav.url)) closeCheckout();
             }}
             onError={handleWebViewError}
+            onHttpError={(e) => {
+              const code = e?.nativeEvent?.statusCode ?? 0;
+              if (code >= 400 && code < 600 && !errorShownRef.current) {
+                handleWebViewError(e);
+              }
+            }}
             renderLoading={() => (
               <View style={styles.webviewLoading}>
                 <ActivityIndicator size="large" color={Colors.secondary} />
