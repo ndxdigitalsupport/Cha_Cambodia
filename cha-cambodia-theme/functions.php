@@ -2644,7 +2644,7 @@ function cha_render_admin_page() {
                                 <div class="cha-edit-field">
                                     <label for="bloodType">Blood Type</label>
                                     <select id="bloodType" name="bloodType">
-                                        <option value="">Select blood type</option>
+                                        <option value="" disabled <?php echo empty($edit_member['bloodType']) ? 'selected hidden' : ''; ?>>Select blood type</option>
                                         <?php foreach (array('A+','A-','B+','B-','AB+','AB-','O+','O-') as $bt): ?>
                                             <option value="<?php echo $bt; ?>" <?php echo ($edit_member['bloodType'] ?? '') === $bt ? 'selected' : ''; ?>><?php echo $bt; ?></option>
                                         <?php endforeach; ?>
@@ -2658,7 +2658,7 @@ function cha_render_admin_page() {
                                     $is_other_cond = (!empty($curr_cond) && !in_array($curr_cond, $standard_types));
                                     ?>
                                     <select id="condition" name="condition_select" onchange="var o = document.getElementById('condition_other_wrap'); if (o) o.style.display = (this.value === 'Other') ? 'block' : 'none';">
-                                        <option value="">Select Hemophilia Type</option>
+                                        <option value="" disabled <?php echo empty($curr_cond) ? 'selected hidden' : ''; ?>>Select Hemophilia Type</option>
                                         <option value="Hemophilia A" <?php echo ($curr_cond === 'Hemophilia A') ? 'selected' : ''; ?>>Hemophilia A</option>
                                         <option value="Hemophilia B" <?php echo ($curr_cond === 'Hemophilia B') ? 'selected' : ''; ?>>Hemophilia B</option>
                                         <option value="Other" <?php echo $is_other_cond ? 'selected' : ''; ?>>Other</option>
@@ -2803,7 +2803,7 @@ function cha_render_admin_page() {
                                 <div class="cha-edit-field">
                                     <label for="add-bloodType">Blood Type</label>
                                     <select id="add-bloodType" name="bloodType">
-                                        <option value="">Select blood type</option>
+                                        <option value="" disabled selected hidden>Select blood type</option>
                                         <?php foreach (array('A+','A-','B+','B-','AB+','AB-','O+','O-') as $bt): ?>
                                             <option value="<?php echo $bt; ?>"><?php echo $bt; ?></option>
                                         <?php endforeach; ?>
@@ -2812,7 +2812,7 @@ function cha_render_admin_page() {
                                 <div class="cha-edit-field cha-field-full">
                                     <label for="add-condition">Hemophilia Type</label>
                                     <select id="add-condition" name="condition_select" onchange="var o = document.getElementById('add-condition_other_wrap'); if (o) o.style.display = (this.value === 'Other') ? 'block' : 'none';">
-                                        <option value="">Select Hemophilia Type</option>
+                                        <option value="" disabled selected hidden>Select Hemophilia Type</option>
                                         <option value="Hemophilia A">Hemophilia A</option>
                                         <option value="Hemophilia B">Hemophilia B</option>
                                         <option value="Other">Other</option>
