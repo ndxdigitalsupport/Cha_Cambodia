@@ -41,6 +41,17 @@ function escapeHtml(value: string) {
     .replace(/'/g, '&#39;');
 }
 
+function decodeEntities(value?: string) {
+  if (!value) return '';
+  return value
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+}
+
 function buildCheckoutHtml(checkoutUrl: string, fields: Record<string, string>) {
   const inputs = Object.keys(fields)
     .map(
@@ -205,11 +216,15 @@ export default function DonateScreen({ navigation }: any) {
       url.includes('/wp-json/cha/v1/payway/callback') ||
       url.includes('payway.com.kh/api/payment-gateway/v1/payments/return'));
 
-  const closeCheckout = () => {
+  const closeCheckout = (options?: { poll?: boolean }) => {
     const tranId = tranIdRef.current;
     setCheckoutHtml(null);
-    if (tranId) startStatusPoll(tranId);
-    else setChecking(false);
+    if (options?.poll === false || !tranId) {
+      setChecking(false);
+      stopPolling();
+      return;
+    }
+    startStatusPoll(tranId);
   };
 
   const handleWebViewError = () => {
@@ -218,7 +233,7 @@ export default function DonateScreen({ navigation }: any) {
       t('donate.webviewError', 'Could not load the payment page. Please try again.'),
       [{ text: 'OK' }]
     );
-    closeCheckout();
+    closeCheckout({ poll: false });
   };
 
   return (
@@ -273,14 +288,14 @@ export default function DonateScreen({ navigation }: any) {
                   <View key={c.id} style={styles.campaignCard}>
                     <View style={styles.campaignTitleRow}>
                       <Text style={styles.campaignTitle} numberOfLines={2}>
-                        {isKm && c.title_km ? c.title_km : c.title}
+                        {decodeEntities(isKm && c.title_km ? c.title_km : c.title)}
                       </Text>
                       <View style={[styles.pctPill, { backgroundColor: barColor + '15' }]}>
                         <Text style={[styles.pctPillText, { color: barColor }]}>{pct}%</Text>
                       </View>
                     </View>
                     <Text style={styles.campaignDesc} numberOfLines={3}>
-                      {isKm && c.excerpt_km ? c.excerpt_km : c.excerpt}
+                      {decodeEntities(isKm && c.excerpt_km ? c.excerpt_km : c.excerpt)}
                     </Text>
                     <View style={styles.progressTrack}>
                       <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: barColor }]} />
@@ -386,6 +401,7 @@ export default function DonateScreen({ navigation }: any) {
           <WebView
             originWhitelist={['*']}
             source={{ html: checkoutHtml, baseUrl: 'https://chacambodia.org' }}
+            userAgent="Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
             javaScriptEnabled
             domStorageEnabled
             thirdPartyCookiesEnabled
@@ -396,10 +412,6 @@ export default function DonateScreen({ navigation }: any) {
               if (nav.url && isReturnUrl(nav.url)) closeCheckout();
             }}
             onError={handleWebViewError}
-            onHttpError={(e) => {
-              const code = e.nativeEvent.statusCode;
-              if (code >= 400) handleWebViewError();
-            }}
             renderLoading={() => (
               <View style={styles.webviewLoading}>
                 <ActivityIndicator size="large" color={Colors.secondary} />

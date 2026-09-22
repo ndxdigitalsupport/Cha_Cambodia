@@ -1341,10 +1341,10 @@ function cha_rest_get_campaigns($request) {
             if (!$color) $color = 'red';
             $items[] = array(
                 'id'         => $id,
-                'title'      => get_the_title($id),
-                'title_km'   => (string) get_post_meta($id, '_cha_campaign_title_km', true),
-                'excerpt'    => wp_trim_words(get_the_excerpt($id), 22, '...'),
-                'excerpt_km' => (string) get_post_meta($id, '_cha_campaign_desc_km', true),
+                'title'      => html_entity_decode(get_the_title($id), ENT_QUOTES, 'UTF-8'),
+                'title_km'   => html_entity_decode((string) get_post_meta($id, '_cha_campaign_title_km', true), ENT_QUOTES, 'UTF-8'),
+                'excerpt'    => html_entity_decode(wp_trim_words(get_the_excerpt($id), 22, '...'), ENT_QUOTES, 'UTF-8'),
+                'excerpt_km' => html_entity_decode((string) get_post_meta($id, '_cha_campaign_desc_km', true), ENT_QUOTES, 'UTF-8'),
                 'raised'     => $raised,
                 'goal'       => $goal,
                 'pct'        => $goal > 0 ? min(100, round(($raised / $goal) * 100)) : 0,
