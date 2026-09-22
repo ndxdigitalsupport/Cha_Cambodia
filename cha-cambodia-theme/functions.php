@@ -1963,6 +1963,10 @@ function cha_render_admin_page() {
             echo '<div class="cha-notice cha-notice-error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Please enter a valid email address.</div>';
         } else {
         $update_id = sanitize_text_field($_POST['member_id']);
+        $cond_val = sanitize_text_field($_POST['condition_select'] ?? $_POST['condition'] ?? '');
+        if ($cond_val === 'Other') {
+            $cond_val = sanitize_text_field($_POST['condition_other'] ?? 'Other');
+        }
         $data = array(
             'name'              => sanitize_text_field($_POST['name']),
             'name_khmer'        => sanitize_text_field($_POST['name_khmer'] ?? ''),
@@ -1970,7 +1974,7 @@ function cha_render_admin_page() {
             'province'          => sanitize_text_field($_POST['province']),
             'role'              => sanitize_text_field($_POST['role']),
             'blood_type'        => sanitize_text_field($_POST['bloodType'] ?? ''),
-            'condition'         => sanitize_text_field($_POST['condition'] ?? ''),
+            'condition'         => $cond_val,
             'dob'               => sanitize_text_field($_POST['dob'] ?? ''),
             'treatment_centre'  => sanitize_text_field($_POST['treatmentCentre'] ?? ''),
             'phone'             => sanitize_text_field($_POST['phone'] ?? ''),
@@ -2051,7 +2055,13 @@ function cha_render_admin_page() {
                 'registered'   => current_time('mysql'),
                 'address'      => sanitize_text_field($_POST['address'] ?? ''),
                 'dob'          => sanitize_text_field($_POST['dob'] ?? ''),
-                'condition'    => sanitize_text_field($_POST['condition'] ?? ''),
+                'condition'    => (function() {
+                    $c = sanitize_text_field($_POST['condition_select'] ?? $_POST['condition'] ?? '');
+                    if ($c === 'Other') {
+                        $c = sanitize_text_field($_POST['condition_other'] ?? 'Other');
+                    }
+                    return $c;
+                })(),
                 'blood_type'   => sanitize_text_field($_POST['bloodType'] ?? ''),
             );
             $added = $wpdb->insert($table, $add_data);
@@ -2641,8 +2651,21 @@ function cha_render_admin_page() {
                                     </select>
                                 </div>
                                 <div class="cha-edit-field cha-field-full">
-                                    <label for="condition">Diagnosed Bleeding Condition</label>
-                                    <input type="text" id="condition" name="condition" value="<?php echo esc_attr($edit_member['condition'] ?? ''); ?>" placeholder="e.g. Severe Hemophilia A, Factor IX Deficiency">
+                                    <label for="condition">Hemophilia Type</label>
+                                    <?php
+                                    $curr_cond = $edit_member['condition'] ?? '';
+                                    $standard_types = array('Hemophilia A', 'Hemophilia B');
+                                    $is_other_cond = (!empty($curr_cond) && !in_array($curr_cond, $standard_types));
+                                    ?>
+                                    <select id="condition" name="condition_select" onchange="var o = document.getElementById('condition_other_wrap'); if (o) o.style.display = (this.value === 'Other') ? 'block' : 'none';">
+                                        <option value="">Select Hemophilia Type</option>
+                                        <option value="Hemophilia A" <?php echo ($curr_cond === 'Hemophilia A') ? 'selected' : ''; ?>>Hemophilia A</option>
+                                        <option value="Hemophilia B" <?php echo ($curr_cond === 'Hemophilia B') ? 'selected' : ''; ?>>Hemophilia B</option>
+                                        <option value="Other" <?php echo $is_other_cond ? 'selected' : ''; ?>>Other</option>
+                                    </select>
+                                    <div id="condition_other_wrap" style="display:<?php echo $is_other_cond ? 'block' : 'none'; ?>;margin-top:8px;">
+                                        <input type="text" id="condition_other" name="condition_other" value="<?php echo $is_other_cond ? esc_attr($curr_cond) : ''; ?>" placeholder="Specify bleeding condition (e.g. Von Willebrand disease)">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2787,8 +2810,16 @@ function cha_render_admin_page() {
                                     </select>
                                 </div>
                                 <div class="cha-edit-field cha-field-full">
-                                    <label for="add-condition">Diagnosed Bleeding Condition</label>
-                                    <input type="text" id="add-condition" name="condition" placeholder="e.g. Severe Hemophilia A, Factor IX Deficiency">
+                                    <label for="add-condition">Hemophilia Type</label>
+                                    <select id="add-condition" name="condition_select" onchange="var o = document.getElementById('add-condition_other_wrap'); if (o) o.style.display = (this.value === 'Other') ? 'block' : 'none';">
+                                        <option value="">Select Hemophilia Type</option>
+                                        <option value="Hemophilia A">Hemophilia A</option>
+                                        <option value="Hemophilia B">Hemophilia B</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <div id="add-condition_other_wrap" style="display:none;margin-top:8px;">
+                                        <input type="text" id="add-condition_other" name="condition_other" placeholder="Specify bleeding condition (e.g. Von Willebrand disease)">
+                                    </div>
                                 </div>
                             </div>
                         </div>
