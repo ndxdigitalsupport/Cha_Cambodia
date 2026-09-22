@@ -212,6 +212,15 @@ export default function DonateScreen({ navigation }: any) {
     else setChecking(false);
   };
 
+  const handleWebViewError = () => {
+    Alert.alert(
+      t('donate.payWay', 'Pay with PayWay (ABA)'),
+      t('donate.webviewError', 'Could not load the payment page. Please try again.'),
+      [{ text: 'OK' }]
+    );
+    closeCheckout();
+  };
+
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.heroContainer, { transform: [{ translateY: parallaxTranslateY }, { scale: scaleZoom }] }]}>
@@ -376,14 +385,21 @@ export default function DonateScreen({ navigation }: any) {
         {checkoutHtml ? (
           <WebView
             originWhitelist={['*']}
-            source={{ html: checkoutHtml }}
+            source={{ html: checkoutHtml, baseUrl: 'https://chacambodia.org' }}
             javaScriptEnabled
             domStorageEnabled
+            thirdPartyCookiesEnabled
+            sharedCookiesEnabled
+            setSupportMultipleWindows={false}
             startInLoadingState
             onNavigationStateChange={(nav) => {
               if (nav.url && isReturnUrl(nav.url)) closeCheckout();
             }}
-            onError={closeCheckout}
+            onError={handleWebViewError}
+            onHttpError={(e) => {
+              const code = e.nativeEvent.statusCode;
+              if (code >= 400) handleWebViewError();
+            }}
             renderLoading={() => (
               <View style={styles.webviewLoading}>
                 <ActivityIndicator size="large" color={Colors.secondary} />
