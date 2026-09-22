@@ -17,13 +17,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { WebView } from 'react-native-webview';
 import { Colors, Spacing, Shadows } from '../../theme/colors';
 import { campaignsAPI, paywayAPI } from '../../api/client';
-import qrImage from '../../../assets/aba-pay-qr.jpeg';
-
-const STEPS = [
-  { icon: 'phone-portrait-outline' as const, color: Colors.secondary },
-  { icon: 'scan-outline' as const, color: Colors.primary },
-  { icon: 'checkmark-circle-outline' as const, color: Colors.success },
-];
 
 const PRESETS = [5, 10, 25, 50];
 
@@ -80,7 +73,6 @@ const colorHex: Record<string, string> = {
 
 export default function DonateScreen({ navigation }: any) {
   const { t, i18n } = useTranslation();
-  const [done, setDone] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [campaignsLoading, setCampaignsLoading] = useState(true);
   const [amountText, setAmountText] = useState('10');
@@ -142,7 +134,6 @@ export default function DonateScreen({ navigation }: any) {
         if (local === 'completed' || code === 0) {
           stopPolling();
           setChecking(false);
-          setDone(true);
           Alert.alert(
             t('donate.thankYou', 'Thank You!'),
             t('donate.paymentSuccess', 'Thank you! Your payment was received.'),
@@ -219,15 +210,6 @@ export default function DonateScreen({ navigation }: any) {
     setCheckoutHtml(null);
     if (tranId) startStatusPoll(tranId);
     else setChecking(false);
-  };
-
-  const handleDone = () => {
-    Alert.alert(
-      t('donate.thankYou', 'Thank You!'),
-      t('donate.thankYouMsg', 'Your support helps CHA provide treatment and care for haemophilia patients across Cambodia.'),
-      [{ text: 'OK' }]
-    );
-    setDone(true);
   };
 
   return (
@@ -375,71 +357,6 @@ export default function DonateScreen({ navigation }: any) {
             </TouchableOpacity>
             <Text style={styles.checkoutHint}>{t('donate.checkoutHint', 'Complete payment in the secure window, then return.')}</Text>
           </View>
-
-          {/* QR fallback */}
-          <View style={styles.qrCard}>
-            <View style={styles.qrBadge}>
-              <Ionicons name="shield-checkmark" size={14} color={Colors.success} />
-              <Text style={styles.qrBadgeText}>{t('donate.securePayment', 'Secure Payment')}</Text>
-            </View>
-
-            <View style={styles.qrImageWrap}>
-              <View style={styles.qrFrame}>
-                <Animated.Image source={qrImage} style={styles.qrImage} resizeMode="contain" />
-              </View>
-            </View>
-
-            <View style={styles.accountInfo}>
-              <Text style={styles.accountLabel}>{t('donate.scanToPay', 'Scan to Pay')}</Text>
-              <Text style={styles.accountName}>CHA</Text>
-              <Text style={styles.accountOrg}>{t('donate.accountOrg', 'CAMBODIA HEMOPHILIA ASSOCIATION')}</Text>
-              <View style={styles.accountNumberWrap}>
-                <Text style={styles.accountNumber}>{t('donate.accountNumber', '000 283 539')}</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Scan Steps */}
-          <View style={styles.stepsCard}>
-            <Text style={styles.stepsTitle}>{t('donate.howToPay', 'How to Pay')}</Text>
-            {[
-              t('donate.step1', 'Open your ABA Mobile, Bakong, or any KHQR-supported banking app'),
-              t('donate.step2', 'Scan the QR code above and enter the amount'),
-              t('donate.step3', 'Confirm the payment in your banking app'),
-            ].map((step, i) => (
-              <View key={i} style={styles.stepRow}>
-                <View style={[styles.stepIcon, { backgroundColor: STEPS[i].color + '15' }]}>
-                  <Ionicons name={STEPS[i].icon} size={20} color={STEPS[i].color} />
-                </View>
-                <View style={styles.stepContent}>
-                  <Text style={styles.stepNumber}>{t('donate.step', 'Step')} {i + 1}</Text>
-                  <Text style={styles.stepText}>{step}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-
-          {/* Done Button */}
-          <TouchableOpacity
-            style={[styles.doneBtn, done && styles.doneBtnCompleted]}
-            onPress={handleDone}
-            activeOpacity={0.85}
-            disabled={done}
-          >
-            <LinearGradient
-              colors={done ? ['#16A34A', '#15803D'] : ['#DC2626', '#B91C1C']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.doneBtnGradient}
-            >
-              <Ionicons name={done ? 'checkmark-circle' : 'checkmark'} size={20} color="#FFFFFF" />
-              <Text style={styles.doneBtnText}>
-                {done
-                  ? t('donate.paymentCompleted', 'Payment Completed')
-                  : t('donate.markAsPaid', "I've Completed Payment")}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
 
           <View style={styles.securityNote}>
             <Ionicons name="lock-closed" size={14} color={Colors.textMuted} />
@@ -660,105 +577,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   webviewLoadingText: { fontSize: 13, color: Colors.textSecondary },
-
-  qrCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 24,
-    alignItems: 'center',
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.04)',
-    ...Shadows.md,
-  },
-  qrBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: Colors.successLight,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 100,
-    marginBottom: 20,
-  },
-  qrBadgeText: { fontSize: 12, fontWeight: '700', color: Colors.success },
-  qrImageWrap: {
-    width: 260,
-    height: 260,
-    marginBottom: 20,
-  },
-  qrFrame: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: Colors.border,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...Shadows.sm,
-  },
-  qrImage: {
-    width: '100%',
-    height: '100%',
-  },
-
-  accountInfo: {
-    alignItems: 'center',
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: Colors.borderLight,
-    width: '100%',
-  },
-  accountLabel: { fontSize: 12, fontWeight: '700', color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
-  accountName: { fontSize: 22, fontWeight: '900', color: Colors.secondary, marginBottom: 4 },
-  accountOrg: { fontSize: 12, fontWeight: '700', color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 },
-  accountNumberWrap: {
-    backgroundColor: Colors.secondaryLight,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
-  accountNumber: { fontSize: 20, fontWeight: '900', color: Colors.secondary, letterSpacing: 3 },
-
-  stepsCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.04)',
-    ...Shadows.sm,
-  },
-  stepsTitle: { fontSize: 18, fontWeight: '800', color: Colors.secondary, marginBottom: 16 },
-  stepRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 14,
-    marginBottom: 16,
-  },
-  stepIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepContent: { flex: 1 },
-  stepNumber: { fontSize: 11, fontWeight: '700', color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 },
-  stepText: { fontSize: 13, color: Colors.text, lineHeight: 20 },
-
-  doneBtn: { borderRadius: 16, overflow: 'hidden', marginBottom: 16, ...Shadows.md },
-  doneBtnCompleted: { opacity: 0.85 },
-  doneBtnGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 18,
-  },
-  doneBtnText: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
 
   securityNote: {
     flexDirection: 'row',

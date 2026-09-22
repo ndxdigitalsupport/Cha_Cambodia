@@ -133,7 +133,7 @@ export default function DashboardScreen({ navigation }: any) {
             <View style={styles.vipCardBottom}>
               <View style={styles.vipDataBlock}>
                 <Text style={styles.vipDataLabel}>Role</Text>
-                <Text style={styles.vipDataValue}>{user?.role || t('dashboard.member', 'Member')}</Text>
+                <Text style={styles.vipDataValue}>{t('dashboard.member', 'Member')}</Text>
               </View>
               <View style={styles.vipDataBlock}>
                 <Text style={styles.vipDataLabel}>Joined</Text>

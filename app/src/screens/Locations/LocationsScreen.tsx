@@ -42,31 +42,6 @@ export default function LocationsScreen({ navigation }: any) {
     },
   ];
 
-  const offices = [
-    {
-      key: 'phnomPenh',
-      icon: 'business' as const,
-      name: t('locations.offices.phnomPenh.name', 'CHA National Headquarters'),
-      sub: t('locations.offices.phnomPenh.sub', 'Phnom Penh'),
-      address: t('locations.offices.phnomPenh.address', '#35, St. 121, Sangkat Tuol Tompoung 2, Khan Chamkarmon, Phnom Penh, Cambodia'),
-      phone: '+855 (0) 12 751 728',
-      email: 'info@chacambodia.org',
-      mapQuery: 'CHA Cambodia, St 121, Phnom Penh',
-      color: Colors.secondary,
-    },
-    {
-      key: 'siemReap',
-      icon: 'business' as const,
-      name: t('locations.offices.siemReap.name', 'CHA Siem Reap Chapter'),
-      sub: t('locations.offices.siemReap.sub', 'Siem Reap'),
-      address: t('locations.offices.siemReap.address', 'Angkor Hospital for Children, Tep Vong St, Siem Reap, Cambodia'),
-      phone: '+855 (0) 12 794 685',
-      email: 'info@chacambodia.org',
-      mapQuery: 'Angkor Hospital for Children, Siem Reap',
-      color: Colors.primary,
-    },
-  ];
-
   const filteredCentres = CENTRES.filter(c => {
     const matchesProvince = selectedProvinceKey === 'all' || c.provinceKey === selectedProvinceKey;
     const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -77,10 +52,6 @@ export default function LocationsScreen({ navigation }: any) {
 
   const handleCall = (phone: string) => {
     Linking.openURL(`tel:${phone.replace(/\s+/g, '')}`);
-  };
-
-  const openMaps = (query: string) => {
-    Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`);
   };
 
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -123,66 +94,18 @@ export default function LocationsScreen({ navigation }: any) {
           </View>
           <Text style={styles.heroTitle}>{t('locations.title', 'CHA Locations')}</Text>
           <Text style={styles.heroLead}>
-            {t('locations.lead', 'Find CHA offices and partner treatment centres in Phnom Penh and Siem Reap.')}
+            {t('locations.lead', 'Find partner treatment centres for haemophilia care in Phnom Penh and Siem Reap.')}
           </Text>
         </LinearGradient>
         </ImageBackground>
       </Animated.View>
 
       <View style={{ backgroundColor: Colors.surface, flex: 1 }}>
-      {/* CHA Offices */}
-      <View style={styles.officeSection}>
-        <View style={styles.sectionTitleRow}>
-          <View style={styles.redBar} />
-          <Text style={styles.sectionTitle}>{t('locations.officesTitle', 'CHA Offices')}</Text>
-        </View>
-
-        {offices.map((office) => (
-          <View key={office.key} style={styles.officeCard}>
-            <View style={styles.officeTop}>
-              <View style={[styles.officeIcon, { backgroundColor: office.color + '15' }]}>
-                <Ionicons name={office.icon} size={22} color={office.color} />
-              </View>
-              <View style={styles.officeInfo}>
-                <Text style={styles.officeName}>{office.name}</Text>
-                <Text style={styles.officeSub}>{office.sub}</Text>
-              </View>
-            </View>
-
-            <View style={styles.officeDetails}>
-              <View style={styles.detailRow}>
-                <Ionicons name="location" size={14} color={Colors.primary} />
-                <Text style={styles.detailText}>{office.address}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Ionicons name="call" size={14} color={Colors.secondary} />
-                <Text style={styles.detailText}>{office.phone}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Ionicons name="mail" size={14} color={Colors.purple} />
-                <Text style={styles.detailText}>{office.email}</Text>
-              </View>
-            </View>
-
-            <View style={styles.officeActions}>
-              <TouchableOpacity style={styles.actionBtn} onPress={() => handleCall(office.phone)} activeOpacity={0.85}>
-                <Ionicons name="call" size={14} color="#FFFFFF" />
-                <Text style={styles.actionBtnText}>{t('programs.callNow', 'Call Now')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.actionBtn, styles.actionBtnOutline]} onPress={() => openMaps(office.mapQuery)} activeOpacity={0.85}>
-                <Ionicons name="map-outline" size={14} color={Colors.secondary} />
-                <Text style={[styles.actionBtnText, styles.actionBtnTextOutline]}>{t('locations.openInMaps', 'Open in Maps')}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-      </View>
-
       {/* Partner Treatment Centres */}
       <View style={styles.partnerSection}>
         <View style={styles.sectionTitleRow}>
           <View style={styles.redBar} />
-          <Text style={styles.sectionTitle}>{t('locations.partnersTitle', 'Partner Treatment Centres')}</Text>
+          <Text style={styles.sectionTitle}>{t('locations.partnersTitle', 'Treatment Centres')}</Text>
         </View>
         <Text style={styles.partnerSub}>
           {t('locations.partnersSub', 'Hospitals and specialized haematology units across Cambodia.')}
@@ -313,44 +236,11 @@ const styles = StyleSheet.create({
   heroTitle: { fontSize: 26, fontWeight: '900', color: '#FFFFFF', textAlign: 'center', lineHeight: 38, paddingTop: 4, marginBottom: 8 },
   heroLead: { fontSize: 14, color: 'rgba(255,255,255,0.9)', lineHeight: 24, paddingTop: 2, textAlign: 'center', maxWidth: '95%' },
 
-  officeSection: { paddingHorizontal: Spacing.lg, paddingTop: 24 },
   partnerSection: { paddingHorizontal: Spacing.lg, paddingTop: 24 },
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
   redBar: { width: 4, height: 22, borderRadius: 2, backgroundColor: Colors.primary },
   sectionTitle: { fontSize: 20, fontWeight: '800', color: Colors.secondary, lineHeight: 32, paddingTop: 4 },
   partnerSub: { fontSize: 13, color: Colors.textSecondary, lineHeight: 22, marginLeft: 12, paddingTop: 2, marginBottom: 16 },
-
-  officeCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: BorderRadius.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    padding: Spacing.md,
-    marginBottom: 12,
-    ...Shadows.md,
-  },
-  officeTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 12 },
-  officeIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  officeInfo: { flex: 1 },
-  officeName: { fontSize: 15, fontWeight: '800', color: Colors.text, lineHeight: 22, paddingTop: 2 },
-  officeSub: { fontSize: 12, color: Colors.textSecondary, lineHeight: 18, paddingTop: 2 },
-  officeDetails: { gap: 6, marginBottom: 14, paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.borderLight },
-  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  detailText: { fontSize: 12, color: Colors.textSecondary, fontWeight: '500', lineHeight: 19, paddingTop: 2, flex: 1 },
-  officeActions: { flexDirection: 'row', gap: 10 },
-  actionBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    backgroundColor: Colors.secondary,
-    paddingVertical: 12,
-    borderRadius: BorderRadius.md,
-  },
-  actionBtnOutline: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: Colors.secondary },
-  actionBtnText: { fontSize: 13, fontWeight: '700', color: '#FFFFFF', paddingTop: 2 },
-  actionBtnTextOutline: { color: Colors.secondary },
 
   searchSection: { paddingHorizontal: Spacing.lg, paddingTop: 8 },
   searchBar: {
@@ -407,6 +297,8 @@ const styles = StyleSheet.create({
   labBadgeText: { fontSize: 10, fontWeight: '700', color: Colors.success, paddingTop: 2 },
 
   cardDetails: { gap: 6, marginBottom: 14, paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.borderLight },
+  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  detailText: { fontSize: 12, color: Colors.textSecondary, fontWeight: '500', lineHeight: 19, paddingTop: 2, flex: 1 },
   callBtn: {
     flexDirection: 'row',
     alignItems: 'center',
