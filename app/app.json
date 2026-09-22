@@ -18,16 +18,11 @@
     },
     "android": {
       "package": "com.chacambodia.app",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundColor": "#E6F4FE"
       }
-    },
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0B1D6D"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -41,7 +36,15 @@
           "photosPermission": "Allow CHA to access your photos to set your membership card photo."
         }
       ],
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0B1D6D"
+        }
+      ]
     ],
     "extra": {
       "eas": {
