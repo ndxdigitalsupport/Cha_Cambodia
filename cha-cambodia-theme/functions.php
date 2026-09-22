@@ -2683,10 +2683,11 @@ function cha_render_admin_page() {
         <?php if ($editing && $edit_member): ?>
             <div class="cha-edit-wrap">
                 <div class="cha-edit-card">
-                    <form method="post" action="admin.php?page=cha-members" id="cha-edit-member-form">
+                    <form method="post" action="admin.php?page=cha-members" id="cha-edit-member-form" enctype="multipart/form-data">
                         <?php wp_nonce_field('cha_edit_member', 'cha_edit_nonce'); ?>
                         <input type="hidden" name="member_id" value="<?php echo esc_attr($edit_member['memberId']); ?>">
                         <input type="hidden" name="photo" id="cha-edit-photo-input" value="<?php echo esc_attr($edit_member['photo'] ?? ''); ?>">
+                        <input type="file" name="avatar_file" id="cha-edit-file-input" accept="image/*" style="display:none;">
 
                         <div class="cha-edit-header">
                             <div class="cha-avatar-uploader-wrap" id="cha-edit-avatar-trigger" title="Click to upload / change photo">
@@ -2861,34 +2862,59 @@ function cha_render_admin_page() {
                             });
                         });
 
-                        // WordPress Media Uploader for Edit Member
+                        // Avatar Uploader for Edit Member (WordPress Media Library with direct File Picker fallback)
                         var trigger = document.getElementById('cha-edit-avatar-trigger');
                         var input = document.getElementById('cha-edit-photo-input');
+                        var fileInput = document.getElementById('cha-edit-file-input');
                         var img = document.getElementById('cha-edit-avatar-img');
                         var placeholder = document.getElementById('cha-edit-avatar-placeholder');
                         var removeBtn = document.getElementById('cha-edit-avatar-remove');
 
-                        if (trigger && typeof wp !== 'undefined' && wp.media) {
+                        function updateEditAvatarPreview(url) {
+                            if (img) {
+                                img.src = url;
+                                img.style.display = 'block';
+                            }
+                            if (placeholder) placeholder.style.display = 'none';
+                            if (removeBtn) removeBtn.style.display = 'flex';
+                        }
+
+                        if (trigger) {
                             var frame;
                             trigger.addEventListener('click', function(e) {
                                 if (e.target.closest('#cha-edit-avatar-remove')) return;
                                 e.preventDefault();
-                                if (frame) { frame.open(); return; }
-                                frame = wp.media({
-                                    title: 'Select or Upload Member Photo',
-                                    button: { text: 'Use this photo' },
-                                    multiple: false,
-                                    library: { type: 'image' }
-                                });
-                                frame.on('select', function() {
-                                    var attachment = frame.state().get('selection').first().toJSON();
-                                    var url = attachment.sizes && attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url;
-                                    if (input) input.value = url;
-                                    if (img) { img.src = url; img.style.display = 'block'; }
-                                    if (placeholder) placeholder.style.display = 'none';
-                                    if (removeBtn) removeBtn.style.display = 'flex';
-                                });
-                                frame.open();
+                                
+                                if (typeof wp !== 'undefined' && wp.media) {
+                                    if (frame) { frame.open(); return; }
+                                    frame = wp.media({
+                                        title: 'Select or Upload Member Photo',
+                                        button: { text: 'Use this photo' },
+                                        multiple: false,
+                                        library: { type: 'image' }
+                                    });
+                                    frame.on('select', function() {
+                                        var attachment = frame.state().get('selection').first().toJSON();
+                                        var url = attachment.sizes && attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url;
+                                        if (input) input.value = url;
+                                        updateEditAvatarPreview(url);
+                                    });
+                                    frame.open();
+                                } else if (fileInput) {
+                                    fileInput.click();
+                                }
+                            });
+                        }
+
+                        if (fileInput) {
+                            fileInput.addEventListener('change', function() {
+                                if (this.files && this.files[0]) {
+                                    var reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        updateEditAvatarPreview(e.target.result);
+                                    };
+                                    reader.readAsDataURL(this.files[0]);
+                                }
                             });
                         }
 
@@ -2897,6 +2923,7 @@ function cha_render_admin_page() {
                                 e.stopPropagation();
                                 e.preventDefault();
                                 if (input) input.value = '';
+                                if (fileInput) fileInput.value = '';
                                 if (img) { img.src = ''; img.style.display = 'none'; }
                                 if (placeholder) placeholder.style.display = 'inline-flex';
                                 removeBtn.style.display = 'none';
@@ -2909,9 +2936,10 @@ function cha_render_admin_page() {
         <?php elseif ($adding): ?>
             <div class="cha-edit-wrap">
                 <div class="cha-edit-card">
-                    <form method="post" action="admin.php?page=cha-members&add=1" id="cha-add-member-form">
+                    <form method="post" action="admin.php?page=cha-members&add=1" id="cha-add-member-form" enctype="multipart/form-data">
                         <?php wp_nonce_field('cha_edit_member', 'cha_edit_nonce'); ?>
                         <input type="hidden" name="photo" id="cha-add-photo-input" value="<?php echo esc_attr($add_form_photo ?? ''); ?>">
+                        <input type="file" name="avatar_file" id="cha-add-file-input" accept="image/*" style="display:none;">
 
                         <div class="cha-edit-header">
                             <div class="cha-avatar-uploader-wrap" id="cha-add-avatar-trigger" title="Click to upload member photo">
@@ -3068,34 +3096,59 @@ function cha_render_admin_page() {
                             });
                         });
 
-                        // WordPress Media Uploader for Add Member
+                        // Avatar Uploader for Add Member (WordPress Media Library with direct File Picker fallback)
                         var trigger = document.getElementById('cha-add-avatar-trigger');
                         var input = document.getElementById('cha-add-photo-input');
+                        var fileInput = document.getElementById('cha-add-file-input');
                         var img = document.getElementById('cha-add-avatar-img');
                         var placeholder = document.getElementById('cha-add-avatar-placeholder');
                         var removeBtn = document.getElementById('cha-add-avatar-remove');
 
-                        if (trigger && typeof wp !== 'undefined' && wp.media) {
+                        function updateAddAvatarPreview(url) {
+                            if (img) {
+                                img.src = url;
+                                img.style.display = 'block';
+                            }
+                            if (placeholder) placeholder.style.display = 'none';
+                            if (removeBtn) removeBtn.style.display = 'flex';
+                        }
+
+                        if (trigger) {
                             var frame;
                             trigger.addEventListener('click', function(e) {
                                 if (e.target.closest('#cha-add-avatar-remove')) return;
                                 e.preventDefault();
-                                if (frame) { frame.open(); return; }
-                                frame = wp.media({
-                                    title: 'Select or Upload Member Photo',
-                                    button: { text: 'Use this photo' },
-                                    multiple: false,
-                                    library: { type: 'image' }
-                                });
-                                frame.on('select', function() {
-                                    var attachment = frame.state().get('selection').first().toJSON();
-                                    var url = attachment.sizes && attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url;
-                                    if (input) input.value = url;
-                                    if (img) { img.src = url; img.style.display = 'block'; }
-                                    if (placeholder) placeholder.style.display = 'none';
-                                    if (removeBtn) removeBtn.style.display = 'flex';
-                                });
-                                frame.open();
+                                
+                                if (typeof wp !== 'undefined' && wp.media) {
+                                    if (frame) { frame.open(); return; }
+                                    frame = wp.media({
+                                        title: 'Select or Upload Member Photo',
+                                        button: { text: 'Use this photo' },
+                                        multiple: false,
+                                        library: { type: 'image' }
+                                    });
+                                    frame.on('select', function() {
+                                        var attachment = frame.state().get('selection').first().toJSON();
+                                        var url = attachment.sizes && attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url;
+                                        if (input) input.value = url;
+                                        updateAddAvatarPreview(url);
+                                    });
+                                    frame.open();
+                                } else if (fileInput) {
+                                    fileInput.click();
+                                }
+                            });
+                        }
+
+                        if (fileInput) {
+                            fileInput.addEventListener('change', function() {
+                                if (this.files && this.files[0]) {
+                                    var reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        updateAddAvatarPreview(e.target.result);
+                                    };
+                                    reader.readAsDataURL(this.files[0]);
+                                }
                             });
                         }
 
@@ -3104,6 +3157,7 @@ function cha_render_admin_page() {
                                 e.stopPropagation();
                                 e.preventDefault();
                                 if (input) input.value = '';
+                                if (fileInput) fileInput.value = '';
                                 if (img) { img.src = ''; img.style.display = 'none'; }
                                 if (placeholder) placeholder.style.display = 'inline-flex';
                                 removeBtn.style.display = 'none';
