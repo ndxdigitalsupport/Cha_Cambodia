@@ -108,12 +108,4 @@ export const campaignsAPI = {
   getCampaigns: () => apiClient.get('/campaigns'),
 };
 
-// PayWay API
-export const paywayAPI = {
-  purchase: (data: { amount: number; currency?: string; firstname?: string; email?: string; phone?: string }) =>
-    apiClient.post('/payway/purchase', { currency: 'USD', ...data }),
-
-  check: (tran_id: string) => apiClient.post('/payway/check', { tran_id }),
-};
-
 export default apiClient;

@@ -32,7 +32,7 @@ get_header(); ?>
         <li><strong>Membership information</strong> — full name, email address, phone number, postal address, province, and role (patient, family member, healthcare professional, or member).</li>
         <li><strong>Health information (with consent)</strong> — date of birth, bleeding-disorder type, blood type, treatment centre, and emergency contact details that you choose to add for your membership card and emergency support.</li>
         <li><strong>Profile photo</strong> — an optional photo you upload for your member card. Photos are stored on CHA servers in a restricted folder.</li>
-        <li><strong>Donation information</strong> — name and contact details you provide when donating. Payments are processed securely by PayWay (ABA Bank); CHA does not store full card numbers or CVV.</li>
+        <li><strong>Donation information</strong> — name and contact details you provide when donating. Payments are made by scanning the CHA KHQR code with ABA Mobile, Bakong, or another KHQR-supported banking app; CHA does not store full card numbers or CVV.</li>
         <li><strong>Technical data</strong> — basic anonymised analytics to help us improve the site and app (e.g. pages viewed, app version).</li>
         <li><strong>Communications</strong> — when you email us, use the contact form, or join our community channels.</li>
       </ul>
@@ -55,7 +55,7 @@ get_header(); ?>
         <li>We do <strong>not</strong> sell or rent your personal information.</li>
         <li>We may share information with treatment centres and partner organisations only with your explicit consent.</li>
         <li>We use service providers (hosting, email, payment processing) bound by confidentiality and data-protection obligations.</li>
-        <li>PayWay (ABA Bank) processes donation payments on our behalf under their own privacy policy.</li>
+        <li>Donation payments are made through KHQR via your own banking app under that app's privacy policy. CHA does not process or store card details on this website.</li>
         <li>We may disclose information to authorities where required by law.</li>
       </ul>
 
@@ -116,7 +116,7 @@ get_header(); ?>
         <li><strong>ព័ត៌មានសមាជិកភាព</strong> — ឈ្មោះពេញ អ៊ីមែល លេខទូរស័ព្ទ អាសយដ្ឋាន ខេត្ត និងតួនាទី (អ្នកជំងឺ សមាជិកគ្រួសារ អ្នកជំនាញសុខភាព ឬអ្នកគាំទ្រ)។</li>
         <li><strong>ព័ត៌មានសុខភាព (ដោយមានការយល់ព្រម)</strong> — ថ្ងៃខែឆ្នាំកំណើត ប្រភេទជំងឺដំណក់ឈាម ប្រភេទឈាម កន្លែងព្យាបាល និងព័ត៌មានទំនាក់ទំនងបន្ទាន់ ដែលអ្នកជ្រើសរើសបន្ថែមសម្រាប់កាតសមាជិក និងការគាំទ្របន្ទាន់។</li>
         <li><strong>រូបថតប្រវត្តិរូប</strong> — រូបថតស្រេចចិត្តដែលអ្នកផ្ទុកឡើងសម្រាប់កាតសមាជិក ត្រូវបានរក្សាទុកនៅក្នុងថតដែលមានការការពារ។</li>
-        <li><strong>ព័ត៌មានបរិច្ចាគ</strong> — ឈ្មោះ និងព័ត៌មានទំនាក់ទំនង នៅពេលអ្នកបរិច្ចាគ។ ការទូទាត់ត្រូវបានដំណើរការដោយសុវត្ថិភាពតាមរយៈ PayWay (ធនាគារ ABA)។ CHA មិនរក្សាទុកលេខកាត ឬ CVV ទេ។</li>
+        <li><strong>ព័ត៌មានបរិច្ចាគ</strong> — ឈ្មោះ និងព័ត៌មានទំនាក់ទំនង នៅពេលអ្នកបរិច្ចាគ។ ការទូទាត់ធ្វើឡើងដោយស្កែនកូដ KHQR របស់ CHA តាម ABA Mobile, Bakong ឬកម្មវិធីធនាគារផ្សេង។ CHA មិនរក្សាទុកលេខកាត ឬ CVV ទេ។</li>
       </ul>
 
       <h2>៣. ការប្រើប្រាស់ព័ត៌មាន</h2>
@@ -133,7 +133,7 @@ get_header(); ?>
         <li>យើងមិនលក់ ឬជួលព័ត៌មានផ្ទាល់ខ្លួនទេ។</li>
         <li>យើងអាចចែករំលែកព័ត៌មានទៅមណ្ឌលព្យាបាល និងអង្គការដៃគូ បានតែដោយការយល់ព្រមជាក់លាក់របស់អ្នក។</li>
         <li>យើងប្រើអ្នកផ្តល់សេវា (ម៉ាស៊ីនមេ អ៊ីមែល ដំណើរការទូទាត់) ដែលត្រូវគោរពកាតព្វកិច្ចភាពជឿជាក់ និងការពារទិន្នន័យ។</li>
-        <li>PayWay (ធនាគារ ABA) ដំណើរការការទូទាត់បរិច្ចាគ ដោយអនុវត្តតាមគោលនយោបាយឯកជនភាពផ្ទាល់របស់ពួកគេ។</li>
+        <li>ការទូទាត់បរិច្ចាគធ្វើតាមរយៈ KHQR ក្នុងកម្មវិធីធនាគារផ្ទាល់ខ្លួនរបស់អ្នក ស្ថិតនៅក្រោមគោលនយោបាយឯកជនភាពរបស់កម្មវិធីនោះ។ CHA មិនដំណើរការ ឬរក្សាទុកព័ត៌មានកាតនៅលើគេហទំព័រនេះទេ។</li>
       </ul>
 
       <h2>៥. សន្តិសុខទិន្នន័យ</h2>

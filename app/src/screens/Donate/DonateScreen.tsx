@@ -148,7 +148,7 @@ export default function DonateScreen({ navigation }: any) {
           {/* Security Note */}
           <View style={styles.securityNote}>
             <Ionicons name="lock-closed" size={14} color={Colors.textMuted} />
-            <Text style={styles.securityText}>{t('donate.securityNote', 'Payments are processed securely via ABA Bank KHQR.')}</Text>
+            <Text style={styles.securityText}>{t('donate.securityNote', 'Pay directly with ABA Mobile, Bakong, or any KHQR-supported banking app.')}</Text>
           </View>
 
           {/* Current Campaigns */}

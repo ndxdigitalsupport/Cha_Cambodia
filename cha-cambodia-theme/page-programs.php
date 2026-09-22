@@ -153,7 +153,7 @@
         <div class="csr-block csr-red" id="csr-donate" data-reveal>
           <div class="csr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
           <h3 data-i18n="csr_donate_online"><?php echo esc_html(cha_get_option('csr_2_title', 'Online donation')); ?></h3>
-          <p data-i18n="csr_donate_online_desc"><?php echo esc_html(cha_get_option('csr_2_desc', 'Donate securely via PayWay (ABA Bank) — every contribution changes lives across Cambodia.')); ?></p>
+          <p data-i18n="csr_donate_online_desc"><?php echo esc_html(cha_get_option('csr_2_desc', 'Donate securely via KHQR (ABA Mobile & Bakong) — every contribution changes lives across Cambodia.')); ?></p>
           <a class="csr-btn csr-btn-red" href="#" data-donate-trigger data-i18n="csr_donate_now"><?php echo esc_html(cha_get_option('csr_2_link', 'Donate now')); ?> <span class="arrow">→</span></a>
         </div>
         <div class="csr-block csr-purple" id="csr-partners" data-reveal>

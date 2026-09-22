@@ -712,7 +712,7 @@ function cha_customize_register($wp_customize) {
 
     $csr_items = array(
         array('Fundraising', 'ប្រមូលថវិកា', 'Raising funds through community drives, events, and partner campaigns that keep our programs running.', 'ប្រមូលថវិកាតាមរយៈកម្មវិធីសហគមន៍ ព្រឹត្តិការណ៍ និងយុទ្ធនាការដៃគូដែលរក្សាកម្មវិធីរបស់យើងដំណើរការ។', 'View campaigns', 'មើលយុទ្ធនាការ'),
-        array('Online Donation', 'បរិច្ចាគតាមអនឡាញ', 'Donate securely via PayWay (ABA Bank) — every contribution changes lives across Cambodia.', 'បរិច្ចាគដោយសុវត្ថិភាពតាម PayWay (ធនាគារ ABA) — រាល់ការរួមចំណែកផ្លាស់ប្តូរជីវិតនៅទូទាំងកម្ពុជា។', 'Donate now', 'បរិច្ចាគឥឡូវ'),
+        array('Online Donation', 'បរិច្ចាគតាមអនឡាញ', 'Donate securely via KHQR (ABA Mobile & Bakong) — every contribution changes lives across Cambodia.', 'បរិច្ចាគដោយសុវត្ថិភាពតាមរយៈ KHQR (ABA Mobile និង Bakong) — រាល់ការរួមចំណែកផ្លាស់ប្តូរជីវិតនៅទូទាំងកម្ពុជា។', 'Donate now', 'បរិច្ចាគឥឡូវ'),
         array('Corporate Partners', 'ដៃគូធុរកិច្ច', 'Trusted organisations that support our mission and amplify our reach nationwide.', 'អង្គការដែលគួរឱ្យទុកចិត្តដែលគាំទ្របេសកកម្មរបស់យើង និងពង្រីកការឈានដល់របស់យើងទូទាំងប្រទេស។', 'Become a partner', 'ក្លាយជាដៃគូ'),
     );
     $wp_customize->add_setting('csr_heading', array('default' => 'CSR Program', 'sanitize_callback' => 'sanitize_text_field'));

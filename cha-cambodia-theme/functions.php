@@ -4033,7 +4033,7 @@ function cha_render_donations_page() {
                 </div>
                 <div>
                     <h1>Donations Dashboard</h1>
-                    <p>Financial ledger &amp; PayWay gateway operations for CHA Cambodia</p>
+                    <p>Financial ledger for KHQR donations to CHA Cambodia</p>
                 </div>
             </div>
             <div class="cha-fintech-hero-actions">
@@ -4273,7 +4273,7 @@ function cha_render_donations_page() {
                         </svg>
                     </div>
                     <p style="font-weight:700;font-size:1.05rem;color:#1e293b;margin:0 0 6px;">No transactions recorded yet</p>
-                    <p style="font-size:0.85rem;margin:0;color:#64748b;">Donations will populate this ledger once donors complete an ABA PayWay checkout.</p>
+                    <p style="font-size:0.85rem;margin:0;color:#64748b;">Donations will populate this ledger once donors complete a KHQR payment.</p>
                 </div>
             <?php else: ?>
                 <div style="overflow-x:auto;">

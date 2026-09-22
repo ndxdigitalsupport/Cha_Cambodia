@@ -326,7 +326,7 @@
           </div>
 
           <div class="donate-qr-frame" style="max-width:280px;margin:0 auto 16px;">
-            <img src="<?php echo esc_url(get_template_directory_uri() . '/aba-pay-qr.jpeg'); ?>" alt="CHA Cambodia ABA Pay KHQR code" width="240" height="240" style="width:100%;height:auto;display:block;border-radius:12px;" decoding="async">
+            <img src="<?php echo esc_url(get_template_directory_uri() . '/aba-pay-qr.jpeg'); ?>" alt="CHA Cambodia KHQR donation code" width="240" height="240" style="width:100%;height:auto;display:block;border-radius:12px;" decoding="async">
           </div>
 
           <div data-i18n="donate_account_name_lbl" style="font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;color:#64748B;margin-bottom:6px;">ACCOUNT NAME</div>

@@ -47,7 +47,7 @@ get_header(); ?>
       <p>Where translations between English and Khmer are provided, every effort has been made to ensure accuracy. However, the English version takes precedence in case of any discrepancy or ambiguity.</p>
 
       <h2>8. Donations</h2>
-      <p>All donations made through this website or app are processed by PayWay (ABA Bank), a third-party payment provider. CHA is not responsible for any issues arising from payment processing, but we will gladly assist you in resolving any donation-related concerns.</p>
+      <p>Donations made through this website or app are paid by scanning the CHA KHQR code with ABA Mobile, Bakong, or any other KHQR-supported banking app. CHA is not responsible for issues arising in your banking app, but we will gladly assist you in resolving any donation-related concerns.</p>
 
       <h2>9. Limitation of liability</h2>
       <p>To the fullest extent permitted by law, CHA and its representatives are not liable for any loss or damage (including indirect, consequential, or incidental loss) arising out of or in connection with your use of this website or app.</p>
@@ -92,7 +92,7 @@ get_header(); ?>
       <p>ក្នុងករណីមានភាពខុសគ្នារវាងភាសាអង់គ្លេស និងខ្មែរ អត្ថបទភាសាអង់គ្លេសត្រូវបានយកជាអាទិភាព។</p>
 
       <h2>៨. បរិច្ចាគ</h2>
-      <p>រាល់ការបរិច្ចាគតាមគេហទំព័រ ឬកម្មវិធីនេះ ត្រូវបានដំណើរការដោយ PayWay (ធនាគារ ABA) ដែលជាអ្នកផ្តល់សេវាទូទាត់ភាគីទីបី។</p>
+      <p>ការបរិច្ចាគតាមគេហទំព័រ ឬកម្មវិធីនេះ បង់ដោយស្កែនកូដ KHQR របស់ CHA តាម ABA Mobile, Bakong ឬកម្មវិធីធនាគារដែលគាំទ្រ KHQR ផ្សេងទៀត។ CHA មិនទទួលខុសត្រូវចំពោះបញ្ហាដែលកើតឡើងក្នុងកម្មវិធីធនាគាររបស់អ្នក ប៉ុន្តែយើងរីករាយជួយដោះស្រាយបញ្ហាទាក់ទងនឹងការបរិច្ចាគ។</p>
 
       <h2>៩. ទាក់ទងមកយើង</h2>
       <ul>

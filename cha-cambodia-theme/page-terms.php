@@ -48,9 +48,9 @@ get_header(); ?>
 
       <h2>5. Donations and Refund Policy</h2>
       <ul>
-        <li>Donations are voluntary and processed securely by PayWay (Advanced Bank of Asia Limited - ABA Bank).</li>
-        <li>Payments are subject to the terms and privacy conditions of PayWay. All card and KHQR transactions are encrypted and processed through ABA Bank's secure hosted payment gateway.</li>
-        <li><strong>Refund & Cancellation Policy:</strong> In accordance with PayWay Merchant Guidelines, if you believe a donation was processed in error or wish to cancel an unauthorized transaction, you may request a full refund within thirty (30) calendar days of the original transaction date by contacting CHA at <a href="mailto:choryee.hun@gmail.com">choryee.hun@gmail.com</a> or +855 96 260 5335. Approved refunds will be reimbursed to the original payment method (Card, ABA account, or e-Wallet) through the PayWay Merchant Portal within 30 days. Refunds will not be provided in cash.</li>
+        <li>Donations are voluntary and paid securely by scanning the CHA KHQR code with ABA Mobile, Bakong, or any other KHQR-supported banking app.</li>
+        <li>Payments are processed by your banking app under that app's own terms and security conditions. CHA does not collect or store card numbers on this website or app.</li>
+        <li><strong>Refund & Cancellation Policy:</strong> If you believe a donation was made in error or wish to request a refund for an unauthorized transaction, contact CHA within thirty (30) calendar days of the transaction date at <a href="mailto:choryee.hun@gmail.com">choryee.hun@gmail.com</a> or +855 96 260 5335. Approved refunds will be returned by bank transfer to the account used for the donation (or another arrangement agreed with CHA) within 30 days. Refunds will not be provided in cash.</li>
         <li><strong>Customer Support Notice:</strong> Please contact CHA Cambodia directly for all questions, transaction inquiries, or refund requests related to donations made through this website or app. Do not contact ABA Bank directly for website support or donation-related inquiries.</li>
       </ul>
 
@@ -108,9 +108,9 @@ get_header(); ?>
 
       <h2>៥. ការបរិច្ចាគ និងគោលការណ៍បង្វិលសងប្រាក់</h2>
       <ul>
-        <li>ការបរិច្ចាគគឺស្ម័គ្រចិត្ត និងត្រូវបានដំណើរការដោយសុវត្ថិភាពតាមរយៈ PayWay (ធនាគារ វឌ្ឍនៈ អាស៊ី ចំកាត់ - ធនាគារ ABA)។</li>
-        <li>ការទូទាត់ស្ថិតនៅក្រោមលក្ខខណ្ឌសុវត្ថិភាពរបស់ PayWay។ រាល់ប្រតិបត្តិការកាត និង KHQR ត្រូវបានអ៊ិនគ្រីប និងដំណើរការតាមច្រកទូទាត់សុវត្ថិភាពរបស់ធនាគារ ABA។</li>
-        <li><strong>គោលការណ៍បង្វិលសងប្រាក់ និងការលុបចោល៖</strong> អនុលោមតាមគោលការណ៍អាជីវករ PayWay ប្រសិនបើអ្នកយល់ថាមានការបរិច្ចាគដោយច្រឡំ ឬមានប្រតិបត្តិការដែលមិនមានការអនុញ្ញាត អ្នកអាចស្នើសុំការបង្វិលសងប្រាក់ពេញលេញក្នុងរយៈពេលសាមសិប (៣០) ថ្ងៃតាមប្រតិទិន គិតចាប់ពីថ្ងៃធ្វើប្រតិបត្តិការ ដោយទាក់ទងមកកាន់ CHA តាមរយៈ <a href="mailto:choryee.hun@gmail.com">choryee.hun@gmail.com</a> ឬទូរស័ព្ទ +855 96 260 5335។ ការបង្វិលសងដែលបានអនុម័ត នឹងត្រូវផ្ញើត្រឡប់ទៅកាន់វិធីសាស្ត្រទូទាត់ដើមរបស់អ្នក (កាត, គណនី ABA ឬ e-Wallet) តាមរយៈ PayWay ក្នុងរយៈពេល ៣០ ថ្ងៃ។ ការបង្វិលសងជាប្រាក់សុទ្ធមិនត្រូវបានអនុញ្ញាតឡើយ។</li>
+        <li>ការបរិច្ចាគគឺស្ម័គ្រចិត្ត និងបង់ដោយសុវត្ថិភាពតាមរយៈការស្កែនកូដ KHQR របស់ CHA តាម ABA Mobile, Bakong ឬកម្មវិធីធនាគារដែលគាំទ្រ KHQR ផ្សេងទៀត។</li>
+        <li>ការទូទាត់ដំណើរការដោយកម្មវិធីធនាគាររបស់អ្នក ស្ថិតនៅក្រោមលក្ខខណ្ឌ និងសុវត្ថិភាពរបស់កម្មវិធីនោះ។ CHA មិនប្រមូល ឬរក្សាទុកលេខកាតនៅលើគេហទំព័រ ឬកម្មវិធីនេះទេ។</li>
+        <li><strong>គោលការណ៍បង្វិលសងប្រាក់ និងការលុបចោល៖</strong> ប្រសិនបើអ្នកយល់ថាមានការបរិច្ចាគដោយច្រឡំ ឬសុំបង្វិលសងសម្រាប់ប្រតិបត្តិការដែលមិនបានអនុញ្ញាត សូមទាក់ទងមកកាន់ CHA ក្នុងរយៈពេលសាមសិប (៣០) ថ្ងៃតាមប្រតិទិន គិតចាប់ពីថ្ងៃធ្វើប្រតិបត្តិការ តាមរយៈ <a href="mailto:choryee.hun@gmail.com">choryee.hun@gmail.com</a> ឬទូរស័ព្ទ +855 96 260 5335។ ការបង្វិលសងដែលបានអនុម័ត នឹងត្រូវផ្ញើត្រឡប់តាមការផ្ទេរប្រាក់ធនាគារទៅគណនីដែលបានប្រើសម្រាប់ការបរិច្ចាគ (ឬកិច្ចព្រមព្រៀងផ្សេងដែលយល់ព្រមជាមួយ CHA) ក្នុងរយៈពេល ៣០ ថ្ងៃ។ ការបង្វិលសងជាប្រាក់សុទ្ធមិនត្រូវបានអនុញ្ញាតឡើយ។</li>
         <li><strong>សេចក្តីជូនដំណឹងអំពីការគាំទ្រអតិថិជន៖</strong> សូមទាក់ទងមកកាន់សមាគម CHA Cambodia ដោយផ្ទាល់ សម្រាប់រាល់ចម្ងល់ ការសាកសួរប្រតិបត្តិការ ឬសំណើសុំបង្វិលសងប្រាក់ទាក់ទងនឹងការបរិច្ចាគ។ សូមកុំទាក់ទងទៅកាន់ធនាគារ ABA ដោយផ្ទាល់សម្រាប់ការគាំទ្រគេហទំព័រ ឬសំណួរទាក់ទងនឹងការបរិច្ចាគឡើយ។</li>
       </ul>
 
