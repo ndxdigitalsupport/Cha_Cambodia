@@ -5,19 +5,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
-  Alert,
-  TextInput,
-  Modal,
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
-import { WebView } from 'react-native-webview';
 import { Colors, Spacing, Shadows } from '../../theme/colors';
-import { campaignsAPI, paywayAPI } from '../../api/client';
-
-const PRESETS = [5, 10, 25, 50];
+import { campaignsAPI } from '../../api/client';
+import qrImage from '../../../assets/aba-pay-qr.jpeg';
 
 type Campaign = {
   id: number;
@@ -42,24 +37,6 @@ function decodeEntities(value?: string) {
     .replace(/&nbsp;/g, ' ');
 }
 
-function base64UrlEncode(value: string) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-  const bytes = new TextEncoder().encode(value);
-  let result = '';
-  for (let i = 0; i < bytes.length; i += 3) {
-    const b0 = bytes[i];
-    const b1 = i + 1 < bytes.length ? bytes[i + 1] : undefined;
-    const b2 = i + 2 < bytes.length ? bytes[i + 2] : undefined;
-    result += chars[b0 >> 2];
-    result += chars[((b0 & 3) << 4) | ((b1 ?? 0) >> 4)];
-    if (b1 === undefined) break;
-    result += chars[((b1 & 15) << 2) | ((b2 ?? 0) >> 6)];
-    if (b2 === undefined) break;
-    result += chars[b2 & 63];
-  }
-  return result.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
 const colorHex: Record<string, string> = {
   red: '#E31E24',
   blue: '#0B1D6D',
@@ -71,15 +48,6 @@ export default function DonateScreen({ navigation }: any) {
   const { t, i18n } = useTranslation();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [campaignsLoading, setCampaignsLoading] = useState(true);
-  const [amountText, setAmountText] = useState('10');
-  const [checkoutSource, setCheckoutSource] = useState<{ uri: string } | null>(null);
-  const [webviewKey, setWebviewKey] = useState(0);
-  const [paying, setPaying] = useState(false);
-  const [checking, setChecking] = useState(false);
-  const tranIdRef = useRef<string | null>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const loadedRef = useRef(false);
-  const errorShownRef = useRef(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const isKm = i18n.language === 'km';
 
@@ -108,158 +76,11 @@ export default function DonateScreen({ navigation }: any) {
 
   useEffect(() => {
     loadCampaigns();
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
   }, [loadCampaigns]);
-
-  const stopPolling = () => {
-    if (pollRef.current) {
-      clearInterval(pollRef.current);
-      pollRef.current = null;
-    }
-  };
-
-  const startStatusPoll = (tranId: string) => {
-    stopPolling();
-    setChecking(true);
-    let attempts = 0;
-    pollRef.current = setInterval(async () => {
-      attempts += 1;
-      try {
-        const res: any = await paywayAPI.check(tranId);
-        const local = res?.local_status;
-        const code = res?.data?.payment_status_code;
-        if (local === 'completed' || code === 0) {
-          stopPolling();
-          setChecking(false);
-          Alert.alert(
-            t('donate.thankYou', 'Thank You!'),
-            t('donate.paymentSuccess', 'Thank you! Your payment was received.'),
-            [{ text: 'OK' }]
-          );
-          return;
-        }
-        if (local === 'failed' || local === 'cancelled' || code === 3 || code === 7) {
-          stopPolling();
-          setChecking(false);
-          Alert.alert(
-            t('donate.paymentFailed', 'Payment not completed'),
-            t('donate.paymentFailed', 'Payment not completed. Please try again.'),
-            [{ text: 'OK' }]
-          );
-          return;
-        }
-      } catch {
-        // keep polling
-      }
-      if (attempts >= 20) {
-        stopPolling();
-        setChecking(false);
-        Alert.alert(
-          t('donate.paymentStatus', 'Checking payment status…'),
-          t('donate.paymentFailed', 'Payment not completed. Please try again.'),
-          [{ text: 'OK' }]
-        );
-      }
-    }, 3000);
-  };
-
-  const startCheckout = async () => {
-    const amount = parseFloat(amountText);
-    if (!amount || amount <= 0 || Number.isNaN(amount)) {
-      Alert.alert(
-        t('donate.invalidAmount', 'Invalid amount'),
-        t('donate.invalidAmount', 'Please select or enter a valid donation amount.')
-      );
-      return;
-    }
-
-    setPaying(true);
-    try {
-      const res: any = await paywayAPI.purchase({
-        amount,
-        currency: 'USD',
-        firstname: 'Friend',
-      });
-      if (!res?.success || !res?.checkout_url || !res?.fields) {
-        throw new Error(res?.message || 'Could not start payment.');
-      }
-      tranIdRef.current = res.tran_id;
-      loadedRef.current = false;
-      errorShownRef.current = false;
-      setWebviewKey((k) => k + 1);
-      const payload = base64UrlEncode(
-        JSON.stringify({ checkout_url: res.checkout_url, fields: res.fields })
-      );
-      setCheckoutSource({
-        uri: `https://chacambodia.org/wp-json/cha/v1/payway/frame?payload=${payload}`,
-      });
-    } catch (e: any) {
-      Alert.alert(
-        t('donate.payWay', 'Pay with PayWay (ABA)'),
-        e?.message || 'Could not start payment. Please try again.'
-      );
-    } finally {
-      setPaying(false);
-    }
-  };
-
-  const isReturnUrl = (url: string) =>
-    !!url &&
-    (url.includes('donation-thank-you') ||
-      url.includes('donation-cancelled') ||
-      url.includes('/wp-json/cha/v1/payway/callback') ||
-      url.includes('payway.com.kh/api/payment-gateway/v1/payments/return'));
-
-  const closeCheckout = (options?: { poll?: boolean }) => {
-    const tranId = tranIdRef.current;
-    setCheckoutSource(null);
-    loadedRef.current = false;
-    errorShownRef.current = false;
-    if (options?.poll === false || !tranId) {
-      setChecking(false);
-      stopPolling();
-      return;
-    }
-    startStatusPoll(tranId);
-  };
-
-  const handleWebViewError = (e: any) => {
-    const desc = String(e?.nativeEvent?.description || '');
-    const code = Number(e?.nativeEvent?.code ?? 0);
-    const benign =
-      desc.includes('ERR_ABORTED') ||
-      desc.includes('ERR_UNKNOWN_URL_SCHEME') ||
-      desc.includes('about:blank') ||
-      desc.includes('ERR_CACHE_MISS') ||
-      desc === '' ||
-      code === -999;
-    if (benign) return;
-    if (errorShownRef.current) return;
-    errorShownRef.current = true;
-    Alert.alert(
-      t('donate.payWay', 'Pay with PayWay (ABA)'),
-      t('donate.webviewError', 'Could not load the payment page. Please try again.'),
-      [
-        {
-          text: t('common.retry', 'Retry'),
-          onPress: () => {
-            errorShownRef.current = false;
-            startCheckout();
-          },
-        },
-        {
-          text: t('common.cancel', 'Cancel'),
-          onPress: () => closeCheckout({ poll: false }),
-          style: 'cancel',
-        },
-      ]
-    );
-  };
 
   return (
     <View style={styles.container}>
+      {/* Hero */}
       <Animated.View style={[styles.heroContainer, { transform: [{ translateY: parallaxTranslateY }, { scale: scaleZoom }] }]}>
         <LinearGradient
           colors={['#DC2626', '#991B1B']}
@@ -281,10 +102,16 @@ export default function DonateScreen({ navigation }: any) {
         </LinearGradient>
       </Animated.View>
 
-      <TouchableOpacity style={styles.floatingBackBtn} onPress={() => navigation.goBack()} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+      {/* Floating Back Button */}
+      <TouchableOpacity
+        style={styles.floatingBackBtn}
+        onPress={() => navigation.goBack()}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
         <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
       </TouchableOpacity>
 
+      {/* Scrollable Content */}
       <Animated.ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -293,80 +120,38 @@ export default function DonateScreen({ navigation }: any) {
         scrollEventThrottle={16}
       >
         <View style={styles.contentWrapper}>
-          {/* PayWay amount */}
-          <View style={styles.sectionCard}>
-            <View style={styles.payWayHeader}>
-              <View style={styles.payWayIcon}>
-                <Ionicons name="card" size={20} color={Colors.secondary} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.sectionTitle}>{t('donate.payWay', 'Pay with PayWay (ABA)')}</Text>
-                <Text style={styles.payWayHint}>
-                  {t('donate.payWayHint', 'Enter an amount and continue to secure ABA checkout.')}
-                </Text>
+
+          {/* QR Code Card */}
+          <View style={styles.qrCard}>
+            <View style={styles.qrBadge}>
+              <Ionicons name="shield-checkmark" size={14} color={Colors.success} />
+              <Text style={styles.qrBadgeText}>{t('donate.securePayment', 'Secure Payment')}</Text>
+            </View>
+
+            <View style={styles.qrImageWrap}>
+              <View style={styles.qrFrame}>
+                <Animated.Image source={qrImage} style={styles.qrImage} resizeMode="contain" />
               </View>
             </View>
 
-            <Text style={styles.amountLabel}>{t('donate.amount', 'Donation amount (USD)')}</Text>
-            <View style={styles.presetRow}>
-              {PRESETS.map((p) => {
-                const selected = amountText === String(p);
-                return (
-                  <TouchableOpacity
-                    key={p}
-                    style={[styles.presetBtn, selected && styles.presetBtnActive]}
-                    onPress={() => setAmountText(String(p))}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={[styles.presetText, selected && styles.presetTextActive]}>${p}</Text>
-                  </TouchableOpacity>
-                );
-              })}
+            {/* Account Info */}
+            <View style={styles.accountInfo}>
+              <Text style={styles.accountLabel}>{t('donate.scanToPay', 'Scan to Pay')}</Text>
+              <Text style={styles.accountName}>CHA</Text>
+              <Text style={styles.accountOrg}>{t('donate.accountOrg', 'CAMBODIA HEMOPHILIA ASSOCIATION')}</Text>
+              <View style={styles.accountNumberWrap}>
+                <Text style={styles.accountNumber}>{t('donate.accountNumber', '000 283 539')}</Text>
+              </View>
             </View>
-            <TextInput
-              style={styles.amountInput}
-              keyboardType="numeric"
-              value={amountText}
-              onChangeText={setAmountText}
-              placeholder="10"
-              placeholderTextColor={Colors.textMuted}
-            />
-
-            <TouchableOpacity
-              style={[styles.checkoutBtn, (paying || checking) && styles.checkoutBtnDisabled]}
-              onPress={startCheckout}
-              disabled={paying || checking}
-              activeOpacity={0.85}
-            >
-              <LinearGradient
-                colors={['#DC2626', '#B91C1C']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.checkoutGradient}
-              >
-                {paying || checking ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Ionicons name="lock-closed" size={18} color="#FFFFFF" />
-                )}
-                <Text style={styles.checkoutText}>
-                  {paying
-                    ? t('donate.processing', 'Processing payment…')
-                    : checking
-                      ? t('donate.paymentStatus', 'Checking payment status…')
-                      : t('donate.openCheckout', 'Continue to Payment')}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-            <Text style={styles.checkoutHint}>{t('donate.checkoutHint', 'Complete payment in the secure window, then return.')}</Text>
           </View>
 
+          {/* Security Note */}
           <View style={styles.securityNote}>
             <Ionicons name="lock-closed" size={14} color={Colors.textMuted} />
             <Text style={styles.securityText}>{t('donate.securityNote', 'Payments are processed securely via ABA Bank KHQR.')}</Text>
           </View>
 
-          {/* Campaigns */}
+          {/* Current Campaigns */}
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>{t('donate.campaignsHeading', 'Current Campaigns')}</Text>
             {campaignsLoading ? (
@@ -408,55 +193,9 @@ export default function DonateScreen({ navigation }: any) {
               })
             )}
           </View>
+
         </View>
       </Animated.ScrollView>
-
-      <Modal visible={!!checkoutSource} animationType="slide" onRequestClose={() => closeCheckout()}>
-        <View style={styles.modalHeader}>
-          <TouchableOpacity style={styles.modalClose} onPress={() => closeCheckout()}>
-            <Ionicons name="close" size={22} color={Colors.secondary} />
-          </TouchableOpacity>
-          <Text style={styles.modalTitle}>{t('donate.payWay', 'Pay with PayWay (ABA)')}</Text>
-          <View style={{ width: 40 }} />
-        </View>
-        {checkoutSource ? (
-          <WebView
-            key={webviewKey}
-            originWhitelist={['*']}
-            source={checkoutSource}
-            javaScriptEnabled
-            domStorageEnabled
-            thirdPartyCookiesEnabled
-            sharedCookiesEnabled
-            setSupportMultipleWindows={false}
-            allowsBackForwardNavigationGestures
-            startInLoadingState
-            onLoadStart={() => {
-              loadedRef.current = false;
-            }}
-            onLoadEnd={() => {
-              loadedRef.current = true;
-            }}
-            onNavigationStateChange={(nav) => {
-              if (nav.url && isReturnUrl(nav.url)) closeCheckout();
-            }}
-            onError={handleWebViewError}
-            onHttpError={(e) => {
-              const code = e?.nativeEvent?.statusCode ?? 0;
-              if (code >= 400 && code < 600 && !errorShownRef.current) {
-                handleWebViewError(e);
-              }
-            }}
-            renderLoading={() => (
-              <View style={styles.webviewLoading}>
-                <ActivityIndicator size="large" color={Colors.secondary} />
-                <Text style={styles.webviewLoadingText}>{t('donate.processing', 'Processing payment…')}</Text>
-              </View>
-            )}
-            style={{ flex: 1 }}
-          />
-        ) : null}
-      </Modal>
     </View>
   );
 }
@@ -525,6 +264,81 @@ const styles = StyleSheet.create({
     ...Shadows.lg,
   },
 
+  // QR Card
+  qrCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    ...Shadows.md,
+  },
+  qrBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: Colors.successLight,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 100,
+    marginBottom: 20,
+  },
+  qrBadgeText: { fontSize: 12, fontWeight: '700', color: Colors.success },
+  qrImageWrap: {
+    width: 260,
+    height: 260,
+    marginBottom: 20,
+  },
+  qrFrame: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: Colors.border,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Shadows.sm,
+  },
+  qrImage: {
+    width: '100%',
+    height: '100%',
+  },
+
+  // Account Info
+  accountInfo: {
+    alignItems: 'center',
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: Colors.borderLight,
+    width: '100%',
+  },
+  accountLabel: { fontSize: 12, fontWeight: '700', color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
+  accountName: { fontSize: 22, fontWeight: '900', color: Colors.secondary, marginBottom: 4 },
+  accountOrg: { fontSize: 12, fontWeight: '700', color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 },
+  accountNumberWrap: {
+    backgroundColor: Colors.secondaryLight,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  accountNumber: { fontSize: 20, fontWeight: '900', color: Colors.secondary, letterSpacing: 3 },
+
+  // Security
+  securityNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingBottom: 8,
+    marginBottom: 16,
+  },
+  securityText: { fontSize: 11, fontWeight: '600', color: Colors.textMuted },
+
+  // Section / Campaigns
   sectionCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
@@ -560,93 +374,4 @@ const styles = StyleSheet.create({
   campaignMetaRow: { flexDirection: 'row', justifyContent: 'space-between' },
   campaignMeta: { fontSize: 12, color: Colors.textSecondary },
   campaignMetaStrong: { fontWeight: '800', color: Colors.text },
-
-  payWayHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 16 },
-  payWayIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.secondaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  payWayHint: { fontSize: 12, color: Colors.textSecondary, lineHeight: 18, marginTop: 2 },
-  amountLabel: { fontSize: 12, fontWeight: '700', color: Colors.textSecondary, marginBottom: 8 },
-  presetRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
-  presetBtn: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  presetBtnActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '10' },
-  presetText: { fontSize: 14, fontWeight: '700', color: Colors.textSecondary },
-  presetTextActive: { color: Colors.primary },
-  amountInput: {
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 18,
-    fontWeight: '800',
-    color: Colors.secondary,
-    backgroundColor: '#FFFFFF',
-    marginBottom: 14,
-  },
-  checkoutBtn: { borderRadius: 16, overflow: 'hidden', ...Shadows.md },
-  checkoutBtnDisabled: { opacity: 0.85 },
-  checkoutGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 16,
-  },
-  checkoutText: { fontSize: 15, fontWeight: '800', color: '#FFFFFF' },
-  checkoutHint: { fontSize: 11, color: Colors.textMuted, textAlign: 'center', marginTop: 10, lineHeight: 16 },
-
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 56,
-    paddingBottom: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
-  },
-  modalClose: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.secondaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalTitle: { flex: 1, textAlign: 'center', fontSize: 16, fontWeight: '800', color: Colors.secondary },
-  webviewLoading: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    gap: 12,
-  },
-  webviewLoadingText: { fontSize: 13, color: Colors.textSecondary },
-
-  securityNote: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingBottom: 8,
-  },
-  securityText: { fontSize: 11, fontWeight: '600', color: Colors.textMuted },
 });
