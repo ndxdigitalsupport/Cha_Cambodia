@@ -1171,6 +1171,59 @@ function cha_rest_payway_purchase($request) {
     ));
 }
 
+function cha_payway_b64url_decode($data) {
+    $data = strtr($data, '-_', '+/');
+    $pad = strlen($data) % 4;
+    if ($pad) $data .= str_repeat('=', 4 - $pad);
+    return base64_decode($data, true);
+}
+
+function cha_rest_payway_frame($request) {
+    $payload = (string) $request->get_param('payload');
+    if ($payload === '') {
+        return new WP_Error('missing_payload', 'Missing checkout payload.', array('status' => 400));
+    }
+    $raw = cha_payway_b64url_decode($payload);
+    if ($raw === false || $raw === '') {
+        return new WP_Error('bad_payload', 'Invalid checkout payload.', array('status' => 400));
+    }
+    $data = json_decode($raw, true);
+    $checkout_url = isset($data['checkout_url']) ? (string) $data['checkout_url'] : '';
+    $fields = isset($data['fields']) && is_array($data['fields']) ? $data['fields'] : array();
+    if ($checkout_url === '' || !$fields || strpos($checkout_url, 'https://') !== 0) {
+        return new WP_Error('bad_payload', 'Invalid checkout payload.', array('status' => 400));
+    }
+
+    $inputs = '';
+    foreach ($fields as $key => $value) {
+        $inputs .= '<input type="hidden" name="' . esc_attr((string) $key) . '" value="' . esc_attr((string) $value) . '">';
+    }
+    $action = esc_url($checkout_url);
+
+    $html = '<!DOCTYPE html><html><head><meta charset="utf-8">'
+        . '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        . '<title>PayWay Checkout</title>'
+        . '<style>body{margin:0;font-family:system-ui,sans-serif;background:#fff;color:#0B1D6D}'
+        . '.wrap{padding:32px 20px;max-width:420px;margin:0 auto;text-align:center}'
+        . 'button{margin-top:16px;padding:12px 22px;font-size:16px;font-weight:700;'
+        . 'border:0;border-radius:12px;background:#E31E24;color:#fff}</style></head><body>'
+        . '<div class="wrap"><p>Opening secure ABA checkout…</p>'
+        . '<form id="pw-form" method="POST" action="' . $action . '">' . $inputs
+        . '<button type="submit">Open payment page</button></form>'
+        . '<noscript>JavaScript is required. Tap the button.</noscript></div>'
+        . '<script>(function(){function s(){var f=document.getElementById("pw-form");'
+        . 'if(f&&!f.dataset.go){f.dataset.go="1";f.submit();}}'
+        . 'if(document.readyState==="complete"){setTimeout(s,40);}'
+        . 'else{window.addEventListener("load",function(){setTimeout(s,40);});}})();</script>'
+        . '</body></html>';
+
+    return new WP_REST_Response($html, 200, array(
+        'Content-Type'              => 'text/html; charset=UTF-8',
+        'Cache-Control'             => 'no-store, no-cache, must-revalidate',
+        'X-Content-Type-Options'    => 'nosniff',
+    ));
+}
+
 function cha_rest_payway_callback($request) {
     $s = cha_get_payway_settings();
     $body = $request->get_body();
@@ -1980,6 +2033,11 @@ function cha_register_rest_routes() {
     register_rest_route('cha/v1', '/payway/check', array(
         'methods'  => 'POST',
         'callback' => 'cha_rest_payway_check',
+        'permission_callback' => '__return_true',
+    ));
+    register_rest_route('cha/v1', '/payway/frame', array(
+        'methods'  => 'GET',
+        'callback' => 'cha_rest_payway_frame',
         'permission_callback' => '__return_true',
     ));
     register_rest_route('cha/v1', '/news', array(

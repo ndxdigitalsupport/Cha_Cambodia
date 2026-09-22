@@ -42,13 +42,22 @@ function decodeEntities(value?: string) {
     .replace(/&nbsp;/g, ' ');
 }
 
-function buildFormBody(fields: Record<string, string>) {
-  return Object.keys(fields)
-    .map(
-      (key) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(String(fields[key] ?? ''))}`
-    )
-    .join('&');
+function base64UrlEncode(value: string) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const bytes = new TextEncoder().encode(value);
+  let result = '';
+  for (let i = 0; i < bytes.length; i += 3) {
+    const b0 = bytes[i];
+    const b1 = i + 1 < bytes.length ? bytes[i + 1] : undefined;
+    const b2 = i + 2 < bytes.length ? bytes[i + 2] : undefined;
+    result += chars[b0 >> 2];
+    result += chars[((b0 & 3) << 4) | ((b1 ?? 0) >> 4)];
+    if (b1 === undefined) break;
+    result += chars[((b1 & 15) << 2) | ((b2 ?? 0) >> 6)];
+    if (b2 === undefined) break;
+    result += chars[b2 & 63];
+  }
+  return result.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 const colorHex: Record<string, string> = {
@@ -63,12 +72,7 @@ export default function DonateScreen({ navigation }: any) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [campaignsLoading, setCampaignsLoading] = useState(true);
   const [amountText, setAmountText] = useState('10');
-  const [checkoutSource, setCheckoutSource] = useState<{
-    uri: string;
-    method: 'POST';
-    body: string;
-    headers: Record<string, string>;
-  } | null>(null);
+  const [checkoutSource, setCheckoutSource] = useState<{ uri: string } | null>(null);
   const [webviewKey, setWebviewKey] = useState(0);
   const [paying, setPaying] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -185,11 +189,11 @@ export default function DonateScreen({ navigation }: any) {
       loadedRef.current = false;
       errorShownRef.current = false;
       setWebviewKey((k) => k + 1);
+      const payload = base64UrlEncode(
+        JSON.stringify({ checkout_url: res.checkout_url, fields: res.fields })
+      );
       setCheckoutSource({
-        uri: res.checkout_url,
-        method: 'POST',
-        body: buildFormBody(res.fields),
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        uri: `https://chacambodia.org/wp-json/cha/v1/payway/frame?payload=${payload}`,
       });
     } catch (e: any) {
       Alert.alert(
