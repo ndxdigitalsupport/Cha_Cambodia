@@ -6,6 +6,7 @@ import { setAuthToken } from './tokenStore';
 export interface ChaUser {
   memberId: string;
   name: string;
+  nameKhmer?: string;
   email: string;
   province: string;
   role: string;
@@ -30,6 +31,7 @@ export interface ChaUser {
 
 export interface RegisterPayload {
   name: string;
+  nameKhmer?: string;
   email: string;
   password: string;
   phone: string;

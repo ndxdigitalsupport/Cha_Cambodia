@@ -1261,6 +1261,105 @@ function cha_rest_payway_check($request) {
     return rest_ensure_response($data);
 }
 
+function cha_rest_get_news($request) {
+    $per_page = (int) $request->get_param('per_page');
+    if ($per_page <= 0 || $per_page > 50) $per_page = 10;
+    $page = (int) $request->get_param('page');
+    if ($page < 1) $page = 1;
+    $category = sanitize_text_field((string) $request->get_param('category'));
+
+    $args = array(
+        'post_type'      => 'cha_news',
+        'posts_per_page' => $per_page,
+        'paged'          => $page,
+        'post_status'    => 'publish',
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+    );
+    if ($category !== '' && strtolower($category) !== 'all') {
+        $args['meta_query'] = array(
+            array(
+                'key'     => '_cha_news_badge',
+                'value'   => $category,
+                'compare' => '=',
+            ),
+        );
+    }
+
+    $q = new WP_Query($args);
+    $items = array();
+    if ($q->have_posts()) {
+        while ($q->have_posts()) {
+            $q->the_post();
+            $id = get_the_ID();
+            $image = '';
+            if (has_post_thumbnail($id)) {
+                $img = wp_get_attachment_image_src($id, 'medium_large');
+                if ($img) $image = $img[0];
+            }
+            $items[] = array(
+                'id'         => $id,
+                'title'      => get_the_title($id),
+                'title_km'   => (string) get_post_meta($id, '_cha_news_title_km', true),
+                'excerpt'    => wp_trim_words(get_the_excerpt($id), 18, '...'),
+                'excerpt_km' => (string) get_post_meta($id, '_cha_news_excerpt_km', true),
+                'date'       => (string) (get_post_meta($id, '_cha_news_date', true) ?: get_the_date('M j, Y', $id)),
+                'badge'      => (string) (get_post_meta($id, '_cha_news_badge', true) ?: 'Event'),
+                'url'        => get_permalink($id),
+                'image'      => $image,
+            );
+        }
+        wp_reset_postdata();
+    }
+
+    return rest_ensure_response(array(
+        'success' => true,
+        'items'   => $items,
+        'total'   => (int) $q->found_posts,
+        'pages'   => (int) $q->max_num_pages,
+        'page'    => $page,
+    ));
+}
+
+function cha_rest_get_campaigns($request) {
+    $q = new WP_Query(array(
+        'post_type'      => 'cha_campaigns',
+        'posts_per_page' => 12,
+        'post_status'    => 'publish',
+        'orderby'        => 'menu_order',
+        'order'          => 'ASC',
+    ));
+
+    $items = array();
+    if ($q->have_posts()) {
+        while ($q->have_posts()) {
+            $q->the_post();
+            $id = get_the_ID();
+            $raised = (float) get_post_meta($id, '_cha_campaign_raised', true);
+            $goal = (float) get_post_meta($id, '_cha_campaign_goal', true);
+            $color = (string) get_post_meta($id, '_cha_campaign_color', true);
+            if (!$color) $color = 'red';
+            $items[] = array(
+                'id'         => $id,
+                'title'      => get_the_title($id),
+                'title_km'   => (string) get_post_meta($id, '_cha_campaign_title_km', true),
+                'excerpt'    => wp_trim_words(get_the_excerpt($id), 22, '...'),
+                'excerpt_km' => (string) get_post_meta($id, '_cha_campaign_desc_km', true),
+                'raised'     => $raised,
+                'goal'       => $goal,
+                'pct'        => $goal > 0 ? min(100, round(($raised / $goal) * 100)) : 0,
+                'color'      => $color,
+            );
+        }
+        wp_reset_postdata();
+    }
+
+    return rest_ensure_response(array(
+        'success' => true,
+        'items'   => $items,
+    ));
+}
+
 function cha_rest_payway_get_settings() {
     return rest_ensure_response(cha_get_payway_settings());
 }
@@ -1883,6 +1982,16 @@ function cha_register_rest_routes() {
         'callback' => 'cha_rest_payway_check',
         'permission_callback' => '__return_true',
     ));
+    register_rest_route('cha/v1', '/news', array(
+        'methods'  => 'GET',
+        'callback' => 'cha_rest_get_news',
+        'permission_callback' => '__return_true',
+    ));
+    register_rest_route('cha/v1', '/campaigns', array(
+        'methods'  => 'GET',
+        'callback' => 'cha_rest_get_campaigns',
+        'permission_callback' => '__return_true',
+    ));
 }
 add_action('rest_api_init', 'cha_register_rest_routes');
 
@@ -1921,6 +2030,14 @@ add_action('admin_menu', 'cha_add_admin_menu');
 add_action('admin_enqueue_scripts', function($hook) {
     if (isset($_GET['page']) && $_GET['page'] === 'cha-members') {
         wp_enqueue_media();
+    }
+});
+
+add_action('admin_print_footer_scripts', function() {
+    if (isset($_GET['page']) && $_GET['page'] === 'cha-members') {
+        if (function_exists('wp_print_media_templates')) {
+            wp_print_media_templates();
+        }
     }
 });
 
@@ -1973,6 +2090,15 @@ function cha_render_admin_page() {
         if ($cond_val === 'Other') {
             $cond_val = sanitize_text_field($_POST['condition_other'] ?? 'Other');
         }
+        $edit_photo = esc_url_raw($_POST['photo'] ?? '');
+        if (!empty($_FILES['avatar_file']['name']) && empty($_FILES['avatar_file']['error'])) {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+            require_once(ABSPATH . 'wp-admin/includes/image.php');
+            $upload = wp_handle_upload($_FILES['avatar_file'], array('test_form' => false));
+            if (!empty($upload['url'])) {
+                $edit_photo = esc_url_raw($upload['url']);
+            }
+        }
         $data = array(
             'name'              => sanitize_text_field($_POST['name']),
             'name_khmer'        => sanitize_text_field($_POST['name_khmer'] ?? ''),
@@ -1991,7 +2117,7 @@ function cha_render_admin_page() {
             'specialty'         => sanitize_text_field($_POST['specialty'] ?? ''),
             'license_number'    => sanitize_text_field($_POST['license_number'] ?? ''),
             'address'           => sanitize_text_field($_POST['address'] ?? ''),
-            'photo'             => esc_url_raw($_POST['photo'] ?? ''),
+            'photo'             => $edit_photo,
         );
         $new_pass = trim($_POST['new_password']);
         if (!empty($new_pass)) {
@@ -2048,6 +2174,15 @@ function cha_render_admin_page() {
             $valid_roles = array('Patient', 'Family member / Caregiver', 'Healthcare professional', 'Member');
             if (!in_array($add_role, $valid_roles)) $add_role = 'Member';
             $add_id = cha_generate_member_id();
+            $add_photo = esc_url_raw($_POST['photo'] ?? '');
+            if (!empty($_FILES['avatar_file']['name']) && empty($_FILES['avatar_file']['error'])) {
+                require_once(ABSPATH . 'wp-admin/includes/file.php');
+                require_once(ABSPATH . 'wp-admin/includes/image.php');
+                $upload = wp_handle_upload($_FILES['avatar_file'], array('test_form' => false));
+                if (!empty($upload['url'])) {
+                    $add_photo = esc_url_raw($upload['url']);
+                }
+            }
             $add_data = array(
                 'member_id'    => $add_id,
                 'name'         => $add_name,
@@ -2062,7 +2197,7 @@ function cha_render_admin_page() {
                 'registered'   => current_time('mysql'),
                 'address'      => sanitize_text_field($_POST['address'] ?? ''),
                 'dob'          => sanitize_text_field($_POST['dob'] ?? ''),
-                'photo'        => esc_url_raw($_POST['photo'] ?? ''),
+                'photo'        => $add_photo,
                 'condition'    => (function() {
                     $c = sanitize_text_field($_POST['condition_select'] ?? $_POST['condition'] ?? '');
                     if ($c === 'Other') {
@@ -2127,6 +2262,10 @@ function cha_render_admin_page() {
     /* Handle added=1 success notice */
     if (isset($_GET['added']) && $_GET['added'] === '1') {
         echo '<div class="cha-notice cha-notice-success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Member created successfully.</div>';
+    }
+
+    if (function_exists('wp_enqueue_media')) {
+        wp_enqueue_media();
     }
     ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">

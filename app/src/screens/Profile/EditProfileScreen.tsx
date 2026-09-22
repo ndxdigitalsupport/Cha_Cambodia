@@ -40,6 +40,7 @@ export default function EditProfileScreen({ navigation }: any) {
 
   const [form, setForm] = useState({
     name: '',
+    nameKhmer: '',
     phone: '',
     address: '',
     bloodType: '',
@@ -53,6 +54,7 @@ export default function EditProfileScreen({ navigation }: any) {
     if (user) {
       setForm({
         name: user.name || '',
+        nameKhmer: user.nameKhmer || '',
         phone: user.phone || '',
         address: user.address || '',
         bloodType: user.bloodType || '',
@@ -127,6 +129,7 @@ export default function EditProfileScreen({ navigation }: any) {
     try {
       const payload: any = {
         name: form.name.trim(),
+        nameKhmer: form.nameKhmer.trim(),
         phone: form.phone.trim(),
         address: form.address.trim(),
       };
@@ -246,6 +249,20 @@ export default function EditProfileScreen({ navigation }: any) {
         </View>
 
         <View style={styles.field}>
+          <Text style={styles.inputLabel}>{t('profile.nameKhmer', 'Khmer Name')}</Text>
+          <View style={styles.inputWrap}>
+            <Ionicons name="language-outline" size={18} color="#64748B" style={styles.fieldIcon} />
+            <TextInput
+              style={styles.textInput}
+              value={form.nameKhmer}
+              onChangeText={v => update('nameKhmer', v)}
+              placeholder="ឧ. សុខា ចាន់"
+              placeholderTextColor="#94A3B8"
+            />
+          </View>
+        </View>
+
+        <View style={styles.field}>
           <Text style={styles.inputLabel}>{t('profile.phone', 'Phone Number')}</Text>
           <View style={styles.inputWrap}>
             <Ionicons name="call-outline" size={18} color="#64748B" style={styles.fieldIcon} />
@@ -340,7 +357,7 @@ export default function EditProfileScreen({ navigation }: any) {
                   style={styles.textInput}
                   value={form.treatmentCentre}
                   onChangeText={v => update('treatmentCentre', v)}
-                  placeholder="e.g. Calmette Hospital"
+                  placeholder="e.g. National Pediatric Hospital"
                   placeholderTextColor="#94A3B8"
                 />
               </View>

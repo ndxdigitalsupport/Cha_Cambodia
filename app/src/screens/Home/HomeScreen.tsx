@@ -1,18 +1,46 @@
-import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ImageBackground, Image, Animated } from 'react-native';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ImageBackground, Image, Animated, Linking, ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Shadows, Glassmorphism } from '../../theme/colors';
 import { useAuth } from '../../store/AuthContext';
+import { newsAPI } from '../../api/client';
 import heroImg from '../../../assets/hero.jpg';
 import donateImg from '../../../assets/heart-hands.jpg';
 
 const { width } = Dimensions.get('window');
 
+type NewsItem = {
+  id: number;
+  title: string;
+  title_km?: string;
+  date: string;
+  badge: string;
+  url: string;
+};
+
 export default function HomeScreen({ navigation }: any) {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+  const isKm = i18n.language === 'km';
+
+  const loadNews = useCallback(async () => {
+    try {
+      const res: any = await newsAPI.getNews({ page: 1, per_page: 3 });
+      setNews(Array.isArray(res?.items) ? res.items : []);
+    } catch {
+      setNews([]);
+    } finally {
+      setNewsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadNews();
+  }, [loadNews]);
 
   const stats = [
     { value: '25', label: t('home.stats.provinces', 'Provinces'), icon: 'location' as const },
@@ -128,6 +156,55 @@ export default function HomeScreen({ navigation }: any) {
             </TouchableOpacity>
           ))}
         </View>
+      </View>
+
+      {/* Latest News */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionTitleRow}>
+            <View style={styles.redBar} />
+            <Text style={styles.sectionTitle}>{t('news.title', 'News & Events')}</Text>
+          </View>
+          <TouchableOpacity style={styles.viewAllBtn} onPress={() => navigation.navigate('News')}>
+            <Text style={styles.viewAllText}>{t('news.viewAll', 'View All')}</Text>
+            <Ionicons name="arrow-forward" size={14} color={Colors.primary} />
+          </TouchableOpacity>
+        </View>
+        {newsLoading ? (
+          <View style={styles.newsLoadingBox}>
+            <ActivityIndicator color={Colors.secondary} />
+          </View>
+        ) : news.length === 0 ? (
+          <View style={styles.newsEmptyBox}>
+            <Ionicons name="newspaper-outline" size={28} color={Colors.textMuted} />
+            <Text style={styles.newsEmptyText}>{t('news.empty', 'No articles yet. Check back soon!')}</Text>
+          </View>
+        ) : (
+          news.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.newsCard}
+              activeOpacity={0.85}
+              onPress={() => {
+                if (item.url) Linking.openURL(item.url).catch(() => {});
+              }}
+            >
+              <View style={styles.newsIconWrap}>
+                <Ionicons name="megaphone-outline" size={20} color={Colors.primary} />
+              </View>
+              <View style={styles.newsBody}>
+                <View style={styles.newsMetaRow}>
+                  <Text style={styles.newsBadge}>{item.badge}</Text>
+                  <Text style={styles.newsDate}>{item.date}</Text>
+                </View>
+                <Text style={styles.newsTitle} numberOfLines={2}>
+                  {isKm && item.title_km ? item.title_km : item.title}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={Colors.textMuted} />
+            </TouchableOpacity>
+          ))
+        )}
       </View>
 
       {/* CTA Banner */}
@@ -254,6 +331,51 @@ const styles = StyleSheet.create({
   helpDesc: { fontSize: 12, color: Colors.textSecondary, marginBottom: 16, lineHeight: 19, flex: 1, paddingTop: 2 },
   helpLinkPill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 100, alignSelf: 'flex-start' },
   helpLinkText: { fontSize: 12, fontWeight: '800', paddingTop: 2 },
+
+  viewAllBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  viewAllText: { fontSize: 13, fontWeight: '800', color: Colors.primary },
+  newsLoadingBox: { paddingVertical: 24, alignItems: 'center' },
+  newsEmptyBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+  },
+  newsEmptyText: { fontSize: 13, color: Colors.textSecondary, textAlign: 'center' },
+  newsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+    ...Shadows.sm,
+  },
+  newsIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.primary + '12',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  newsBody: { flex: 1 },
+  newsMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
+  newsBadge: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  newsDate: { fontSize: 11, color: Colors.textMuted, fontWeight: '600' },
+  newsTitle: { fontSize: 14, fontWeight: '700', color: Colors.text, lineHeight: 20 },
 
   ctaWrap: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 24 },
   ctaBannerWrapper: { borderRadius: 24, overflow: 'hidden', ...Shadows.lg },

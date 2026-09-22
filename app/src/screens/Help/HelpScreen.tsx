@@ -21,7 +21,7 @@ const faqItems = [
   },
   {
     q: 'Where are the main treatment centres located?',
-    a: 'CHA partners with hospital centers in Phnom Penh (National Pediatric Hospital & Calmette Hospital), Siem Reap, Battambang, and regional referral units across 25 provinces.',
+    a: 'CHA partners with 2 verified treatment centres: National Pediatric Hospital in Phnom Penh and Angkor Hospital for Children (AHC) Haemophilia Unit in Siem Reap. CHA offices also support members nationwide across 25 provinces.',
   },
   {
     q: 'What should I do during a bleeding emergency?',

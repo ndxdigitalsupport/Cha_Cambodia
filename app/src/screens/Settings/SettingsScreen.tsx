@@ -106,7 +106,7 @@ export default function SettingsScreen({ navigation }: any) {
         { icon: 'help-circle-outline' as const, label: t('settings.helpCenter', 'Help Center'), color: Colors.secondary, action: 'Help' },
         { icon: 'chatbubble-ellipses-outline' as const, label: t('settings.contactSupport', 'Contact Support'), color: Colors.success, action: 'ContactSupport' },
         { icon: 'document-text-outline' as const, label: t('settings.privacy', 'Privacy Policy'), color: Colors.textSecondary, action: 'https://chacambodia.org/privacy' },
-        { icon: 'document-outline' as const, label: t('settings.terms', 'Terms of Use'), color: Colors.textSecondary, action: 'https://chacambodia.org/disclaimer' },
+        { icon: 'document-outline' as const, label: t('settings.terms', 'Terms of Use'), color: Colors.textSecondary, action: 'https://chacambodia.org/terms' },
       ],
     },
   ];

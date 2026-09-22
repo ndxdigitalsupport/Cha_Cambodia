@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +41,7 @@ export default function MembershipCardScreen({ navigation }: any) {
   }, [user]);
 
   const name = displayUser?.name || 'Sok Dara';
+  const nameKhmer = displayUser?.nameKhmer || '';
   const bloodType = displayUser?.bloodType || 'A+';
   const condition = displayUser?.condition || 'Haemophilia A';
   const dob = displayUser?.dob || '15 March 1992';
@@ -84,6 +85,7 @@ export default function MembershipCardScreen({ navigation }: any) {
 
           {/* Member Name */}
           <Text style={styles.memberName}>{name}</Text>
+          {!!nameKhmer && <Text style={styles.memberNameKhmer}>{nameKhmer}</Text>}
 
           {/* 2x2 Details Grid */}
           <View style={styles.grid2x2}>
@@ -219,6 +221,34 @@ export default function MembershipCardScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
 
+        {/* Treatment Centre Hotlines */}
+        <View style={styles.hotlinesCard}>
+          <View style={styles.hotlinesHeader}>
+            <Ionicons name="call" size={16} color={Colors.primary} />
+            <Text style={styles.hotlinesTitle}>{t('card.hotlines', 'Treatment Centre Hotlines')}</Text>
+          </View>
+          <TouchableOpacity style={styles.hotlineRow} activeOpacity={0.85} onPress={() => Linking.openURL('tel:+85512751728')}>
+            <View style={[styles.hotlineIcon, { backgroundColor: '#EAF0FB' }]}>
+              <Ionicons name="business-outline" size={16} color={Colors.secondary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.hotlineName}>National Pediatric Hospital</Text>
+              <Text style={styles.hotlinePhone}>Phnom Penh · 012 751 728</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={14} color={Colors.textMuted} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.hotlineRow} activeOpacity={0.85} onPress={() => Linking.openURL('tel:+85563963409')}>
+            <View style={[styles.hotlineIcon, { backgroundColor: '#F3E8FF' }]}>
+              <Ionicons name="business-outline" size={16} color={Colors.purple} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.hotlineName}>Angkor Hospital for Children</Text>
+              <Text style={styles.hotlinePhone}>Siem Reap · 063 963 409</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={14} color={Colors.textMuted} />
+          </TouchableOpacity>
+        </View>
+
         <View style={{ height: Spacing.xl }} />
       </View>
     </ScrollView>
@@ -279,7 +309,8 @@ const styles = StyleSheet.create({
   roleGlassTag: { backgroundColor: 'rgba(255,255,255,0.18)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 100 },
   roleTagText: { fontSize: 10, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.5 },
 
-  memberName: { fontSize: 26, fontWeight: '900', color: '#FFFFFF', marginBottom: 20, lineHeight: 34, paddingTop: 4 },
+  memberName: { fontSize: 26, fontWeight: '900', color: '#FFFFFF', marginBottom: 4, lineHeight: 34, paddingTop: 4 },
+  memberNameKhmer: { fontSize: 16, fontWeight: '700', color: 'rgba(255,255,255,0.85)', marginBottom: 16, lineHeight: 24, paddingTop: 2 },
 
   grid2x2: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginBottom: 16 },
   gridCol: { width: '45%' },
@@ -333,4 +364,30 @@ const styles = StyleSheet.create({
     borderColor: '#BFDBFE',
   },
   editProfileText: { fontSize: 13, fontWeight: '700', color: Colors.secondary, paddingTop: 2 },
+
+  hotlinesCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: BorderRadius.lg,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginTop: 16,
+    ...Shadows.md,
+  },
+  hotlinesHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
+  hotlinesTitle: { fontSize: 14, fontWeight: '800', color: Colors.secondary, paddingTop: 2 },
+  hotlineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#F8FAFC',
+    padding: 12,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+    marginBottom: 8,
+  },
+  hotlineIcon: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  hotlineName: { fontSize: 13, fontWeight: '700', color: Colors.text, paddingTop: 2 },
+  hotlinePhone: { fontSize: 12, color: Colors.textSecondary, paddingTop: 2 },
 });
