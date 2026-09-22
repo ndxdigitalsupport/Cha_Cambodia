@@ -3,59 +3,77 @@
 <!-- Donate modal -->
 <div class="donate-modal" id="donate-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Make a donation">
     <div class="donate-modal-backdrop" data-donate-close></div>
-    <div class="donate-modal-panel">
-      <div class="donate-modal-header">
-        <div class="donate-modal-title-block">
-          <div class="donate-modal-icon donate-modal-icon-heart">
-            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
+    <div class="donate-modal-panel donate-modal-panel--split" style="max-width: 720px; width: 94vw; border-radius: 28px; overflow: hidden; background: #ffffff; box-shadow: 0 32px 80px -16px rgba(11, 29, 109, 0.35), 0 16px 36px rgba(0, 0, 0, 0.08); border: 1px solid rgba(226, 232, 240, 0.8);">
+      <div class="donate-modal-header" style="padding: 16px 26px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%); border-bottom: 1px solid #EEF2F6;">
+        <div class="donate-modal-title-block" style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 12px; background: #FFFFFF; border: 1.5px solid #E2E8F0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(11, 29, 109, 0.08); flex-shrink: 0; padding: 4px; overflow: hidden;">
+            <img src="<?php echo esc_url(get_template_directory_uri() . '/logo-icon-cha.png'); ?>" alt="CHA Logo Icon" style="width: 100%; height: 100%; object-fit: contain; display: block;">
           </div>
-          <span class="donate-modal-title" style="font-size: 1.0625rem; font-weight: 700; color: var(--c-blue);" data-i18n="donate_modal_title"><?php echo esc_html(cha_get_option('donate_modal_title', 'Make a Donation')); ?></span>
+          <div>
+            <span class="donate-modal-title" style="font-size: 1.125rem; font-weight: 800; color: #0B1D6D; letter-spacing: -0.02em; line-height: 1.25; display: block;" data-i18n="donate_modal_title"><?php echo esc_html(cha_get_option('donate_modal_title', 'Make a Donation')); ?></span>
+            <span style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; line-height: 1.3; margin-top: 2px;">Cambodian Haemophilia Association</span>
+          </div>
         </div>
-        <button class="donate-modal-close" type="button" data-donate-close aria-label="Close donation form"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <button class="donate-modal-close" type="button" data-donate-close aria-label="Close donation form" style="width: 34px; height: 34px; border-radius: 50%; border: 1px solid #E2E8F0; background: #ffffff; color: #64748B; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
-      <div class="donate-modal-body">
-        <p class="modal-subtitle" data-i18n="donate_modal_desc">Scan with ABA Mobile, Bakong, or any Cambodian banking app to send your contribution.</p>
 
-        <div class="donate-qr-stand" style="background:#fff;border:1.5px solid #E2E8F0;border-radius:22px;padding:20px 18px;text-align:center;box-shadow:0 14px 32px -4px rgba(11,29,109,0.12);">
-          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(227,30,36,0.08);color:#E31E24;padding:5px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;margin-bottom:14px">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-            <span data-i18n="donate_khqr_badge">KHQR National Pay</span>
+      <div class="donate-modal-body donate-split-body" style="padding: 24px 28px 28px; display: flex; flex-direction: row; gap: 28px; align-items: stretch; justify-content: space-between; flex-wrap: wrap;">
+        <!-- Left Column: Premium QR Flyer Stand -->
+        <div class="donate-split-left" style="flex: 1 1 270px; max-width: 295px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <div class="donate-qr-stand" style="background: #ffffff; border-radius: 22px; border: 1px solid #E2E8F0; padding: 12px; box-shadow: 0 16px 36px -6px rgba(11, 29, 109, 0.14), 0 4px 12px rgba(0, 0, 0, 0.04); width: 100%; text-align: center; position: relative;">
+            <img src="<?php echo esc_url(get_template_directory_uri() . '/aba-pay-qr.jpeg'); ?>" alt="ABA Pay KHQR Code - CHA Cambodia Donation" class="donate-split-qr-img" id="donate-qr-image" style="width: 100%; height: auto; display: block; border-radius: 12px; object-fit: contain;">
           </div>
-
-          <div class="donate-qr-frame" style="max-width:280px;margin:0 auto 16px;">
-            <img src="<?php echo esc_url(get_template_directory_uri() . '/aba-pay-qr.jpeg'); ?>" alt="CHA Cambodia ABA Pay KHQR code" width="240" height="240" style="width:100%;height:auto;display:block;border-radius:12px;" decoding="async">
-          </div>
-
-          <div data-i18n="donate_account_name_lbl" style="font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;color:#64748B;margin-bottom:6px;">ACCOUNT NAME</div>
-          <div style="font-size:1.125rem;font-weight:800;color:#0B1D6D;margin-bottom:2px;">CHA</div>
-          <div data-i18n="donate_account_org" style="font-size:0.75rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px;">Cambodia Haemophilia Association</div>
-
-          <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-            <span style="font-size:1.25rem;font-weight:900;color:#0B1D6D;letter-spacing:0.12em;">000 283 539</span>
-            <button type="button" id="donate-copy-btn-modal" class="donate-copy-account-btn" style="border:1.5px solid #E2E8F0;background:#F8FAFC;color:#0B1D6D;border-radius:10px;padding:6px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;">
-              <span id="donate-copy-label-modal" data-i18n="donate_modal_copy_btn">Copy</span>
-            </button>
-          </div>
-
-          <a class="donate-save-qr-btn" href="<?php echo esc_url(get_template_directory_uri() . '/aba-pay-qr.jpeg'); ?>" download="cha-aba-pay-qr.jpeg">
-            <svg class="save-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span data-i18n="donate_save_qr_btn">Save QR Image</span>
-          </a>
         </div>
 
-        <div class="donate-compliance-note" style="margin-top: var(--s-4); text-align: center; font-size: 0.8125rem; color: var(--c-muted); line-height: 1.5;">
-          <p class="secure-note" style="margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: #22C55E;">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              <polyline points="9 12 11 14 15 10"/>
-            </svg>
-            <span data-i18n="donate_secure_note">Pay directly with ABA Mobile, Bakong, or any KHQR-supported banking app</span>
-          </p>
-          <p style="margin: 0; font-size: 0.75rem; color: #64748b;">
-            By continuing, you agree to our <a href="<?php echo esc_url(home_url('/terms')); ?>" target="_blank" style="color: var(--c-blue); text-decoration: underline;">Terms &amp; Refund Policy</a>.
-          </p>
+        <!-- Right Column: Content & Actions -->
+        <div class="donate-split-right" style="flex: 1 1 300px; display: flex; flex-direction: column; justify-content: space-between; text-align: left;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+              <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #E31E24; background: rgba(227,30,36,0.08); padding: 4px 10px; border-radius: 100px; border: 1px solid rgba(227,30,36,0.18);">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #E31E24; display: inline-block;"></span>
+                KHQR National Payment
+              </span>
+            </div>
+
+            <h3 style="font-size: 1.5rem; font-weight: 800; color: #0B1D6D; margin: 0 0 6px; letter-spacing: -0.025em; line-height: 1.25;">Scan &amp; Support</h3>
+            <p style="font-size: 0.8125rem; color: #64748B; margin: 0 0 16px; line-height: 1.5;">Scan with <strong>ABA Mobile, Bakong</strong>, or any Cambodian banking app to send your contribution.</p>
+          </div>
+
+          <!-- Account Details Box -->
+          <div style="background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; margin-bottom: 16px;">
+            <div style="font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; color: #64748B; letter-spacing: 0.6px; margin-bottom: 4px;">Beneficiary Name</div>
+            <div style="font-size: 0.8125rem; font-weight: 800; color: #0B1D6D; margin-bottom: 10px; line-height: 1.3;">CAMBODIA HEMOPHILIA ASSOCIATION</div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1.5px solid #CBD5E1; border-radius: 12px; padding: 8px 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.6875rem; font-weight: 900; background: #0B1D6D; color: #ffffff; padding: 3px 7px; border-radius: 6px; letter-spacing: 0.5px;">ABA</span>
+                <span id="donate-acct-number" style="font-size: 1rem; font-weight: 800; color: #0B1D6D; letter-spacing: 0.75px;">000 283 539</span>
+              </div>
+              <button type="button" class="donate-copy-account-btn" id="donate-copy-btn-modal" title="Copy account number" style="background: #F4F6FC; border: 1px solid #CBD5E1; border-radius: 8px; padding: 5px 11px; cursor: pointer; display: flex; align-items: center; gap: 5px; color: #0B1D6D; font-size: 0.75rem; font-weight: 700;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span id="donate-copy-label-modal" data-i18n="donate_modal_copy_btn">Copy</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Actions & Trust Footer -->
+          <div>
+            <div style="margin-bottom: 12px;">
+              <a href="<?php echo esc_url(get_template_directory_uri() . '/aba-pay-qr.jpeg'); ?>" download="CHA-Cambodia-Donation-QR.jpeg" id="donate-download-btn" class="donate-save-qr-btn">
+                <svg class="save-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span data-i18n="donate_save_qr_btn">Save QR Image</span>
+              </a>
+            </div>
+
+            <!-- Footer Trust Note -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.75rem; color: #64748B; font-weight: 600; padding-top: 2px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: #16A34A; flex-shrink: 0;">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <polyline points="9 12 11 14 15 10"/>
+              </svg>
+              <span>Instant Verification · Zero Processing Fee</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
