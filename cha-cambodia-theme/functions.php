@@ -1918,6 +1918,12 @@ function cha_add_admin_menu() {
 }
 add_action('admin_menu', 'cha_add_admin_menu');
 
+add_action('admin_enqueue_scripts', function($hook) {
+    if (isset($_GET['page']) && $_GET['page'] === 'cha-members') {
+        wp_enqueue_media();
+    }
+});
+
 add_action('wp_ajax_cha_view_smtp_log', function() {
     if (!current_user_can('manage_options')) wp_die('Unauthorized');
     $log_file = WP_CONTENT_DIR . '/cha-smtp-debug.log';
@@ -1985,6 +1991,7 @@ function cha_render_admin_page() {
             'specialty'         => sanitize_text_field($_POST['specialty'] ?? ''),
             'license_number'    => sanitize_text_field($_POST['license_number'] ?? ''),
             'address'           => sanitize_text_field($_POST['address'] ?? ''),
+            'photo'             => esc_url_raw($_POST['photo'] ?? ''),
         );
         $new_pass = trim($_POST['new_password']);
         if (!empty($new_pass)) {
@@ -2055,6 +2062,7 @@ function cha_render_admin_page() {
                 'registered'   => current_time('mysql'),
                 'address'      => sanitize_text_field($_POST['address'] ?? ''),
                 'dob'          => sanitize_text_field($_POST['dob'] ?? ''),
+                'photo'        => esc_url_raw($_POST['photo'] ?? ''),
                 'condition'    => (function() {
                     $c = sanitize_text_field($_POST['condition_select'] ?? $_POST['condition'] ?? '');
                     if ($c === 'Other') {
@@ -2114,6 +2122,7 @@ function cha_render_admin_page() {
     $add_form_role     = isset($_POST['cha_add_member']) ? sanitize_text_field($_POST['role'] ?? '') : '';
     $add_form_phone    = isset($_POST['cha_add_member']) ? sanitize_text_field($_POST['phone'] ?? '') : '';
     $add_form_address  = isset($_POST['cha_add_member']) ? sanitize_text_field($_POST['address'] ?? '') : '';
+    $add_form_photo    = isset($_POST['cha_add_member']) ? esc_url_raw($_POST['photo'] ?? '') : '';
 
     /* Handle added=1 success notice */
     if (isset($_GET['added']) && $_GET['added'] === '1') {
@@ -2184,8 +2193,15 @@ function cha_render_admin_page() {
     .cha-edit-card { background:#fff; border:1px solid #E2E8F0; border-radius:20px; padding:36px 40px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.04), 0 8px 10px -6px rgba(0,0,0,0.02); }
     @media (max-width:768px) { .cha-edit-card { padding:24px 20px; } }
     .cha-edit-header { display:flex; align-items:center; gap:16px; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid #F1F5F9; }
-    .cha-edit-avatar { width:64px; height:76px; object-fit:cover; border-radius:12px; border:2px solid #E2E8F0; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); }
-    .cha-edit-avatar-placeholder { width:64px; height:76px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; color:#94A3B8; font-size:1.25rem; font-weight:700; background:#F8FAFC; border:2px dashed #CBD5E1; }
+    .cha-avatar-uploader-wrap { position:relative; width:68px; height:80px; flex-shrink:0; cursor:pointer; }
+    .cha-edit-avatar { width:68px; height:80px; object-fit:cover; border-radius:12px; border:2px solid #E2E8F0; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); display:block; }
+    .cha-edit-avatar-placeholder { width:68px; height:80px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; color:#94A3B8; font-size:1.25rem; font-weight:700; background:#F8FAFC; border:2px dashed #CBD5E1; transition:all 0.2s ease; cursor:pointer; box-sizing:border-box; }
+    .cha-avatar-uploader-wrap:hover .cha-edit-avatar-placeholder { border-color:var(--cha-blue); background:#EFF6FF; color:var(--cha-blue); transform:scale(1.02); }
+    .cha-avatar-uploader-overlay { position:absolute; inset:0; border-radius:12px; background:rgba(11,29,109,0.72); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; opacity:0; transition:opacity 0.2s ease; backdrop-filter:blur(2px); }
+    .cha-avatar-uploader-wrap:hover .cha-avatar-uploader-overlay { opacity:1; }
+    .cha-avatar-uploader-overlay span { font-size:0.625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+    .cha-avatar-remove-btn { position:absolute; top:-6px; right:-6px; width:22px; height:22px; border-radius:50%; background:#EF4444; color:#fff; border:2px solid #fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2); transition:transform 0.15s ease, background 0.15s ease; z-index:2; padding:0; }
+    .cha-avatar-remove-btn:hover { background:#DC2626; transform:scale(1.1); }
     .cha-edit-title-block h2 { font-size:1.375rem; font-weight:700; color:var(--cha-blue); margin:0 0 6px; letter-spacing:-0.01em; display:flex; align-items:center; gap:10px; }
     .cha-edit-sub { font-size:0.875rem; color:var(--cha-muted); margin:0; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .cha-id-tag { background:#EFF6FF; color:var(--cha-blue); padding:3px 10px; border-radius:6px; font-weight:700; font-size:0.8125rem; font-family:monospace; }
@@ -2528,32 +2544,39 @@ function cha_render_admin_page() {
         <?php if ($editing && $edit_member): ?>
             <div class="cha-edit-wrap">
                 <div class="cha-edit-card">
-                    <div class="cha-edit-header">
-                        <?php if (!empty($edit_member['photo'])): ?>
-                            <img src="<?php echo esc_url($edit_member['photo']); ?>" alt="<?php echo esc_attr($edit_member['name'] ?? 'Member'); ?>" class="cha-edit-avatar">
-                        <?php else: ?>
-                            <div class="cha-edit-avatar-placeholder">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            </div>
-                        <?php endif; ?>
-                        <div class="cha-edit-title-block">
-                            <h2>Edit Member &middot; <?php echo esc_html($edit_member['name']); ?></h2>
-                            <p class="cha-edit-sub">
-                                <span>ID: <strong class="cha-id-tag"><?php echo esc_html($edit_member['memberId'] ?? '—'); ?></strong></span>
-                                <span>&bull;</span>
-                                <span>Joined <?php echo esc_html($edit_member['memberSince'] ?? '—'); ?></span>
-                                <?php if (($edit_member['status'] ?? '') === 'active'): ?>
-                                    <span style="background:#ECFDF5;color:#166534;font-size:0.75rem;padding:2px 8px;border-radius:999px;font-weight:700;">Active</span>
-                                <?php else: ?>
-                                    <span style="background:#FFFBEB;color:#B45309;font-size:0.75rem;padding:2px 8px;border-radius:999px;font-weight:700;">Pending</span>
-                                <?php endif; ?>
-                            </p>
-                        </div>
-                    </div>
-
-                    <form method="post" action="admin.php?page=cha-members">
+                    <form method="post" action="admin.php?page=cha-members" id="cha-edit-member-form">
                         <?php wp_nonce_field('cha_edit_member', 'cha_edit_nonce'); ?>
                         <input type="hidden" name="member_id" value="<?php echo esc_attr($edit_member['memberId']); ?>">
+                        <input type="hidden" name="photo" id="cha-edit-photo-input" value="<?php echo esc_attr($edit_member['photo'] ?? ''); ?>">
+
+                        <div class="cha-edit-header">
+                            <div class="cha-avatar-uploader-wrap" id="cha-edit-avatar-trigger" title="Click to upload / change photo">
+                                <img src="<?php echo esc_url($edit_member['photo'] ?? ''); ?>" alt="<?php echo esc_attr($edit_member['name'] ?? 'Member'); ?>" class="cha-edit-avatar" id="cha-edit-avatar-img" style="<?php echo empty($edit_member['photo']) ? 'display:none;' : ''; ?>">
+                                <div class="cha-edit-avatar-placeholder" id="cha-edit-avatar-placeholder" style="<?php echo !empty($edit_member['photo']) ? 'display:none;' : ''; ?>">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="cha-avatar-uploader-overlay">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                    <span>Change</span>
+                                </div>
+                                <button type="button" class="cha-avatar-remove-btn" id="cha-edit-avatar-remove" title="Remove photo" style="<?php echo empty($edit_member['photo']) ? 'display:none;' : ''; ?>">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
+                            </div>
+                            <div class="cha-edit-title-block">
+                                <h2>Edit Member &middot; <?php echo esc_html($edit_member['name']); ?></h2>
+                                <p class="cha-edit-sub">
+                                    <span>ID: <strong class="cha-id-tag"><?php echo esc_html($edit_member['memberId'] ?? '—'); ?></strong></span>
+                                    <span>&bull;</span>
+                                    <span>Joined <?php echo esc_html($edit_member['memberSince'] ?? '—'); ?></span>
+                                    <?php if (($edit_member['status'] ?? '') === 'active'): ?>
+                                        <span style="background:#ECFDF5;color:#166534;font-size:0.75rem;padding:2px 8px;border-radius:999px;font-weight:700;">Active</span>
+                                    <?php else: ?>
+                                        <span style="background:#FFFBEB;color:#B45309;font-size:0.75rem;padding:2px 8px;border-radius:999px;font-weight:700;">Pending</span>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                        </div>
 
                         <?php
                         $current_role = $edit_member['role'] ?? 'Member';
@@ -2570,7 +2593,7 @@ function cha_render_admin_page() {
                             </div>
                             <div class="cha-role-grid">
                                 <label class="cha-role-card <?php echo !$is_patient ? 'is-selected' : ''; ?>" data-role-card="Member">
-                                    <input type="radio" name="role" value="Member" <?php echo !$is_patient ? 'checked' : ''; ?> style="display:none">
+                                    <input type="radio" name="role" value="Member" <?php checked(!$is_patient); ?> style="display:none">
                                     <div class="cha-role-radio-custom">
                                         <div class="cha-role-radio-dot"></div>
                                     </div>
@@ -2580,7 +2603,7 @@ function cha_render_admin_page() {
                                     </div>
                                 </label>
                                 <label class="cha-role-card <?php echo $is_patient ? 'is-selected' : ''; ?>" data-role-card="Patient">
-                                    <input type="radio" name="role" value="Patient" <?php echo $is_patient ? 'checked' : ''; ?> style="display:none">
+                                    <input type="radio" name="role" value="Patient" <?php checked($is_patient); ?> style="display:none">
                                     <div class="cha-role-radio-custom">
                                         <div class="cha-role-radio-dot"></div>
                                     </div>
@@ -2603,7 +2626,7 @@ function cha_render_admin_page() {
                             <div class="cha-edit-grid-2">
                                 <div class="cha-edit-field">
                                     <label for="name">Full Name (English) <span style="color:#DC2626">*</span></label>
-                                    <input type="text" id="name" name="name" value="<?php echo esc_attr($edit_member['name'] ?? ''); ?>" placeholder="e.g. John Doe" required>
+                                    <input type="text" id="name" name="name" value="<?php echo esc_attr($edit_member['name']); ?>" required>
                                 </div>
                                 <div class="cha-edit-field">
                                     <label for="name_khmer" class="km-label">ឈ្មោះខ្មែរ (Khmer Name)</label>
@@ -2611,25 +2634,25 @@ function cha_render_admin_page() {
                                 </div>
                                 <div class="cha-edit-field">
                                     <label for="email">Email Address <span style="color:#DC2626">*</span></label>
-                                    <input type="email" id="email" name="email" value="<?php echo esc_attr($edit_member['email'] ?? ''); ?>" placeholder="name@example.com" required>
+                                    <input type="email" id="email" name="email" value="<?php echo esc_attr($edit_member['email']); ?>" required>
                                 </div>
                                 <div class="cha-edit-field">
                                     <label for="phone">Phone Number <span class="field-hint">Numbers only</span></label>
-                                    <input type="tel" id="phone" name="phone" value="<?php echo esc_attr($edit_member['phone'] ?? ''); ?>" placeholder="012345678" pattern="[0-9+ -]{7,20}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9+]/g, '');">
+                                    <input type="tel" id="phone" name="phone" value="<?php echo esc_attr($edit_member['phone'] ?? ''); ?>" pattern="[0-9+ -]{7,20}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9+]/g, '');">
                                 </div>
                                 <div class="cha-edit-field cha-field-full">
                                     <label for="address">Address</label>
                                     <input type="text" id="address" name="address" value="<?php echo esc_attr($edit_member['address'] ?? ''); ?>" placeholder="House #, Street, Sangkat, Khan, Province">
                                 </div>
                                 <div class="cha-edit-field cha-field-full">
-                                    <label for="new_password">New Password <span class="field-hint">Leave blank to keep existing password</span></label>
+                                    <label for="new_password">Set New Password <span class="field-hint">Leave blank to keep current password</span></label>
                                     <input type="password" id="new_password" name="new_password" placeholder="Enter new password (optional)">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Patient Details (Conditional) -->
-                        <div id="admin-patient-fields" class="cha-section-box" style="display:<?php echo $is_patient ? 'block' : 'none' ?>;">
+                        <div id="admin-patient-fields" class="cha-section-box" style="<?php echo $is_patient ? '' : 'display:none;'; ?>">
                             <div class="cha-section-box-header">
                                 <div class="cha-section-box-icon" style="background:rgba(227,30,36,0.1);color:var(--cha-red);">
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
@@ -2646,17 +2669,16 @@ function cha_render_admin_page() {
                                     <select id="bloodType" name="bloodType">
                                         <option value="" disabled <?php echo empty($edit_member['bloodType']) ? 'selected hidden' : ''; ?>>Select blood type</option>
                                         <?php foreach (array('A+','A-','B+','B-','AB+','AB-','O+','O-') as $bt): ?>
-                                            <option value="<?php echo $bt; ?>" <?php echo ($edit_member['bloodType'] ?? '') === $bt ? 'selected' : ''; ?>><?php echo $bt; ?></option>
+                                            <option value="<?php echo $bt; ?>" <?php selected(($edit_member['bloodType'] ?? ''), $bt); ?>><?php echo $bt; ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
+                                <?php
+                                $curr_cond = $edit_member['condition'] ?? '';
+                                $is_other_cond = (!empty($curr_cond) && !in_array($curr_cond, array('Hemophilia A', 'Hemophilia B')));
+                                ?>
                                 <div class="cha-edit-field cha-field-full">
                                     <label for="condition">Hemophilia Type</label>
-                                    <?php
-                                    $curr_cond = $edit_member['condition'] ?? '';
-                                    $standard_types = array('Hemophilia A', 'Hemophilia B');
-                                    $is_other_cond = (!empty($curr_cond) && !in_array($curr_cond, $standard_types));
-                                    ?>
                                     <select id="condition" name="condition_select" onchange="var o = document.getElementById('condition_other_wrap'); if (o) o.style.display = (this.value === 'Other') ? 'block' : 'none';">
                                         <option value="" disabled <?php echo empty($curr_cond) ? 'selected hidden' : ''; ?>>Select Hemophilia Type</option>
                                         <option value="Hemophilia A" <?php echo ($curr_cond === 'Hemophilia A') ? 'selected' : ''; ?>>Hemophilia A</option>
@@ -2686,7 +2708,7 @@ function cha_render_admin_page() {
                     <script>
                     (function() {
                         var patientFields = document.getElementById('admin-patient-fields');
-                        var cards = document.querySelectorAll('.cha-role-card');
+                        var cards = document.querySelectorAll('#cha-edit-member-form .cha-role-card');
                         cards.forEach(function(card) {
                             card.addEventListener('click', function() {
                                 cards.forEach(function(c) { c.classList.remove('is-selected'); });
@@ -2699,6 +2721,48 @@ function cha_render_admin_page() {
                                 }
                             });
                         });
+
+                        // WordPress Media Uploader for Edit Member
+                        var trigger = document.getElementById('cha-edit-avatar-trigger');
+                        var input = document.getElementById('cha-edit-photo-input');
+                        var img = document.getElementById('cha-edit-avatar-img');
+                        var placeholder = document.getElementById('cha-edit-avatar-placeholder');
+                        var removeBtn = document.getElementById('cha-edit-avatar-remove');
+
+                        if (trigger && typeof wp !== 'undefined' && wp.media) {
+                            var frame;
+                            trigger.addEventListener('click', function(e) {
+                                if (e.target.closest('#cha-edit-avatar-remove')) return;
+                                e.preventDefault();
+                                if (frame) { frame.open(); return; }
+                                frame = wp.media({
+                                    title: 'Select or Upload Member Photo',
+                                    button: { text: 'Use this photo' },
+                                    multiple: false,
+                                    library: { type: 'image' }
+                                });
+                                frame.on('select', function() {
+                                    var attachment = frame.state().get('selection').first().toJSON();
+                                    var url = attachment.sizes && attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url;
+                                    if (input) input.value = url;
+                                    if (img) { img.src = url; img.style.display = 'block'; }
+                                    if (placeholder) placeholder.style.display = 'none';
+                                    if (removeBtn) removeBtn.style.display = 'flex';
+                                });
+                                frame.open();
+                            });
+                        }
+
+                        if (removeBtn) {
+                            removeBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                if (input) input.value = '';
+                                if (img) { img.src = ''; img.style.display = 'none'; }
+                                if (placeholder) placeholder.style.display = 'inline-flex';
+                                removeBtn.style.display = 'none';
+                            });
+                        }
                     })();
                     </script>
                 </div>
@@ -2706,18 +2770,29 @@ function cha_render_admin_page() {
         <?php elseif ($adding): ?>
             <div class="cha-edit-wrap">
                 <div class="cha-edit-card">
-                    <div class="cha-edit-header">
-                        <div class="cha-edit-avatar-placeholder" style="background:#EFF6FF;border-color:#BFDBFE;color:var(--cha-blue);">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        </div>
-                        <div class="cha-edit-title-block">
-                            <h2>Add New Member</h2>
-                            <p class="cha-edit-sub">Enter member profile details and assign their membership tier.</p>
-                        </div>
-                    </div>
-
-                    <form method="post" action="admin.php?page=cha-members&add=1">
+                    <form method="post" action="admin.php?page=cha-members&add=1" id="cha-add-member-form">
                         <?php wp_nonce_field('cha_edit_member', 'cha_edit_nonce'); ?>
+                        <input type="hidden" name="photo" id="cha-add-photo-input" value="<?php echo esc_attr($add_form_photo ?? ''); ?>">
+
+                        <div class="cha-edit-header">
+                            <div class="cha-avatar-uploader-wrap" id="cha-add-avatar-trigger" title="Click to upload member photo">
+                                <img src="<?php echo esc_url($add_form_photo ?? ''); ?>" alt="Member Photo" class="cha-edit-avatar" id="cha-add-avatar-img" style="<?php echo empty($add_form_photo) ? 'display:none;' : ''; ?>">
+                                <div class="cha-edit-avatar-placeholder" id="cha-add-avatar-placeholder" style="background:#EFF6FF;border-color:#BFDBFE;color:var(--cha-blue);<?php echo !empty($add_form_photo) ? 'display:none;' : ''; ?>">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                </div>
+                                <div class="cha-avatar-uploader-overlay">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                    <span>Add Photo</span>
+                                </div>
+                                <button type="button" class="cha-avatar-remove-btn" id="cha-add-avatar-remove" title="Remove photo" style="<?php echo empty($add_form_photo) ? 'display:none;' : ''; ?>">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
+                            </div>
+                            <div class="cha-edit-title-block">
+                                <h2>Add New Member</h2>
+                                <p class="cha-edit-sub">Enter member profile details and assign their membership tier.</p>
+                            </div>
+                        </div>
 
                         <!-- Role Section -->
                         <div class="cha-section-box">
@@ -2840,7 +2915,7 @@ function cha_render_admin_page() {
                     <script>
                     (function() {
                         var patientFields = document.getElementById('admin-add-patient-fields');
-                        var cards = document.querySelectorAll('.cha-role-card');
+                        var cards = document.querySelectorAll('#cha-add-member-form .cha-role-card');
                         cards.forEach(function(card) {
                             card.addEventListener('click', function() {
                                 cards.forEach(function(c) { c.classList.remove('is-selected'); });
@@ -2853,6 +2928,48 @@ function cha_render_admin_page() {
                                 }
                             });
                         });
+
+                        // WordPress Media Uploader for Add Member
+                        var trigger = document.getElementById('cha-add-avatar-trigger');
+                        var input = document.getElementById('cha-add-photo-input');
+                        var img = document.getElementById('cha-add-avatar-img');
+                        var placeholder = document.getElementById('cha-add-avatar-placeholder');
+                        var removeBtn = document.getElementById('cha-add-avatar-remove');
+
+                        if (trigger && typeof wp !== 'undefined' && wp.media) {
+                            var frame;
+                            trigger.addEventListener('click', function(e) {
+                                if (e.target.closest('#cha-add-avatar-remove')) return;
+                                e.preventDefault();
+                                if (frame) { frame.open(); return; }
+                                frame = wp.media({
+                                    title: 'Select or Upload Member Photo',
+                                    button: { text: 'Use this photo' },
+                                    multiple: false,
+                                    library: { type: 'image' }
+                                });
+                                frame.on('select', function() {
+                                    var attachment = frame.state().get('selection').first().toJSON();
+                                    var url = attachment.sizes && attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url;
+                                    if (input) input.value = url;
+                                    if (img) { img.src = url; img.style.display = 'block'; }
+                                    if (placeholder) placeholder.style.display = 'none';
+                                    if (removeBtn) removeBtn.style.display = 'flex';
+                                });
+                                frame.open();
+                            });
+                        }
+
+                        if (removeBtn) {
+                            removeBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                if (input) input.value = '';
+                                if (img) { img.src = ''; img.style.display = 'none'; }
+                                if (placeholder) placeholder.style.display = 'inline-flex';
+                                removeBtn.style.display = 'none';
+                            });
+                        }
                     })();
                     </script>
                 </div>
