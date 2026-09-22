@@ -8,7 +8,6 @@ import {
   Alert,
   TextInput,
   Modal,
-  Linking,
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,15 +31,6 @@ type Campaign = {
   color: string;
 };
 
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
 function decodeEntities(value?: string) {
   if (!value) return '';
   return value
@@ -52,46 +42,13 @@ function decodeEntities(value?: string) {
     .replace(/&nbsp;/g, ' ');
 }
 
-function buildCheckoutHtml(checkoutUrl: string, fields: Record<string, string>) {
-  const inputs = Object.keys(fields)
+function buildFormBody(fields: Record<string, string>) {
+  return Object.keys(fields)
     .map(
       (key) =>
-        `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(String(fields[key] ?? ''))}">`
+        `${encodeURIComponent(key)}=${encodeURIComponent(String(fields[key] ?? ''))}`
     )
-    .join('\n');
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PayWay Checkout</title>
-<style>body{margin:0;font-family:system-ui,sans-serif;background:#fff}</style>
-</head>
-<body>
-<form id="pw-form" method="POST" action="${escapeHtml(checkoutUrl)}">
-${inputs}
-<p style="padding:24px;color:#0B1D6D;font-weight:600">Opening secure ABA checkout…</p>
-<button type="submit" style="padding:12px 20px;font-size:16px">Open payment page</button>
-<noscript>JavaScript is required for checkout. Tap the button above.</noscript>
-</form>
-<script>
-(function () {
-  function submitForm() {
-    var f = document.getElementById('pw-form');
-    if (f && !f.dataset.submitted) {
-      f.dataset.submitted = '1';
-      f.submit();
-    }
-  }
-  if (document.readyState === 'complete') {
-    setTimeout(submitForm, 50);
-  } else {
-    window.addEventListener('load', function () { setTimeout(submitForm, 50); });
-  }
-})();
-</script>
-</body>
-</html>`;
+    .join('&');
 }
 
 const colorHex: Record<string, string> = {
@@ -106,7 +63,12 @@ export default function DonateScreen({ navigation }: any) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [campaignsLoading, setCampaignsLoading] = useState(true);
   const [amountText, setAmountText] = useState('10');
-  const [checkoutHtml, setCheckoutHtml] = useState<string | null>(null);
+  const [checkoutSource, setCheckoutSource] = useState<{
+    uri: string;
+    method: 'POST';
+    body: string;
+    headers: Record<string, string>;
+  } | null>(null);
   const [webviewKey, setWebviewKey] = useState(0);
   const [paying, setPaying] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -223,7 +185,12 @@ export default function DonateScreen({ navigation }: any) {
       loadedRef.current = false;
       errorShownRef.current = false;
       setWebviewKey((k) => k + 1);
-      setCheckoutHtml(buildCheckoutHtml(res.checkout_url, res.fields));
+      setCheckoutSource({
+        uri: res.checkout_url,
+        method: 'POST',
+        body: buildFormBody(res.fields),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
     } catch (e: any) {
       Alert.alert(
         t('donate.payWay', 'Pay with PayWay (ABA)'),
@@ -243,7 +210,7 @@ export default function DonateScreen({ navigation }: any) {
 
   const closeCheckout = (options?: { poll?: boolean }) => {
     const tranId = tranIdRef.current;
-    setCheckoutHtml(null);
+    setCheckoutSource(null);
     loadedRef.current = false;
     errorShownRef.current = false;
     if (options?.poll === false || !tranId) {
@@ -256,12 +223,14 @@ export default function DonateScreen({ navigation }: any) {
 
   const handleWebViewError = (e: any) => {
     const desc = String(e?.nativeEvent?.description || '');
+    const code = Number(e?.nativeEvent?.code ?? 0);
     const benign =
       desc.includes('ERR_ABORTED') ||
       desc.includes('ERR_UNKNOWN_URL_SCHEME') ||
       desc.includes('about:blank') ||
       desc.includes('ERR_CACHE_MISS') ||
-      desc === '';
+      desc === '' ||
+      code === -999;
     if (benign) return;
     if (errorShownRef.current) return;
     errorShownRef.current = true;
@@ -438,7 +407,7 @@ export default function DonateScreen({ navigation }: any) {
         </View>
       </Animated.ScrollView>
 
-      <Modal visible={!!checkoutHtml} animationType="slide" onRequestClose={() => closeCheckout()}>
+      <Modal visible={!!checkoutSource} animationType="slide" onRequestClose={() => closeCheckout()}>
         <View style={styles.modalHeader}>
           <TouchableOpacity style={styles.modalClose} onPress={() => closeCheckout()}>
             <Ionicons name="close" size={22} color={Colors.secondary} />
@@ -446,11 +415,11 @@ export default function DonateScreen({ navigation }: any) {
           <Text style={styles.modalTitle}>{t('donate.payWay', 'Pay with PayWay (ABA)')}</Text>
           <View style={{ width: 40 }} />
         </View>
-        {checkoutHtml ? (
+        {checkoutSource ? (
           <WebView
             key={webviewKey}
             originWhitelist={['*']}
-            source={{ html: checkoutHtml, baseUrl: 'https://chacambodia.org' }}
+            source={checkoutSource}
             javaScriptEnabled
             domStorageEnabled
             thirdPartyCookiesEnabled
