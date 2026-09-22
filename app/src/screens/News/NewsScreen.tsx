@@ -34,6 +34,17 @@ const BADGE_COLORS: Record<string, { bg: string; fg: string }> = {
   Announcement: { bg: '#16A34A15', fg: '#16A34A' },
 };
 
+function decodeEntities(value?: string) {
+  if (!value) return '';
+  return value
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+}
+
 export default function NewsScreen({ navigation }: any) {
   const { t, i18n } = useTranslation();
   const [items, setItems] = useState<NewsItem[]>([]);
@@ -78,9 +89,9 @@ export default function NewsScreen({ navigation }: any) {
   };
 
   const titleFor = (item: NewsItem) =>
-    isKm && item.title_km ? item.title_km : item.title;
+    decodeEntities(isKm && item.title_km ? item.title_km : item.title);
   const excerptFor = (item: NewsItem) =>
-    isKm && item.excerpt_km ? item.excerpt_km : item.excerpt;
+    decodeEntities(isKm && item.excerpt_km ? item.excerpt_km : item.excerpt);
 
   return (
     <View style={styles.container}>

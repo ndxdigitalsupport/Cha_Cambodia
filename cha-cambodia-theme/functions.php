@@ -1299,10 +1299,10 @@ function cha_rest_get_news($request) {
             }
             $items[] = array(
                 'id'         => $id,
-                'title'      => get_the_title($id),
-                'title_km'   => (string) get_post_meta($id, '_cha_news_title_km', true),
-                'excerpt'    => wp_trim_words(get_the_excerpt($id), 18, '...'),
-                'excerpt_km' => (string) get_post_meta($id, '_cha_news_excerpt_km', true),
+                'title'      => html_entity_decode(get_the_title($id), ENT_QUOTES, 'UTF-8'),
+                'title_km'   => html_entity_decode((string) get_post_meta($id, '_cha_news_title_km', true), ENT_QUOTES, 'UTF-8'),
+                'excerpt'    => html_entity_decode(wp_trim_words(get_the_excerpt($id), 18, '...'), ENT_QUOTES, 'UTF-8'),
+                'excerpt_km' => html_entity_decode((string) get_post_meta($id, '_cha_news_excerpt_km', true), ENT_QUOTES, 'UTF-8'),
                 'date'       => (string) (get_post_meta($id, '_cha_news_date', true) ?: get_the_date('M j, Y', $id)),
                 'badge'      => (string) (get_post_meta($id, '_cha_news_badge', true) ?: 'Event'),
                 'url'        => get_permalink($id),

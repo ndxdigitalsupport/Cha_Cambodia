@@ -389,9 +389,9 @@ export default function DonateScreen({ navigation }: any) {
         </View>
       </Animated.ScrollView>
 
-      <Modal visible={!!checkoutHtml} animationType="slide" onRequestClose={closeCheckout}>
+      <Modal visible={!!checkoutHtml} animationType="slide" onRequestClose={() => closeCheckout()}>
         <View style={styles.modalHeader}>
-          <TouchableOpacity style={styles.modalClose} onPress={closeCheckout}>
+          <TouchableOpacity style={styles.modalClose} onPress={() => closeCheckout()}>
             <Ionicons name="close" size={22} color={Colors.secondary} />
           </TouchableOpacity>
           <Text style={styles.modalTitle}>{t('donate.payWay', 'Pay with PayWay (ABA)')}</Text>
