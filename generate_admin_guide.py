@@ -2,7 +2,8 @@
 Client-Facing User Manual Generator: CHA_Cambodia_Website_Admin_Guide.docx
 Written specifically for non-technical executive leadership and operations staff.
 Focuses 100% on practical day-to-day tasks: logging in, publishing news, updating contacts,
-managing campaigns, tracking donations, supporting members, and basic maintenance.
+creating/editing campaigns, editing any page text/images in Customizer, tracking donations,
+managing members (including manual password reset & 1-click verification), and basic maintenance.
 """
 
 import os
@@ -20,7 +21,7 @@ def generate_client_manual():
     meta_info = {
         "Organization": "Cambodian Haemophilia Association (CHA Cambodia)",
         "Document Title": "Website User & Operations Manual",
-        "Document Version": "Version 1.1 — Client Operations Edition",
+        "Document Version": "Version 1.2 — Client Operations Edition",
         "Public Website": "https://chacambodia.org",
         "Admin Portal": "https://chacambodia.org/wp-admin",
         "Publication Date": "September 2026",
@@ -29,7 +30,7 @@ def generate_client_manual():
     docgen_engine.add_executive_cover_page(
         doc,
         "CHA Cambodia — Website User & Operations Manual",
-        "A Practical, Step-by-Step Guide to Managing Content, Donations, Patient Memberships, and Daily Operations on chacambodia.org",
+        "A Practical, Step-by-Step Guide to Managing Content, Campaigns, Donations, Patient Memberships, and Daily Operations on chacambodia.org",
         logo_path=logo_path,
         meta_table=meta_info
     )
@@ -37,7 +38,7 @@ def generate_client_manual():
     # Table of Contents Overview Callout
     docgen_engine.add_callout(
         doc,
-        "Welcome to your official website management guide! This manual was written specifically for the CHA Cambodia leadership and administrative team. It explains everything you need to know to run your website smoothly on a daily basis—such as posting news, updating phone numbers, checking donations, and viewing patient members—without needing any technical or coding knowledge.",
+        "Welcome to your official website management guide! This manual was written specifically for the CHA Cambodia leadership and administrative team. It explains everything you need to know to run your website smoothly on a daily basis—such as posting news, creating new fundraising campaigns, editing any text or photo on the website, resetting patient passwords directly, checking donations, and viewing members—without needing any technical or coding knowledge.",
         title="WELCOME TO YOUR WEBSITE OPERATIONS MANUAL",
         alert_type="note"
     )
@@ -109,6 +110,7 @@ def generate_client_manual():
         "Add Photo & Category Badge, Then Publish",
         [
             "Featured Image: On the right sidebar, click 'Set featured image' and upload a nice photo of your event.",
+            "Display Date: Enter a friendly date string (e.g. 'Apr 17, 2026').",
             "News Category: Choose one category badge that best fits: Event, Workshop, Update, or Announcement.",
             "Publish: Click the blue 'Publish' button at the top right. Your news is now live for the public to read!"
         ]
@@ -122,12 +124,39 @@ def generate_client_manual():
     )
 
     # -------------------------------------------------------------
-    # SECTION 3: UPDATING FUNDRAISING CAMPAIGNS
+    # SECTION 3: CREATING & MANAGING FUNDRAISING CAMPAIGNS
     # -------------------------------------------------------------
-    docgen_engine.add_heading_1(doc, "3. Updating Fundraising Campaigns & Goals")
-    docgen_engine.add_body_p(doc, "The homepage displays active fundraising initiatives (such as 'Patient Support Funding' or 'Education & Awareness') with animated progress bars showing donors how much has been raised.")
+    docgen_engine.add_heading_1(doc, "3. Creating & Managing Fundraising Campaigns")
+    docgen_engine.add_body_p(doc, "The homepage displays active fundraising initiatives (such as 'Patient Support Funding' or 'Emergency Factor Treatment') with animated progress bars showing donors how much money has been raised toward the target goal.")
 
-    docgen_engine.add_heading_2(doc, "3.1 How to Update Campaign Raised Amounts")
+    docgen_engine.add_heading_2(doc, "3.1 How to Create a Brand New Campaign")
+    docgen_engine.add_body_p(doc, "Whenever CHA launches a new fundraising appeal or humanitarian project, you can easily create a new campaign card:")
+    docgen_engine.add_step_card(
+        doc,
+        "1",
+        "Click Add New Campaign",
+        [
+            "In your left-hand menu, hover over 'Campaigns' and click 'Add New'.",
+            "Enter Campaign Title (English): e.g. 'Youth & Pediatric Care Emergency Fund'.",
+            "Enter Short Description: In the main text box, write a 2-3 sentence overview explaining what the fund will support."
+        ]
+    )
+    docgen_engine.add_step_card(
+        doc,
+        "2",
+        "Configure Target Dollar Amounts, Khmer Text & Theme Color",
+        [
+            "Scroll down to the 'Campaign Details' box on the right / below the editor.",
+            "Campaign Icon: Select a matching symbol (Heart, Graduation Cap, Pulse/Health, Users, Shield, Gift, etc.).",
+            "Raised Amount ($): Enter starting funds collected (e.g. 0 or 1500).",
+            "Goal Amount ($): Enter the total dollar target needed (e.g. 10000).",
+            "Theme Color: Select Red, Blue, or Purple for the card accent and progress bar.",
+            "Khmer Title & Description (Optional): Fill in the Khmer title and summary for Khmer readers.",
+            "Click the blue 'Publish' button. The new campaign immediately joins the active initiatives on the homepage!"
+        ]
+    )
+
+    docgen_engine.add_heading_2(doc, "3.2 How to Update an Existing Campaign's Raised Amount")
     docgen_engine.add_step_card(
         doc,
         "1",
@@ -140,41 +169,60 @@ def generate_client_manual():
     docgen_engine.add_step_card(
         doc,
         "2",
-        "Adjust Target Dollar Amounts",
+        "Adjust Target Dollar Amounts & Save",
         [
-            "Scroll down to the 'Campaign Target Details' section below the text box.",
-            "Raised Amount ($): Enter the current total funds collected (for example, 5000).",
-            "Goal Amount ($): Enter the overall target you want to reach (for example, 20000).",
-            "Click the blue 'Update' button on the right sidebar. The website will immediately recalculate the percentage and update the progress bar!"
+            "Scroll to the 'Campaign Details' box.",
+            "Update the 'Raised Amount ($)' with the latest total collected.",
+            "Click the blue 'Update' button. The website automatically recalculates the percentage and updates the animated progress bar!"
         ]
     )
 
     # -------------------------------------------------------------
-    # SECTION 4: UPDATING CONTACT INFO & STATISTICS
+    # SECTION 4: EDITING ANY TEXT, PHOTO & CONTACT ON THE WEBSITE
     # -------------------------------------------------------------
-    docgen_engine.add_heading_1(doc, "4. Updating Office Contacts & Statistics")
-    docgen_engine.add_body_p(doc, "Whenever CHA changes office addresses, phone numbers, email contacts, or patient community statistics, you can update them in a live visual editor without touching any code.")
+    docgen_engine.add_heading_1(doc, "4. Editing Any Text, Photo & Section via Customizer")
+    docgen_engine.add_body_p(doc, "The entire CHA website is built with a live visual editor called the WordPress Customizer. You can edit headlines, mission statements, team bios, statistics, office contacts, and upload new photos across all pages with zero coding knowledge.")
 
-    docgen_engine.add_heading_2(doc, "4.1 Step-by-Step Customizer Guide")
+    docgen_engine.add_heading_2(doc, "4.1 How to Access the Live Customizer")
+    docgen_engine.add_body_p(doc, "1. In your left WordPress admin menu, hover over 'Appearance' and click 'Customize'.")
+    docgen_engine.add_body_p(doc, "2. The screen splits into two: a controls sidebar on the left, and a live preview of your website on the right.")
+    docgen_engine.add_body_p(doc, "3. When you make changes, the preview updates immediately. Click the blue 'Publish' button at the top to save your changes to the live internet.")
+
+    docgen_engine.add_heading_2(doc, "4.2 Overview of What You Can Edit in Each Customizer Panel")
+    customizer_headers = ["Customizer Panel Name", "What You Can Edit & Upload Inside", "Languages Supported"]
+    customizer_rows = [
+        ["Homepage Content", "Hero headline, background banner image, action buttons, 'How We Help' cards, and community impact numbers.", "English & Khmer"],
+        ["Contact & Footer", "Office phone numbers (+855...), email addresses, physical office address, opening hours, and footer mission tagline.", "English & Khmer"],
+        ["Navigation & Header", "Website logo image (Header & Footer), top navigation menu button labels, and donation button text.", "English & Khmer"],
+        ["About Page", "CHA background story, mission statement, volunteer statistics, historical timeline milestones, and partnership info.", "English & Khmer"],
+        ["Leadership Structure", "Portraits and titles for President, Vice President, Executive Directors, Council Leaders, and Medical Advisors.", "English & Khmer"],
+        ["Programs & Services", "Youth outreach descriptions, humanitarian aid factor distribution, emergency patient care programs, and CSR partners.", "English & Khmer"],
+        ["Haemophilia Medical Info", "Medical educational text, bleeding disorder symptoms, Factor VIII / Factor IX explanations, and von Willebrand Disease guide.", "English & Khmer"],
+        ["Popups & Modals", "Donation modal instructions, banking transfer notes, and membership registration terms copy.", "English & Khmer"],
+    ]
+    docgen_engine.add_styled_table(doc, customizer_headers, customizer_rows)
+
     docgen_engine.add_step_card(
         doc,
         "1",
-        "Open the Customizer",
+        "Changing Office Contacts (Phone, Email, Address)",
         [
-            "In the left menu, hover over 'Appearance' and click 'Customize'.",
-            "In the customizer sidebar on the left, click on 'CHA Theme Options'."
+            "In the Customizer left menu, click 'Contact & Footer' -> 'Contact Information'.",
+            "Phone: Update your official phone number (e.g. +855 96 260 5335).",
+            "Email: Update your official office email (e.g. info@chacambodia.org).",
+            "Address: Update your physical office address in Phnom Penh.",
+            "Opening Hours: Update Monday-Friday and Saturday service hours.",
+            "Click the blue 'Publish' button at the top of the sidebar."
         ]
     )
     docgen_engine.add_step_card(
         doc,
         "2",
-        "Edit Contact Details & Save",
+        "Changing Site Logo or Hero Banner Image",
         [
-            "Contact Phone: Type your new official phone number (e.g. +855 96 260 5335).",
-            "Contact Email: Type your official office email (e.g. info@chacambodia.org).",
-            "Office Address: Update your physical office location in Phnom Penh.",
-            "Statistics Numbers: Update patient numbers (e.g. '500+ Patients', '25 Provinces').",
-            "Save: Click the blue 'Publish' button at the top of the sidebar to make the changes live!"
+            "To change the logo: Click 'Navigation & Header' -> 'Site Logo', click 'Change Image', and select your new high-resolution PNG logo.",
+            "To change the homepage hero photo: Click 'Homepage Content' -> 'Hero Section', click 'Change Image' under Background Image, and upload a fresh photo.",
+            "Click 'Publish' to make the new visual immediately live."
         ]
     )
 
@@ -210,16 +258,42 @@ def generate_client_manual():
     # SECTION 6: MANAGING PATIENT MEMBERS & SUPPORT
     # -------------------------------------------------------------
     docgen_engine.add_heading_1(doc, "6. Managing Members & Patient Support")
-    docgen_engine.add_body_p(doc, "Patients and supporters can register through the website or mobile app to receive digital membership cards. You can view and manage all registered members directly from WordPress.")
+    docgen_engine.add_body_p(doc, "Patients and supporters register through the website or mobile app to receive digital membership cards. As an administrator, you have full control to view, add, edit, verify, and support members.")
 
-    docgen_engine.add_heading_2(doc, "6.1 Viewing the Registered Member List")
+    docgen_engine.add_heading_2(doc, "6.1 Viewing the Registered Member Roster")
     docgen_engine.add_body_p(doc, "1. In the left-hand menu, click on 'CHA Members'.")
-    docgen_engine.add_body_p(doc, "2. You will see a complete roster showing each person's Name, Email, Member Role (Patient or Member), Blood Type, and Medical Diagnosis.")
+    docgen_engine.add_body_p(doc, "2. You will see a complete roster showing each member's Photo, Member ID (e.g. CHA-2026-001), Full Name (English & Khmer), Email, Phone, Role Badge (Patient, Caregiver, Healthcare Prof., or Member), and Verification Status.")
+    docgen_engine.add_body_p(doc, "3. Quick Search: Type any name, email, or Member ID into the search box at the top to find a member in under 1 second.")
 
-    docgen_engine.add_heading_2(doc, "6.2 Helping Patients Who Have Login or Password Issues")
-    docgen_engine.add_body_p(doc, "If a patient or family member contacts your office for help with their account:")
-    docgen_engine.add_body_p(doc, "• If they forgot their password: Tell them to click 'Forgot Password?' on the app or website login screen. They enter their email, and the system automatically emails them a password reset link.")
-    docgen_engine.add_body_p(doc, "• If they did not get the verification email: Check 'CHA Members' to verify their email address is spelled correctly. Have them check their Spam/Junk folder.")
+    docgen_engine.add_heading_2(doc, "6.2 Directly Editing a Member & Setting a New Password")
+    docgen_engine.add_body_p(doc, "If a patient contacts your office asking for a password reset, or needs their medical information, address, or phone number updated:")
+    docgen_engine.add_step_card(
+        doc,
+        "1",
+        "Open the Member Edit Screen",
+        [
+            "In 'CHA Members', locate the member and click the blue 'Edit' pill button on their row.",
+            "You can also manually register a patient from your office by clicking 'Add New Member' at the top."
+        ]
+    )
+    docgen_engine.add_step_card(
+        doc,
+        "2",
+        "Update Details or Set a New Password Directly",
+        [
+            "Direct Password Reset: Find the field labeled 'New Password'. Simply type a new temporary password (e.g. Cha2026!) and click 'Save Changes'. You can then give this password directly to the patient! (Leave this box blank if you do not want to change their password).",
+            "Role Selection: Switch between 'Patient' or 'General Member'. Selecting 'Patient' automatically unlocks medical fields.",
+            "Medical Details: Update Blood Type (A+, B+, O+, AB+, etc.), Diagnosed Bleeding Condition, and Date of Birth.",
+            "Contact Info: Update phone number, physical address, and Khmer name.",
+            "Click the blue 'Save Changes' button at the bottom. The member can immediately log in with their new credentials!"
+        ]
+    )
+
+    docgen_engine.add_heading_2(doc, "6.3 One-Click Member Verification & Troubleshooting")
+    docgen_engine.add_body_p(doc, "• Instant 1-Click Verification: If a patient did not receive or cannot open their verification email, you do not need to resend anything! Simply find their name with the amber 'Pending' badge in 'CHA Members' and click the green 'Verify' button on their row. Their account is immediately activated.", bullet=True)
+    docgen_engine.add_body_p(doc, "• Self-Service Password Reset: Patients can also reset their own password anytime by clicking 'Forgot Password?' on the app or website login screen.", bullet=True)
+    docgen_engine.add_body_p(doc, "• Deleting a Member: If a test account or duplicate profile was created, click the red 'Delete' button on that row. A confirmation dialog will ask you to confirm before deleting.", bullet=True)
+    docgen_engine.add_body_p(doc, "• Exporting Member Directory: Click 'Export CSV' at the top of the CHA Members screen to download the full patient registry into Microsoft Excel for offline record-keeping.", bullet=True)
 
     # -------------------------------------------------------------
     # SECTION 7: ONE GOLDEN RULE: PURGING CACHE
@@ -227,7 +301,7 @@ def generate_client_manual():
     docgen_engine.add_heading_1(doc, "7. The Golden Rule: Clearing the Website Cache")
     docgen_engine.add_callout(
         doc,
-        "Why did my changes not show up immediately?\nYour website uses high-speed LiteSpeed acceleration so pages load in under 1 second. When you edit a phone number, update a campaign, or post news, you must clear the cache so the server shows the fresh version to visitors.\n\nHOW TO DO IT IN 3 SECONDS:\nLook at the very top black bar of your WordPress Admin screen. Hover over the LiteSpeed diamond icon and click 'Purge All'. That's it! Your updates will immediately appear to the public.",
+        "Why did my changes not show up immediately?\nYour website uses high-speed LiteSpeed acceleration so pages load in under 1 second. When you edit text in the Customizer, update a campaign, or post news, you must clear the cache so the server shows the fresh version to visitors.\n\nHOW TO DO IT IN 3 SECONDS:\nLook at the very top black bar of your WordPress Admin screen. Hover over the LiteSpeed diamond icon and click 'Purge All'. That's it! Your updates will immediately appear to the public.",
         title="MANDATORY STEP AFTER MAKING ANY CHANGE",
         alert_type="warning"
     )
@@ -247,11 +321,14 @@ def generate_client_manual():
     cheat_rows = [
         ["Log in to Website", "chacambodia.org/wp-admin", "Enter your username and password"],
         ["Post a News Article or Workshop", "News & Events -> Add New", "Add title, story, event photo, and click Publish"],
+        ["Create a New Fundraising Campaign", "Campaigns -> Add New", "Add title, description, target goal ($), and click Publish"],
         ["Update Campaign Money Raised", "Campaigns -> All Campaigns", "Update Raised and Goal dollar amounts, click Update"],
-        ["Change Office Phone or Email", "Appearance -> Customize", "Open 'CHA Theme Options', edit info, click Publish"],
+        ["Edit Any Page Text, Photo or Logo", "Appearance -> Customize", "Open relevant panel (Homepage, About, Leadership), edit, click Publish"],
+        ["Change Office Phone or Email", "Appearance -> Customize", "Open 'Contact & Footer' -> 'Contact Info', edit, click Publish"],
         ["Check Who Donated Money", "Donations menu", "View total raised, donor names, or click 'Export CSV'"],
         ["Switch ABA Bank to Real Money", "Donations -> PayWay Settings", "Paste Live Merchant ID & Key, change to Production"],
-        ["View Registered Patient Members", "CHA Members menu", "Look up patient member IDs, blood types, and diagnoses"],
+        ["Set New Password for a Patient", "CHA Members -> Edit", "Type new password into 'New Password' box and click Save"],
+        ["Verify Patient Account Directly", "CHA Members menu", "Click green 'Verify' button on any pending member row"],
         ["Make Changes Appear Immediately", "Top bar -> LiteSpeed icon", "Click 'Purge All' after making any changes"],
     ]
     docgen_engine.add_styled_table(doc, cheat_headers, cheat_rows)
