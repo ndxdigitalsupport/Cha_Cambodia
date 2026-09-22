@@ -358,65 +358,15 @@ document.addEventListener('click', function(e) {
     });
   }
 
-  // ---------- 12. Donate form — PayWay checkout ----------
-  function chaSubmitPaywayDonate(form, submitBtn) {
-    const activeChip = form.querySelector('.amount-chip.is-active');
-    const otherInput = form.querySelector('[data-amount-other]');
-    let amount = activeChip ? activeChip.dataset.amount : '10';
-    if (amount === 'other' && otherInput && otherInput.value) {
-      amount = otherInput.value;
-    }
-    amount = parseFloat(amount);
-    if (!amount || amount <= 0) {
-      alert('Please enter a valid donation amount.');
-      return;
-    }
-
-    const nameEl = form.querySelector('#doname, #doname-home');
-    const emailEl = form.querySelector('#doemail, #doemail-home');
-    const phoneEl = form.querySelector('#dophone, #dophone-home');
-    const body = { amount: amount, currency: 'USD' };
-    if (nameEl && nameEl.value.trim()) body.firstname = nameEl.value.trim();
-    if (emailEl && emailEl.value.trim()) body.email = emailEl.value.trim();
-    if (phoneEl && phoneEl.value.trim()) body.phone = phoneEl.value.trim();
-
-    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Processing...'; }
-
-    fetch(chaApi.rest_url + 'payway/purchase', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-      .then((res) => res.json().then((d) => ({ ok: res.ok, d: d })))
-      .then((res) => {
-        if (!res.ok || !res.d.success) {
-          throw new Error((res.d && res.d.message) || 'Could not start payment.');
-        }
-        const f = document.createElement('form');
-        f.method = 'POST';
-        f.action = res.d.checkout_url;
-        f.style.display = 'none';
-        Object.keys(res.d.fields).forEach((k) => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = k;
-          input.value = res.d.fields[k];
-          f.appendChild(input);
-        });
-        document.body.appendChild(f);
-        f.submit();
-      })
-      .catch((err) => {
-        alert(err.message || 'Could not start payment. Please try again.');
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Donate Now'; }
-      });
+  // ---------- 12. Donate — static KHQR QR (no PayWay form) ----------
+  function chaSubmitPaywayDonate() {
+    // Disabled: website donate uses static ABA Pay / KHQR image only.
   }
 
   const donateForm = document.getElementById('donate-form-submit');
   if (donateForm) {
     donateForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      chaSubmitPaywayDonate(donateForm, donateForm.querySelector('button[type="submit"]'));
     });
   }
 
@@ -472,32 +422,30 @@ document.addEventListener('click', function(e) {
   donateModal.addEventListener('click', (e) => { if (e.target === donateModal) closeModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && donateModal.classList.contains('is-open')) closeModal(); });
 
-  // Modal donate form submit
+  // Modal donate form submit (form removed — static QR only)
   const modalForm = document.getElementById('donate-modal-form');
   if (modalForm) {
     modalForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      chaSubmitPaywayDonate(modalForm, modalForm.querySelector('button[type="submit"]'));
     });
   }
 
-  // Copy account number interaction
-  const copyBtn = document.getElementById('donate-copy-btn');
-  const copyLabel = document.getElementById('donate-copy-label');
-  if (copyBtn) {
+  // Copy account number (homepage + modal QR cards)
+  document.querySelectorAll('#donate-copy-btn, #donate-copy-btn-modal').forEach((copyBtn) => {
+    const copyLabel = copyBtn.querySelector('[id^="donate-copy-label"]') || copyBtn;
     copyBtn.addEventListener('click', () => {
       const acctNum = '000283539';
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(acctNum).catch(() => {});
       }
       copyBtn.classList.add('is-copied');
-      if (copyLabel) copyLabel.textContent = 'Copied!';
+      copyLabel.textContent = 'Copied!';
       setTimeout(() => {
         copyBtn.classList.remove('is-copied');
-        if (copyLabel) copyLabel.textContent = 'Copy';
+        copyLabel.textContent = 'Copy';
       }, 2000);
     });
-  }
+  });
 
   // ---------- 16. Member modal ----------
   const memberModal = document.getElementById('member-modal');
@@ -1768,12 +1716,13 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       donate_ph_name: "Enter your name",
       donate_ph_email: "Enter your email",
       donate_ph_phone: "Enter your phone",
-      donate_secure_note: "Secure & encrypted via PayWay (ABA Bank)",
+      donate_secure_note: "Pay directly with ABA Mobile, Bakong, or any KHQR-supported banking app",
       donate_khqr_badge: "KHQR National Pay",
       donate_scan_title: "Scan & Support",
       donate_scan_desc: "Directly transfer your donation using ABA Mobile, Bakong, Wing, ACLEDA, Canadia, or banking apps across Cambodia.",
       donate_modal_desc: "Scan with ABA Mobile, Bakong, or any Cambodian banking app to send your contribution.",
       donate_account_name_lbl: "ACCOUNT NAME",
+      donate_account_org: "Cambodia Haemophilia Association",
       donate_copy_btn: "Copy Account Number",
       donate_modal_copy_btn: "Copy",
       donate_save_qr_btn: "Save QR Image",
@@ -1906,7 +1855,7 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       donate_secure_title: "Secure Payment",
       donate_secure_desc: "Pay securely with credit/debit cards, ABA Pay, KHQR, WeChat Pay or Alipay via PayWay (ABA Bank).",
       donate_btn: "Donate Now",
-      donate_footer_note: "Secure & encrypted via PayWay (ABA Bank)",
+      donate_footer_note: "Pay directly with ABA Mobile, Bakong, or any KHQR-supported banking app",
       member_login_title: "Member Login",
       member_login_sub: "Sign in to access your account, resources, and community.",
       form_email_label: "Email",
@@ -2466,12 +2415,13 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       donate_ph_name: "បញ្ចូលឈ្មោះរបស់អ្នក",
       donate_ph_email: "បញ្ចូលអ៊ីមែលរបស់អ្នក",
       donate_ph_phone: "បញ្ចូលលេខទូរស័ព្ទរបស់អ្នក",
-      donate_secure_note: "សុវត្ថិភាព និងការពារសម្ងាត់តាមរយៈ PayWay (ធនាគារ ABA)",
+      donate_secure_note: "ស្កែនបង់ប្រាក់ផ្ទាល់តាម ABA Mobile, Bakong ឬកម្មវិធីធនាគារដែលគាំទ្រ KHQR",
       donate_khqr_badge: "KHQR ទូទាំងប្រទេស",
       donate_scan_title: "ស្កេន & គាំទ្រ",
       donate_scan_desc: "ផ្ទេរការបរិច្ចាគរបស់អ្នកដោយផ្ទាល់តាមរយៈ ABA Mobile, Bakong, Wing, ACLEDA, Canadia ឬកម្មវិធីធនាគារនានានៅកម្ពុជា។",
       donate_modal_desc: "ស្កេនជាមួយ ABA Mobile, Bakong ឬកម្មវិធីធនាគារនៅកម្ពុជាដើម្បីផ្ញើការចូលរួមរបស់អ្នក។",
       donate_account_name_lbl: "ឈ្មោះគណនី",
+      donate_account_org: "សមាគមហេម៉ូហ្វីលាកម្ពុជា",
       donate_copy_btn: "ចម្លងលេខគណនី",
       donate_modal_copy_btn: "ចម្លង",
       donate_save_qr_btn: "រក្សាទុក QR រូបភាព",
@@ -2603,7 +2553,7 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       donate_secure_title: "ការទូទាត់ប្រកបដោយសុវត្ថិភាព",
       donate_secure_desc: "ទូទាត់ប្រកបដោយសុវត្ថិភាពតាមកាតឥណទាន/ឥណពន្ធ, ABA Pay, KHQR, WeChat Pay ឬ Alipay តាមរយៈ PayWay (ធនាគារ ABA)។",
       donate_btn: "បរិច្ចាគឥឡូវ",
-      donate_footer_note: "សុវត្ថិភាព និងការពារសម្ងាត់តាមរយៈ PayWay (ធនាគារ ABA)",
+      donate_footer_note: "ស្កែនបង់ប្រាក់ផ្ទាល់តាម ABA Mobile, Bakong ឬកម្មវិធីធនាគារដែលគាំទ្រ KHQR",
       member_login_title: "ចូលប្រើប្រាស់គណនី",
       member_login_sub: "ចូលគណនីដើម្បីទទួលបានធនធាន និងការតភ្ជាប់ជាមួយសហគមន៍។",
       form_email_label: "អ៊ីមែល",

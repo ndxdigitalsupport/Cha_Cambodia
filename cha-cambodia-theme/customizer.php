@@ -978,7 +978,7 @@ function cha_customize_register($wp_customize) {
         array('donate_aba', 'ABA', 'ABA'),
         array('donate_btn', 'Donate Now', 'បរិច្ចាគឥឡូវ'),
         array('donate_btn_monthly', 'Donate Monthly', 'បរិច្ចាគប្រចាំខែ'),
-        array('donate_footer_note', 'Secure & encrypted via PayWay (ABA Bank)', 'សុវត្ថិភាព និងអ៊ិនគ្រីបតាម PayWay (ធនាគារ ABA)'),
+        array('donate_footer_note', 'Pay directly with ABA Mobile, Bakong, or any KHQR-supported banking app', 'ស្កែនបង់ប្រាក់ផ្ទាល់តាម ABA Mobile, Bakong ឬកម្មវិធីធនាគារដែលគាំទ្រ KHQR'),
         array('donate_success_title', 'Thank You!', 'សូមអរគុណ!'),
         array('donate_success_msg', 'Your generous donation will help change lives across Cambodia.', 'ការបរិច្ចាគដ៏សប្បុរសរបស់អ្នកនឹងជួយផ្លាស់ប្តូរជីវិតនៅទូទាំងកម្ពុជា។'),
     );
