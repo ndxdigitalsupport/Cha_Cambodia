@@ -6545,12 +6545,16 @@ img.roster-item-avatar {
     -webkit-overflow-scrolling: touch !important;
   }
   .donate-modal-acct-row {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
   }
   .donate-modal-acct-row .donate-copy-account-btn {
-    justify-content: center;
-    width: 100%;
+    width: auto !important;
+    flex-shrink: 0 !important;
+    justify-content: center !important;
   }
 }
 
@@ -10930,6 +10934,10 @@ img.roster-item-avatar {
   .donate-modal-acct-row {
     padding: 6px 10px !important;
     gap: 6px !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
   }
   .donate-modal-acct-num {
     font-size: 0.875rem !important;
@@ -10942,6 +10950,9 @@ img.roster-item-avatar {
   .donate-modal-acct-row .donate-copy-account-btn {
     padding: 4px 8px !important;
     font-size: 0.6875rem !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+    justify-content: center !important;
   }
   .donate-modal-actions {
     margin-bottom: 8px !important;
