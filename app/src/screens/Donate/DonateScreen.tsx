@@ -347,7 +347,7 @@ export default function DonateScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#DC2626' },
+  container: { flex: 1, backgroundColor: '#991B1B' },
 
   heroContainer: {
     position: 'absolute',
