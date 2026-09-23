@@ -2142,15 +2142,6 @@ function cha_add_admin_menu() {
         'dashicons-groups',
         26
     );
-    add_menu_page(
-        'Donations',
-        'Donations',
-        'manage_options',
-        'cha-donations',
-        'cha_render_donations_page',
-        'dashicons-heart',
-        27
-    );
 }
 add_action('admin_menu', 'cha_add_admin_menu');
 

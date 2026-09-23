@@ -399,27 +399,32 @@
       </div>
       <div class="campaigns-list campaigns-panel-v2" data-reveal>
         <div class="campaigns-header-row">
-          <div class="campaigns-title-col">
-            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.1);color:#16A34A;padding:5px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;letter-spacing:0.02em;margin-bottom:10px;align-self:flex-start">
-              <span style="width:7px;height:7px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 2px rgba(34,197,94,0.25)"></span>
-              <span data-i18n="campaigns_badge">Active Missions</span>
+          <div class="donate-card-header campaigns-card-header">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #FFFFFF; border: 1.5px solid #E2E8F0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(11, 29, 109, 0.08); flex-shrink: 0; padding: 8px; color: #0B1D6D;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 100%; height: 100%; display: block;">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="M12 8v4"/>
+                  <path d="M12 16h.01"/>
+                </svg>
+              </div>
+              <div style="min-width: 0;">
+                <h3 class="campaigns-main-title" data-i18n="campaigns_heading" style="font-size: 1.35rem; font-weight: 800; color: #0B1D6D; margin: 0 0 2px; letter-spacing: -0.02em; line-height: 1.2;"><?php esc_html_e('Current Campaigns', 'cha-cambodia'); ?></h3>
+                <span data-i18n="campaigns_sub" style="font-size: 0.75rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Support our life-saving missions and emergency patient care.</span>
+              </div>
             </div>
-            <div class="campaigns-top-bar">
-              <h3 class="campaigns-main-title" data-i18n="campaigns_heading"><?php esc_html_e('Current Campaigns', 'cha-cambodia'); ?></h3>
-              <?php
-              $camp_count_q = new WP_Query(array('post_type' => 'cha_campaigns', 'posts_per_page' => 10, 'post_status' => 'publish'));
-              $camp_count = $camp_count_q->found_posts;
-              wp_reset_postdata();
-              if ($camp_count > 0) : ?>
-                <a href="<?php echo esc_url(get_post_type_archive_link('cha_campaigns')); ?>" class="campaigns-pill-btn">
-                  <span data-i18n="campaigns_view_all_count">View All (<?php echo esc_html($camp_count); ?>)</span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                </a>
-              <?php else : ?>
-                <span class="campaigns-count-badge" data-i18n="campaigns_ongoing_badge">3 Ongoing</span>
-              <?php endif; ?>
-            </div>
-            <p class="campaigns-main-sub" data-i18n="campaigns_sub"><?php esc_html_e('Support our life-saving missions and emergency patient care.', 'cha-cambodia'); ?></p>
+            <?php
+            $camp_count_q = new WP_Query(array('post_type' => 'cha_campaigns', 'posts_per_page' => 10, 'post_status' => 'publish'));
+            $camp_count = $camp_count_q->found_posts;
+            wp_reset_postdata();
+            if ($camp_count > 0) : ?>
+              <a href="<?php echo esc_url(get_post_type_archive_link('cha_campaigns')); ?>" class="campaigns-pill-btn" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #0B1D6D; background: rgba(11, 29, 109, 0.06); padding: 7px 14px; border-radius: 100px; border: 1px solid rgba(11, 29, 109, 0.14); text-decoration: none; flex-shrink: 0; white-space: nowrap; box-shadow: none;">
+                <span data-i18n="campaigns_view_all_count">View All (<?php echo esc_html($camp_count); ?>)</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </a>
+            <?php else : ?>
+              <span class="campaigns-count-badge" data-i18n="campaigns_ongoing_badge" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #16A34A; background: rgba(22, 163, 74, 0.08); padding: 7px 14px; border-radius: 100px; border: 1px solid rgba(22, 163, 74, 0.18); flex-shrink: 0;">3 Ongoing</span>
+            <?php endif; ?>
           </div>
         </div>
 
