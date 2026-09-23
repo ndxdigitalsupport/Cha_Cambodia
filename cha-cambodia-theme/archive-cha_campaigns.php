@@ -1,8 +1,13 @@
 <?php get_header(); ?>
 
     <!-- ===== CAMPAIGNS ARCHIVE ===== -->
-    <section class="section" id="campaigns-archive" style="padding-top: 120px;">
+    <section class="section campaigns-archive-section" id="campaigns-archive">
       <div class="container">
+        <div style="margin-bottom: 20px;" data-reveal>
+          <a href="<?php echo esc_url(home_url('/')); ?>" class="card-link" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.9375rem;">
+            <span class="arrow" style="transform: rotate(180deg);">&rarr;</span> <?php esc_html_e('Back to Home', 'cha-cambodia'); ?>
+          </a>
+        </div>
         <div class="section-heading text-left" data-reveal>
           <h1 data-i18n="campaigns_archive_heading"><?php esc_html_e('Current Campaigns', 'cha-cambodia'); ?></h1>
           <p data-i18n="campaigns_archive_sub"><?php esc_html_e('Support our mission — every contribution changes lives across Cambodia.', 'cha-cambodia'); ?></p>
