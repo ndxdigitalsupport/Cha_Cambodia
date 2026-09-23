@@ -140,6 +140,7 @@ export default function NewsDetailScreen({ navigation, route }: Props) {
   const [articleUrl, setArticleUrl] = useState(fallbackUrl);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const [useWebFallback, setUseWebFallback] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [headerTitle, setHeaderTitle] = useState(fallbackTitle);
 
@@ -151,6 +152,12 @@ export default function NewsDetailScreen({ navigation, route }: Props) {
 
   const loadArticle = useCallback(async () => {
     if (!articleId) {
+      if (fallbackUrl) {
+        setUseWebFallback(true);
+        setLoading(false);
+        setFailed(false);
+        return;
+      }
       setFailed(true);
       setLoading(false);
       return;
@@ -158,6 +165,7 @@ export default function NewsDetailScreen({ navigation, route }: Props) {
     setLoading(true);
     setFailed(false);
     setHtml(null);
+    setUseWebFallback(false);
     try {
       const res: any = await newsAPI.getNewsItem(articleId);
       if (!res?.success || !res?.content) throw new Error('no content');
@@ -168,8 +176,15 @@ export default function NewsDetailScreen({ navigation, route }: Props) {
       setHtml(buildArticleHtml(res, isKm));
       setLoading(false);
     } catch {
-      setFailed(true);
-      setLoading(false);
+      if (fallbackUrl) {
+        setArticleUrl(fallbackUrl);
+        setUseWebFallback(true);
+        setLoading(false);
+        setFailed(false);
+      } else {
+        setFailed(true);
+        setLoading(false);
+      }
     }
   }, [articleId, fallbackTitle, fallbackUrl, isKm]);
 
@@ -210,6 +225,18 @@ export default function NewsDetailScreen({ navigation, route }: Props) {
         <WebView
           originWhitelist={['*']}
           source={{ html, baseUrl: 'https://chacambodia.org' }}
+          style={styles.webview}
+          allowsBackForwardNavigationGestures
+          allowsInlineMediaPlayback
+          decelerationRate="normal"
+        />
+      ) : useWebFallback && articleUrl ? (
+        <WebView
+          originWhitelist={['*']}
+          source={{ uri: articleUrl }}
+          userAgent={
+            'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'
+          }
           style={styles.webview}
           allowsBackForwardNavigationGestures
           allowsInlineMediaPlayback
