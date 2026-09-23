@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Clipboard from 'expo-clipboard';
 import * as MediaLibrary from 'expo-media-library';
 import { Asset } from 'expo-asset';
@@ -164,26 +163,19 @@ export default function DonateScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      {/* Hero */}
+      {/* Hero + gap = one continuous red section (extends under white sheet) */}
       <Animated.View style={[styles.heroContainer, { transform: [{ translateY: parallaxTranslateY }, { scale: scaleZoom }] }]}>
-        <LinearGradient
-          colors={['#DC2626', '#991B1B']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.heroGradient}
-        >
-          <View style={styles.heroContent}>
-            <View style={styles.heroIconWrap}>
-              <View style={styles.heroIconGlass}>
-                <Ionicons name="heart" size={42} color="#FFFFFF" />
-              </View>
+        <View style={styles.heroContent}>
+          <View style={styles.heroIconWrap}>
+            <View style={styles.heroIconGlass}>
+              <Ionicons name="heart" size={42} color="#FFFFFF" />
             </View>
-            <Text style={styles.heroTitle}>{t('donate.title', 'Help Change Lives')}</Text>
-            <Text style={styles.heroLead}>
-              {t('donate.subtitle', 'Your generosity directly funds vital treatment and support for bleeding disorder patients across Cambodia.')}
-            </Text>
           </View>
-        </LinearGradient>
+          <Text style={styles.heroTitle}>{t('donate.title', 'Help Change Lives')}</Text>
+          <Text style={styles.heroLead}>
+            {t('donate.subtitle', 'Your generosity directly funds vital treatment and support for bleeding disorder patients across Cambodia.')}
+          </Text>
+        </View>
       </Animated.View>
 
       {/* Floating Back Button */}
@@ -347,18 +339,16 @@ export default function DonateScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#991B1B' },
+  container: { flex: 1, backgroundColor: '#DC2626' },
 
   heroContainer: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 300,
+    height: 420,
     zIndex: 1,
-  },
-  heroGradient: {
-    flex: 1,
+    backgroundColor: '#DC2626',
     paddingTop: 60,
     paddingHorizontal: Spacing.lg,
   },
