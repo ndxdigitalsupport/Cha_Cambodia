@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   contentWrapper: {
     width: '100%',
     alignSelf: 'stretch',
-    backgroundColor: '#DC2626',
+    backgroundColor: '#F8FAFC',
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     paddingTop: 40,
