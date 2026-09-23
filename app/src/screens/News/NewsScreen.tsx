@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Linking,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
@@ -28,10 +27,10 @@ type NewsItem = {
 };
 
 const BADGE_COLORS: Record<string, { bg: string; fg: string }> = {
-  Event: { bg: '#E31E2415', fg: '#E31E24' },
-  Update: { bg: '#0B1D6D15', fg: '#0B1D6D' },
-  Workshop: { bg: '#6A2C9115', fg: '#6A2C91' },
-  Announcement: { bg: '#16A34A15', fg: '#16A34A' },
+  Event: { bg: 'rgba(0,0,0,0.55)', fg: '#F8BFC1' },
+  Update: { bg: 'rgba(0,0,0,0.55)', fg: '#B3C2E8' },
+  Workshop: { bg: 'rgba(0,0,0,0.55)', fg: '#DCC5EA' },
+  Announcement: { bg: 'rgba(0,0,0,0.55)', fg: '#B8E6C8' },
 };
 
 function decodeEntities(value?: string) {
@@ -83,9 +82,12 @@ export default function NewsScreen({ navigation }: any) {
     setRefreshing(false);
   };
 
-  const openArticle = (url: string) => {
-    if (!url) return;
-    Linking.openURL(url).catch(() => {});
+  const openArticle = (item: NewsItem) => {
+    if (!item.url) return;
+    navigation.navigate('NewsDetail', {
+      url: item.url,
+      title: titleFor(item),
+    });
   };
 
   const titleFor = (item: NewsItem) =>
@@ -140,7 +142,7 @@ export default function NewsScreen({ navigation }: any) {
                 key={item.id}
                 style={styles.card}
                 activeOpacity={0.85}
-                onPress={() => openArticle(item.url)}
+                onPress={() => openArticle(item)}
               >
                 <View style={styles.cardMedia}>
                   {item.image ? (
@@ -164,9 +166,9 @@ export default function NewsScreen({ navigation }: any) {
                   <Text style={styles.cardExcerpt} numberOfLines={3}>
                     {excerptFor(item)}
                   </Text>
-                  <View style={styles.readRow}>
+                  <View style={styles.readPill}>
                     <Text style={styles.readText}>{t('news.readMore', 'Read More')}</Text>
-                    <Ionicons name="arrow-forward" size={14} color={Colors.primary} />
+                    <Ionicons name="arrow-forward" size={13} color={Colors.primary} />
                   </View>
                 </View>
               </TouchableOpacity>
@@ -242,9 +244,9 @@ const styles = StyleSheet.create({
   },
   cardDate: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '600',
     color: '#FFFFFF',
-    backgroundColor: 'rgba(11,29,109,0.75)',
+    backgroundColor: 'rgba(0,0,0,0.55)',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 100,
@@ -254,12 +256,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 100,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(0,0,0,0.55)',
   },
-  badgeText: { fontSize: 11, fontWeight: '800' },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
   cardBody: { padding: 16 },
-  cardTitle: { fontSize: 16, fontWeight: '800', color: Colors.secondary, lineHeight: 22, marginBottom: 6 },
-  cardExcerpt: { fontSize: 13, color: Colors.textSecondary, lineHeight: 20, marginBottom: 12 },
-  readRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  readText: { fontSize: 13, fontWeight: '800', color: Colors.primary },
+  cardTitle: { fontSize: 17, fontWeight: '800', color: Colors.secondary, lineHeight: 24, marginBottom: 6 },
+  cardExcerpt: { fontSize: 13, color: Colors.textSecondary, lineHeight: 20, marginBottom: 14 },
+  readPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 100,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+  },
+  readText: { fontSize: 13, fontWeight: '800', color: Colors.secondary, paddingTop: 1 },
 });

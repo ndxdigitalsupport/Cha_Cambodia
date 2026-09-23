@@ -367,6 +367,7 @@
     "readMore": "Read More",
     "empty": "No articles yet. Check back soon!",
     "error": "Could not load news. Please try again.",
-    "openArticle": "Open article on website"
+    "openArticle": "Open article on website",
+    "loading": "Loading article…"
   }
 }

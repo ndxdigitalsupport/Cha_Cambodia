@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ImageBackground, Image, Animated, Linking, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ImageBackground, Image, Animated, ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,10 +15,31 @@ type NewsItem = {
   id: number;
   title: string;
   title_km?: string;
+  excerpt?: string;
+  excerpt_km?: string;
   date: string;
   badge: string;
   url: string;
+  image?: string;
 };
+
+const NEWS_BADGE_COLORS: Record<string, string> = {
+  Event: '#F8BFC1',
+  Update: '#B3C2E8',
+  Workshop: '#DCC5EA',
+  Announcement: '#B8E6C8',
+};
+
+function decodeEntities(value?: string) {
+  if (!value) return '';
+  return value
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+}
 
 export default function HomeScreen({ navigation }: any) {
   const { user } = useAuth();
@@ -180,30 +201,53 @@ export default function HomeScreen({ navigation }: any) {
             <Text style={styles.newsEmptyText}>{t('news.empty', 'No articles yet. Check back soon!')}</Text>
           </View>
         ) : (
-          news.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.newsCard}
-              activeOpacity={0.85}
-              onPress={() => {
-                if (item.url) Linking.openURL(item.url).catch(() => {});
-              }}
-            >
-              <View style={styles.newsIconWrap}>
-                <Ionicons name="megaphone-outline" size={20} color={Colors.primary} />
-              </View>
-              <View style={styles.newsBody}>
-                <View style={styles.newsMetaRow}>
-                  <Text style={styles.newsBadge}>{item.badge}</Text>
-                  <Text style={styles.newsDate}>{item.date}</Text>
+          news.map((item) => {
+            const badgeColor = NEWS_BADGE_COLORS[item.badge] || NEWS_BADGE_COLORS.Event;
+            const title = decodeEntities(isKm && item.title_km ? item.title_km : item.title);
+            const excerpt = decodeEntities(isKm && item.excerpt_km ? item.excerpt_km : item.excerpt);
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.newsCard}
+                activeOpacity={0.85}
+                onPress={() => {
+                  if (item.url) {
+                    navigation.navigate('NewsDetail', { url: item.url, title });
+                  }
+                }}
+              >
+                <View style={styles.newsMedia}>
+                  {item.image ? (
+                    <Image source={{ uri: item.image }} style={styles.newsImage} resizeMode="cover" />
+                  ) : (
+                    <View style={[styles.newsImage, styles.newsImageFallback]}>
+                      <Ionicons name="newspaper" size={26} color={Colors.secondary} />
+                    </View>
+                  )}
+                  <View style={styles.newsDateRow}>
+                    <Text style={styles.newsDatePill}>{item.date}</Text>
+                    <View style={styles.newsBadgePill}>
+                      <Text style={[styles.newsBadgePillText, { color: badgeColor }]}>{item.badge}</Text>
+                    </View>
+                  </View>
                 </View>
-                <Text style={styles.newsTitle} numberOfLines={2}>
-                  {isKm && item.title_km ? item.title_km : item.title}
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={Colors.textMuted} />
-            </TouchableOpacity>
-          ))
+                <View style={styles.newsBody}>
+                  <Text style={styles.newsTitle} numberOfLines={2}>
+                    {title}
+                  </Text>
+                  {!!excerpt && (
+                    <Text style={styles.newsExcerpt} numberOfLines={3}>
+                      {excerpt}
+                    </Text>
+                  )}
+                  <View style={styles.newsReadPill}>
+                    <Text style={styles.newsReadText}>{t('news.readMore', 'Read More')}</Text>
+                    <Ionicons name="arrow-forward" size={13} color={Colors.secondary} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })
         )}
       </View>
 
@@ -346,36 +390,68 @@ const styles = StyleSheet.create({
   },
   newsEmptyText: { fontSize: 13, color: Colors.textSecondary, textAlign: 'center' },
   newsCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    padding: 14,
-    marginBottom: 12,
+    overflow: 'hidden',
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.04)',
-    ...Shadows.sm,
+    ...Shadows.md,
   },
-  newsIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: Colors.primary + '12',
+  newsMedia: { position: 'relative' },
+  newsImage: { width: '100%', aspectRatio: 16 / 9 },
+  newsImageFallback: {
+    backgroundColor: '#EAF0FB',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  newsBody: { flex: 1 },
-  newsMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
-  newsBadge: {
+  newsDateRow: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    right: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  newsDatePill: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 100,
+    overflow: 'hidden',
+  },
+  newsBadgePill: {
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 100,
+  },
+  newsBadgePillText: {
     fontSize: 10,
     fontWeight: '800',
-    color: Colors.primary,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
   },
-  newsDate: { fontSize: 11, color: Colors.textMuted, fontWeight: '600' },
-  newsTitle: { fontSize: 14, fontWeight: '700', color: Colors.text, lineHeight: 20 },
+  newsBody: { padding: 16 },
+  newsTitle: { fontSize: 17, fontWeight: '800', color: Colors.secondary, lineHeight: 24, marginBottom: 6 },
+  newsExcerpt: { fontSize: 13, color: Colors.textSecondary, lineHeight: 20, marginBottom: 14 },
+  newsReadPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 100,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+  },
+  newsReadText: { fontSize: 13, fontWeight: '800', color: Colors.secondary, paddingTop: 1 },
 
   ctaWrap: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 24 },
   ctaBannerWrapper: { borderRadius: 24, overflow: 'hidden', ...Shadows.lg },
