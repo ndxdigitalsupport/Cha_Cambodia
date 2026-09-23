@@ -414,9 +414,16 @@
               </div>
             </div>
             <?php
-            $camp_count_q = new WP_Query(array('post_type' => 'cha_campaigns', 'posts_per_page' => 10, 'post_status' => 'publish'));
-            $camp_count = $camp_count_q->found_posts;
-            wp_reset_postdata();
+            $camp_count = 0;
+            if (function_exists('wp_count_posts')) {
+                $counts = wp_count_posts('cha_campaigns');
+                $camp_count = isset($counts->publish) ? (int) $counts->publish : 0;
+            }
+            if ($camp_count < 1) {
+                $camp_count_q = new WP_Query(array('post_type' => 'cha_campaigns', 'posts_per_page' => -1, 'post_status' => 'publish', 'fields' => 'ids'));
+                $camp_count = (int) $camp_count_q->found_posts;
+                wp_reset_postdata();
+            }
             if ($camp_count > 0) : ?>
               <a href="<?php echo esc_url(get_post_type_archive_link('cha_campaigns')); ?>" class="campaigns-pill-btn" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #0B1D6D; background: rgba(11, 29, 109, 0.06); padding: 7px 14px; border-radius: 100px; border: 1px solid rgba(11, 29, 109, 0.14); text-decoration: none; flex-shrink: 0; white-space: nowrap; box-shadow: none;">
                 <span data-i18n="campaigns_view_all_count">View All (<?php echo esc_html($camp_count); ?>)</span>
@@ -432,7 +439,7 @@
           <?php
           $campaigns_query = new WP_Query(array(
               'post_type'      => 'cha_campaigns',
-              'posts_per_page' => 3,
+              'posts_per_page' => 4,
               'post_status'    => 'publish',
               'orderby'        => 'menu_order',
               'order'          => 'ASC',
