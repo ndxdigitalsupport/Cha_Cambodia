@@ -41,7 +41,7 @@
 
           <!-- Account Details Box -->
           <div style="background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; margin-bottom: 16px;">
-            <div style="font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; color: #64748B; letter-spacing: 0.6px; margin-bottom: 4px;">Beneficiary Name</div>
+            <div style="font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; color: #64748B; letter-spacing: 0.6px; margin-bottom: 4px;">Account Name</div>
             <div style="font-size: 0.8125rem; font-weight: 800; color: #0B1D6D; margin-bottom: 10px; line-height: 1.3;">CAMBODIA HEMOPHILIA ASSOCIATION</div>
 
             <div style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1.5px solid #CBD5E1; border-radius: 12px; padding: 8px 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">

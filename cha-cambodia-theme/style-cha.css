@@ -5553,8 +5553,15 @@ img.roster-item-avatar {
     gap: 18px;
   }
   .donate-qr-frame {
-    max-width: 200px;
+    max-width: 100% !important;
+    width: 100% !important;
     margin: 0 auto;
+    padding: 10px;
+  }
+  .donate-qr-frame img {
+    width: 100% !important;
+    max-width: none;
+    height: auto;
   }
   .donate-steps-strip {
     grid-template-columns: 1fr;
@@ -5585,9 +5592,14 @@ img.roster-item-avatar {
     gap: 18px !important;
   }
   .donate-split-left {
-    max-width: 240px !important;
+    max-width: min(100%, 360px) !important;
     margin: 0 auto !important;
     width: 100% !important;
+  }
+  .donate-split-left .donate-qr-stand {
+    width: 100%;
+    max-width: none;
+    padding: 10px;
   }
 }
 
@@ -6226,8 +6238,14 @@ img.roster-item-avatar {
     flex: 1 1 100% !important;
   }
   .donate-split-left {
-    max-width: 240px !important;
+    max-width: min(100%, 360px) !important;
+    width: 100% !important;
     margin: 0 auto;
+  }
+  .donate-split-left .donate-qr-stand {
+    width: 100%;
+    max-width: none;
+    padding: 10px;
   }
 }
 
