@@ -1360,6 +1360,17 @@ function cha_rest_get_news($request) {
                 $img = wp_get_attachment_image_src($id, 'medium_large');
                 if ($img) $image = $img[0];
             }
+            if ($image === '') {
+                $badge_key = strtolower((string) (get_post_meta($id, '_cha_news_badge', true) ?: 'event'));
+                $fallbacks = array(
+                    'event'        => 'news-event-1.jpg',
+                    'update'       => 'news-update-1.jpg',
+                    'workshop'     => 'doctor training.png',
+                    'announcement' => 'news-update-1.jpg',
+                );
+                $fb = isset($fallbacks[$badge_key]) ? $fallbacks[$badge_key] : 'news-event-1.jpg';
+                $image = get_template_directory_uri() . '/' . str_replace(' ', '%20', $fb);
+            }
             $items[] = array(
                 'id'         => $id,
                 'title'      => html_entity_decode(get_the_title($id), ENT_QUOTES, 'UTF-8'),
