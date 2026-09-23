@@ -402,6 +402,8 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1, zIndex: 2 },
   scrollContent: { paddingTop: 260 },
   contentWrapper: {
+    width: '100%',
+    alignSelf: 'stretch',
     backgroundColor: '#F8FAFC',
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
@@ -414,6 +416,9 @@ const styles = StyleSheet.create({
 
   // Website-style donation card
   donateCard: {
+    width: '100%',
+    alignSelf: 'stretch',
+    overflow: 'hidden',
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     borderWidth: 1.5,
@@ -501,6 +506,8 @@ const styles = StyleSheet.create({
   },
 
   qrFrame: {
+    width: '100%',
+    alignSelf: 'stretch',
     backgroundColor: '#FFFFFF',
     borderRadius: 22,
     borderWidth: 1.5,
@@ -509,6 +516,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
     shadowColor: '#0B1D6D',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.12,
@@ -517,7 +525,8 @@ const styles = StyleSheet.create({
   },
   qrImage: {
     width: '100%',
-    aspectRatio: 1,
+    maxWidth: '100%',
+    aspectRatio: 908 / 1280,
     borderRadius: 14,
   },
 
