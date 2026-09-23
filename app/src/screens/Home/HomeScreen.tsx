@@ -45,7 +45,7 @@ export default function HomeScreen({ navigation }: any) {
   const stats = [
     { value: '25', label: t('home.stats.provinces', 'Provinces'), icon: 'location' as const },
     { value: '500+', label: t('home.stats.patients', 'Patients'), icon: 'people' as const },
-    { value: '15+', label: t('home.stats.partners', 'Partners'), icon: 'heart' as const },
+    { value: '2', label: t('home.stats.partners', 'Partners'), icon: 'heart' as const },
   ];
 
   const helpItems = [

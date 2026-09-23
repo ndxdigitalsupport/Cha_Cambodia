@@ -13,6 +13,7 @@
       "bundleIdentifier": "com.chacambodia.app",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Allow CHA to access your photos to set your membership card photo.",
+        "NSPhotoLibraryAddUsageDescription": "Allow CHA to save the donation QR code to your photos.",
         "NSCameraUsageDescription": "Allow CHA to access your camera for your membership card photo."
       }
     },
@@ -43,6 +44,14 @@
           "image": "./assets/splash-icon.png",
           "resizeMode": "contain",
           "backgroundColor": "#0B1D6D"
+        }
+      ],
+      "expo-asset",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow CHA to save the donation QR code to your photos.",
+          "savePhotosPermission": "Allow CHA to save the donation QR code to your photos."
         }
       ]
     ],
