@@ -5531,7 +5531,7 @@ img.roster-item-avatar {
   .donate-showcase-card {
     padding: 20px 18px;
     border-radius: 20px;
-    overflow: hidden;
+    overflow: clip;
     box-sizing: border-box;
   }
   .campaigns-panel-v2 {
@@ -5543,7 +5543,8 @@ img.roster-item-avatar {
     gap: 10px;
   }
   .donation-wrap {
-    overflow-x: hidden;
+    overflow-x: clip;
+    overflow-y: visible;
   }
   .text-muted[style*="max-width: 380px"] {
     max-width: 100% !important;
@@ -10983,6 +10984,29 @@ img.roster-item-avatar {
     max-width: 100%;
     width: 100%;
   }
+}
+
+/* Homepage donate section — page scroll only (no nested scroll on the card/wrap) */
+#membership .container[data-tabs],
+#membership .tab-panel,
+#membership .donation-wrap,
+#membership .donate-card-split,
+#membership .donate-qr-frame,
+#membership .donate-controls-col,
+#membership .donate-steps-strip {
+  overflow: visible !important;
+  max-height: none !important;
+  overscroll-behavior: auto !important;
+}
+#membership .donation-wrap {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+#membership .donate-showcase-card {
+  overflow: clip !important;
+  max-height: none !important;
+  overscroll-behavior: auto !important;
+  touch-action: pan-y;
 }
 
 /* Flatpickr calendar — prevent cut-off on mobile */
