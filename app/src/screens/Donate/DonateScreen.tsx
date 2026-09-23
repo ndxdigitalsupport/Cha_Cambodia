@@ -225,7 +225,9 @@ export default function DonateScreen({ navigation }: any) {
 
             {/* QR stand */}
             <View style={styles.qrFrame}>
-              <Image source={qrImage} style={styles.qrImage} resizeMode="contain" />
+              <View style={styles.qrImageBox}>
+                <Image source={qrImage} style={styles.qrImage} resizeMode="contain" />
+              </View>
             </View>
 
             {/* Scan & Support */}
@@ -523,11 +525,16 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 4,
   },
-  qrImage: {
+  qrImageBox: {
     width: '100%',
-    maxWidth: '100%',
     aspectRatio: 908 / 1280,
     borderRadius: 14,
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+  },
+  qrImage: {
+    width: '100%',
+    height: '100%',
   },
 
   scanTitle: {
