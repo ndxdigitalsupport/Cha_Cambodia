@@ -403,14 +403,14 @@
             <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
               <div style="width: 44px; height: 44px; border-radius: 12px; background: #FFFFFF; border: 1.5px solid #E2E8F0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(11, 29, 109, 0.08); flex-shrink: 0; padding: 8px; color: #0B1D6D;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 100%; height: 100%; display: block;">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  <path d="M12 8v4"/>
-                  <path d="M12 16h.01"/>
+                  <circle cx="12" cy="12" r="9"/>
+                  <circle cx="12" cy="12" r="5"/>
+                  <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>
                 </svg>
               </div>
               <div style="min-width: 0;">
                 <h3 class="campaigns-main-title" data-i18n="campaigns_heading" style="font-size: 1.35rem; font-weight: 800; color: #0B1D6D; margin: 0 0 2px; letter-spacing: -0.02em; line-height: 1.2;"><?php esc_html_e('Current Campaigns', 'cha-cambodia'); ?></h3>
-                <span data-i18n="campaigns_sub" style="font-size: 0.75rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Support our life-saving missions and emergency patient care.</span>
+                <span data-i18n="campaigns_badge" style="font-size: 0.75rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Active Mission</span>
               </div>
             </div>
             <?php

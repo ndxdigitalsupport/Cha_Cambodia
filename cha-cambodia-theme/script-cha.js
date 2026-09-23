@@ -1777,7 +1777,7 @@ initHemophiliaOther('mregcondition', 'mregcondition-other');
       footer_address: "Phnom Penh, Cambodia",
       /* Campaigns */
       campaigns_active: "Active Initiatives",
-      campaigns_badge: "Active Missions",
+      campaigns_badge: "Active Mission",
       campaigns_heading: "Current Campaigns",
       campaigns_sub: "Support our life-saving missions and emergency patient care.",
       campaigns_ongoing: "Ongoing",
