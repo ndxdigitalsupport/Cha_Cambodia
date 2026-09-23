@@ -206,7 +206,7 @@ export default function DonateScreen({ navigation }: any) {
         <View style={styles.contentWrapper}>
           {/* Website-style donation card */}
           <View style={styles.donateCard}>
-            {/* Header — logo + title, badge on next line like website mobile */}
+            {/* Header — logo + title */}
             <View style={styles.cardHeader}>
               <View style={styles.headerLeft}>
                 <View style={styles.logoBox}>
@@ -216,10 +216,6 @@ export default function DonateScreen({ navigation }: any) {
                   <Text style={styles.cardTitle}>{t('donate.makeDonation', 'Make a Donation')}</Text>
                   <Text style={styles.cardSub}>{t('donate.orgSub', 'Cambodian Haemophilia Association')}</Text>
                 </View>
-              </View>
-              <View style={styles.khqrBadge}>
-                <View style={styles.khqrDot} />
-                <Text style={styles.khqrBadgeText}>{t('donate.khqrBadge', 'KHQR National Pay')}</Text>
               </View>
             </View>
 
@@ -351,7 +347,7 @@ export default function DonateScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  container: { flex: 1, backgroundColor: '#DC2626' },
 
   heroContainer: {
     position: 'absolute',
@@ -402,14 +398,14 @@ const styles = StyleSheet.create({
   heroLead: { fontSize: 13, color: 'rgba(255,255,255,0.9)', lineHeight: 20, textAlign: 'center', maxWidth: 300 },
 
   scrollView: { flex: 1, zIndex: 2 },
-  scrollContent: { paddingTop: 260 },
+  scrollContent: { paddingTop: 320 },
   contentWrapper: {
     width: '100%',
     alignSelf: 'stretch',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#DC2626',
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    paddingTop: 28,
+    paddingTop: 40,
     paddingBottom: 80,
     paddingHorizontal: Spacing.lg,
     minHeight: 700,
@@ -480,31 +476,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: 2,
-  },
-  khqrBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: 5,
-    backgroundColor: 'rgba(227,30,36,0.08)',
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 100,
-    borderWidth: 1,
-    borderColor: 'rgba(227,30,36,0.18)',
-  },
-  khqrDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#E31E24',
-  },
-  khqrBadgeText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#E31E24',
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
   },
 
   qrFrame: {
