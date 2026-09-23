@@ -101,6 +101,7 @@ export const profileAPI = {
 export const newsAPI = {
   getNews: (params?: { page?: number; per_page?: number; category?: string }) =>
     apiClient.get('/news', { params }),
+  getNewsItem: (id: number) => apiClient.get(`/news/${id}`),
 };
 
 // Campaigns API

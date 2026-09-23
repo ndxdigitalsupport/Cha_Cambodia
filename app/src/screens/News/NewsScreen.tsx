@@ -83,8 +83,9 @@ export default function NewsScreen({ navigation }: any) {
   };
 
   const openArticle = (item: NewsItem) => {
-    if (!item.url) return;
+    if (!item.url && !item.id) return;
     navigation.navigate('NewsDetail', {
+      id: item.id,
       url: item.url,
       title: titleFor(item),
     });

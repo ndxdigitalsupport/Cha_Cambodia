@@ -11,55 +11,173 @@ import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors, Spacing } from '../../theme/colors';
+import { newsAPI } from '../../api/client';
 
 type Props = {
   navigation: any;
-  route: { params?: { url?: string; title?: string } };
+  route: { params?: { url?: string; title?: string; id?: number } };
 };
 
+type Article = {
+  title: string;
+  title_km?: string;
+  date: string;
+  badge: string;
+  url: string;
+  image?: string;
+  content: string;
+  content_km?: string;
+};
+
+const BADGE_HEX: Record<string, string> = {
+  Event: '#E31E24',
+  Update: '#0B1D6D',
+  Workshop: '#6A2C91',
+  Announcement: '#16A34A',
+};
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function buildArticleHtml(article: Article, isKm: boolean): string {
+  const title = isKm && article.title_km ? article.title_km : article.title;
+  const content =
+    isKm && article.content_km ? article.content_km : article.content;
+  const badge = article.badge || 'Event';
+  const badgeColor = BADGE_HEX[badge] || BADGE_HEX.Event;
+  const imageHtml = article.image
+    ? `<img src="${escapeHtml(article.image)}" alt="" class="hero">`
+    : '';
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px 18px 48px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Khmer", sans-serif;
+    background: #F8FAFC;
+    color: #0F172A;
+    line-height: 1.75;
+  }
+  .card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+  .hero { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #E2E8F0; }
+  .body { padding: 22px 18px 28px; }
+  .meta { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: ${badgeColor}15;
+    color: ${badgeColor};
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .date { color: #64748B; font-size: 13px; font-weight: 600; }
+  h1 {
+    margin: 0 0 18px;
+    font-size: 24px;
+    line-height: 1.3;
+    font-weight: 800;
+    color: #0B1D6D;
+  }
+  .content { font-size: 16px; color: #1E293B; }
+  .content p { margin: 0 0 14px; }
+  .content img, .content figure img { max-width: 100%; height: auto; border-radius: 12px; }
+  .content h2, .content h3 { color: #0B1D6D; line-height: 1.35; }
+  .content a { color: #E31E24; }
+  .content ul, .content ol { padding-left: 1.25em; }
+  .content blockquote {
+    margin: 16px 0;
+    padding: 12px 16px;
+    border-left: 4px solid #E31E24;
+    background: #F8FAFC;
+    border-radius: 0 12px 12px 0;
+    color: #334155;
+  }
+</style>
+</head>
+<body>
+  <article class="card">
+    ${imageHtml}
+    <div class="body">
+      <div class="meta">
+        <span class="badge">${escapeHtml(badge)}</span>
+        <span class="date">${escapeHtml(article.date || '')}</span>
+      </div>
+      <h1>${escapeHtml(title || '')}</h1>
+      <div class="content">${content || ''}</div>
+    </div>
+  </article>
+</body>
+</html>`;
+}
+
 export default function NewsDetailScreen({ navigation, route }: Props) {
-  const { t } = useTranslation();
-  const url = route?.params?.url || '';
-  const title = route?.params?.title || '';
+  const { t, i18n } = useTranslation();
+  const isKm = i18n.language === 'km';
+  const articleId = Number(route?.params?.id) || 0;
+  const fallbackUrl = route?.params?.url || '';
+  const fallbackTitle = route?.params?.title || '';
   const [html, setHtml] = useState<string | null>(null);
+  const [articleUrl, setArticleUrl] = useState(fallbackUrl);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [headerTitle, setHeaderTitle] = useState(fallbackTitle);
 
   const openExternally = () => {
-    if (!url) return;
-    Linking.openURL(url).catch(() => {});
+    const target = articleUrl || fallbackUrl;
+    if (!target) return;
+    Linking.openURL(target).catch(() => {});
   };
 
   const loadArticle = useCallback(async () => {
-    if (!url) return;
+    if (!articleId) {
+      setFailed(true);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setFailed(false);
     setHtml(null);
     try {
-      const res = await fetch(url, {
-        headers: {
-          Accept: 'text/html,application/xhtml+xml',
-          'User-Agent':
-            'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-        },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const body = await res.text();
-      if (!body || body.length < 100) throw new Error('empty');
-      setHtml(body);
+      const res: any = await newsAPI.getNewsItem(articleId);
+      if (!res?.success || !res?.content) throw new Error('no content');
+      setArticleUrl(res.url || fallbackUrl);
+      setHeaderTitle(
+        (isKm && res.title_km ? res.title_km : res.title) || fallbackTitle
+      );
+      setHtml(buildArticleHtml(res, isKm));
       setLoading(false);
     } catch {
       setFailed(true);
       setLoading(false);
     }
-  }, [url]);
+  }, [articleId, fallbackTitle, fallbackUrl, isKm]);
 
   useEffect(() => {
     loadArticle();
   }, [loadArticle, attempt]);
 
-  if (!url) {
+  if (!articleId && !fallbackUrl) {
     return (
       <View style={styles.container}>
         <Header navigation={navigation} title={t('news.title', 'News & Events')} />
@@ -73,7 +191,7 @@ export default function NewsDetailScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <Header navigation={navigation} title={title || t('news.title', 'News & Events')} />
+      <Header navigation={navigation} title={headerTitle || t('news.title', 'News & Events')} />
       {failed ? (
         <View style={styles.centerBox}>
           <Ionicons name="cloud-offline-outline" size={40} color={Colors.textMuted} />
@@ -81,26 +199,21 @@ export default function NewsDetailScreen({ navigation, route }: Props) {
           <TouchableOpacity style={styles.retryBtn} onPress={() => setAttempt((a) => a + 1)}>
             <Text style={styles.retryText}>{t('common.retry', 'Retry')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.externalBtn} onPress={openExternally}>
-            <Ionicons name="open-outline" size={15} color={Colors.secondary} />
-            <Text style={styles.externalText}>{t('news.openArticle', 'Open article on website')}</Text>
-          </TouchableOpacity>
+          {!!(articleUrl || fallbackUrl) && (
+            <TouchableOpacity style={styles.externalBtn} onPress={openExternally}>
+              <Ionicons name="open-outline" size={15} color={Colors.secondary} />
+              <Text style={styles.externalText}>{t('news.openArticle', 'Open article on website')}</Text>
+            </TouchableOpacity>
+          )}
         </View>
       ) : html ? (
         <WebView
           originWhitelist={['*']}
-          source={{ html, baseUrl: url }}
+          source={{ html, baseUrl: 'https://chacambodia.org' }}
           style={styles.webview}
           allowsBackForwardNavigationGestures
           allowsInlineMediaPlayback
-          mediaPlaybackRequiresUserAction={false}
           decelerationRate="normal"
-          startInLoadingState
-          renderLoading={() => (
-            <View style={styles.webLoading} pointerEvents="none">
-              <ActivityIndicator size="large" color={Colors.secondary} />
-            </View>
-          )}
         />
       ) : (
         <View style={styles.centerBox}>
@@ -113,7 +226,6 @@ export default function NewsDetailScreen({ navigation, route }: Props) {
 }
 
 function Header({ navigation, title }: { navigation: any; title: string }) {
-  const { t } = useTranslation();
   return (
     <View style={styles.header}>
       <TouchableOpacity
@@ -124,7 +236,7 @@ function Header({ navigation, title }: { navigation: any; title: string }) {
         <Ionicons name="arrow-back" size={20} color={Colors.secondary} />
       </TouchableOpacity>
       <Text style={styles.headerTitle} numberOfLines={1}>
-        {title || t('news.title', 'News & Events')}
+        {title}
       </Text>
       <View style={styles.headerSpacer} />
     </View>
@@ -132,7 +244,7 @@ function Header({ navigation, title }: { navigation: any; title: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -160,13 +272,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: { width: 40 },
-  webview: { flex: 1, backgroundColor: '#FFFFFF' },
-  webLoading: {
-    ...StyleSheet.absoluteFill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-  },
+  webview: { flex: 1, backgroundColor: '#F8FAFC' },
   centerBox: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
   loadingLabel: { fontSize: 13, color: Colors.textSecondary, fontWeight: '600' },
   errorText: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22 },

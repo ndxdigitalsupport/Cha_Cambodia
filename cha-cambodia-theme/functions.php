@@ -1395,6 +1395,49 @@ function cha_rest_get_news($request) {
     ));
 }
 
+function cha_rest_get_news_item($request) {
+    $id = (int) $request->get_param('id');
+    if ($id < 1) {
+        return new WP_Error('cha_news_invalid', 'Missing news id', array('status' => 400));
+    }
+    $post = get_post($id);
+    if (!$post || $post->post_type !== 'cha_news' || $post->post_status !== 'publish') {
+        return new WP_Error('cha_news_not_found', 'Article not found', array('status' => 404));
+    }
+
+    $image = '';
+    if (has_post_thumbnail($id)) {
+        $img = wp_get_attachment_image_src($id, 'medium_large');
+        if ($img) $image = $img[0];
+    }
+    if ($image === '') {
+        $badge_key = strtolower((string) (get_post_meta($id, '_cha_news_badge', true) ?: 'event'));
+        $fallbacks = array(
+            'event'        => 'news-event-1.jpg',
+            'update'       => 'news-update-1.jpg',
+            'workshop'     => 'doctor training.png',
+            'announcement' => 'news-update-1.jpg',
+        );
+        $fb = isset($fallbacks[$badge_key]) ? $fallbacks[$badge_key] : 'news-event-1.jpg';
+        $image = get_template_directory_uri() . '/' . str_replace(' ', '%20', $fb);
+    }
+
+    return rest_ensure_response(array(
+        'success'     => true,
+        'id'          => $id,
+        'title'       => html_entity_decode(get_the_title($id), ENT_QUOTES, 'UTF-8'),
+        'title_km'    => html_entity_decode((string) get_post_meta($id, '_cha_news_title_km', true), ENT_QUOTES, 'UTF-8'),
+        'excerpt'     => html_entity_decode(wp_trim_words(get_the_excerpt($id), 18, '...'), ENT_QUOTES, 'UTF-8'),
+        'excerpt_km'  => html_entity_decode((string) get_post_meta($id, '_cha_news_excerpt_km', true), ENT_QUOTES, 'UTF-8'),
+        'date'        => (string) (get_post_meta($id, '_cha_news_date', true) ?: get_the_date('M j, Y', $id)),
+        'badge'       => (string) (get_post_meta($id, '_cha_news_badge', true) ?: 'Event'),
+        'url'         => get_permalink($id),
+        'image'       => $image,
+        'content'     => apply_filters('the_content', $post->post_content),
+        'content_km'  => (string) get_post_meta($id, '_cha_news_content_km', true),
+    ));
+}
+
 function cha_rest_get_campaigns($request) {
     $q = new WP_Query(array(
         'post_type'      => 'cha_campaigns',
@@ -2064,6 +2107,11 @@ function cha_register_rest_routes() {
     register_rest_route('cha/v1', '/news', array(
         'methods'  => 'GET',
         'callback' => 'cha_rest_get_news',
+        'permission_callback' => '__return_true',
+    ));
+    register_rest_route('cha/v1', '/news/(?P<id>\d+)', array(
+        'methods'  => 'GET',
+        'callback' => 'cha_rest_get_news_item',
         'permission_callback' => '__return_true',
     ));
     register_rest_route('cha/v1', '/campaigns', array(

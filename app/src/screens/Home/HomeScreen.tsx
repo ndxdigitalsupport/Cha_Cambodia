@@ -212,7 +212,7 @@ export default function HomeScreen({ navigation }: any) {
                 activeOpacity={0.85}
                 onPress={() => {
                   if (item.url) {
-                    navigation.navigate('NewsDetail', { url: item.url, title });
+                    navigation.navigate('NewsDetail', { id: item.id, url: item.url, title });
                   }
                 }}
               >
