@@ -310,50 +310,46 @@
       <div class="tab-panel is-active" data-tab-panel="csr-donate" style="padding-top:0">
       <div class="donation-wrap">
       <div class="donation-form donate-showcase-card" data-reveal>
-        <div class="donate-header-opt1" style="margin-bottom:var(--s-5);text-align:left">
-          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(227,30,36,0.08);color:var(--c-red,#E31E24);padding:5px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;letter-spacing:0.02em;margin-bottom:10px">
-            <svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            <span data-i18n="donate_badge">Support CHA</span>
+        <div style="text-align:center;margin-bottom:var(--s-5)">
+          <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#E31E24,#0B1D6D);display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </div>
-          <h3 data-i18n="donate_heading" style="font-size:1.45rem;font-weight:800;color:var(--c-blue);margin:0 0 4px;letter-spacing:-0.01em">Make a Donation</h3>
-          <p class="text-muted" data-i18n="donate_sub" style="font-size:0.875rem;margin:0;line-height:1.45">Your support provides treatment, education, and hope to people with bleeding disorders in Cambodia.</p>
+          <h3 data-i18n="donate_heading" style="font-size:1.35rem;font-weight:800;color:var(--c-blue);margin:0 0 6px">Make a Donation</h3>
+          <p class="text-muted" style="font-size:0.875rem;max-width:380px;margin:0 auto">Your support helps us provide treatment, education, and hope to people with bleeding disorders in Cambodia.</p>
         </div>
 
-        <div class="donate-qr-stand" style="background:#fff;border:1.5px solid #E2E8F0;border-radius:22px;padding:20px 18px;text-align:center;box-shadow:0 14px 32px -4px rgba(11,29,109,0.12);">
-          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(227,30,36,0.08);color:#E31E24;padding:5px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;margin-bottom:14px">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-            <span data-i18n="donate_khqr_badge">KHQR National Pay</span>
+        <form id="donate-form-submit" novalidate>
+          <div class="form-group">
+            <label class="form-label"><span data-i18n="donate_amount_label">Donation Amount</span> <span class="req">*</span></label>
+            <div class="amount-chips" style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--s-3);margin-bottom:var(--s-3)">
+              <button type="button" class="amount-chip is-active" data-amount="10">$10</button>
+              <button type="button" class="amount-chip" data-amount="25">$25</button>
+              <button type="button" class="amount-chip" data-amount="50">$50</button>
+              <button type="button" class="amount-chip" data-amount="100">$100</button>
+              <button type="button" class="amount-chip" data-amount="other" data-i18n="donate_other">Other</button>
+            </div>
+            <input class="form-input" type="number" placeholder="Enter amount in USD" data-amount-other min="1" style="display:none">
           </div>
-
-          <div class="donate-qr-frame" style="max-width:280px;margin:0 auto 16px;">
-            <img src="<?php echo esc_url(get_template_directory_uri() . '/aba-pay-qr.jpeg'); ?>" alt="CHA Cambodia ABA Pay KHQR code" width="240" height="240" style="width:100%;height:auto;display:block;border-radius:12px;" decoding="async">
+          <div class="form-group">
+            <label class="form-label" data-i18n="donate_name_label">Full name (optional)</label>
+            <input class="form-input" type="text" id="doname-home" placeholder="Enter your name">
           </div>
-
-          <div data-i18n="donate_account_name_lbl" style="font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;color:#64748B;margin-bottom:6px;">ACCOUNT NAME</div>
-          <div style="font-size:1.125rem;font-weight:800;color:#0B1D6D;margin-bottom:2px;">CHA</div>
-          <div data-i18n="donate_account_org" style="font-size:0.75rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px;">Cambodia Haemophilia Association</div>
-
-          <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-            <span style="font-size:1.25rem;font-weight:900;color:#0B1D6D;letter-spacing:0.12em;">000 283 539</span>
-            <button type="button" id="donate-copy-btn" class="donate-copy-account-btn" style="border:1.5px solid #E2E8F0;background:#F8FAFC;color:#0B1D6D;border-radius:10px;padding:6px 12px;font-size:0.75rem;font-weight:700;cursor:pointer;">
-              <span id="donate-copy-label" data-i18n="donate_modal_copy_btn">Copy</span>
-            </button>
+          <div class="form-group">
+            <label class="form-label" data-i18n="donate_email_label">Email (optional)</label>
+            <input class="form-input" type="email" id="doemail-home" placeholder="Enter your email">
           </div>
-
-          <a class="donate-save-qr-btn" href="<?php echo esc_url(get_template_directory_uri() . '/aba-pay-qr.jpeg'); ?>" download="cha-aba-pay-qr.jpeg">
-            <svg class="save-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span data-i18n="donate_save_qr_btn">Save QR Image</span>
-          </a>
-        </div>
-        <div class="donate-compliance-note" style="margin-top:var(--s-4);text-align:center;font-size:0.8125rem;color:var(--c-muted);line-height:1.5">
-          <p class="secure-note" style="margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:6px">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#22C55E"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-            <span data-i18n="donate_secure_note">Pay directly with ABA Mobile, Bakong, or any KHQR-supported banking app</span>
-          </p>
-          <p style="margin:0;font-size:0.75rem;color:#64748b">
-            By continuing, you agree to our <a href="<?php echo esc_url(home_url('/terms')); ?>" target="_blank" style="color:var(--c-blue);text-decoration:underline">Terms &amp; Refund Policy</a>.
-          </p>
-        </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="donate_phone_label">Phone (optional)</label>
+            <input class="form-input" type="tel" id="dophone-home" placeholder="Enter your phone">
+          </div>
+          <div class="modal-btn-row">
+            <button type="submit" class="btn btn-primary btn-block" data-i18n="donate_btn"><?php echo esc_html(cha_get_option('donate_btn', 'Donate Now')); ?></button>
+          </div>
+        </form>
+        <p class="secure-note" style="margin-top:var(--s-4);text-align:center;font-size:0.8125rem;color:var(--c-muted);display:flex;align-items:center;justify-content:center;gap:6px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#22C55E"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          Secure &amp; encrypted via PayWay (ABA Bank)
+        </p>
         <div class="form-success" data-form-success hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><h3>Thank You!</h3><p>Your generous donation will help change lives across Cambodia.</p></div>
       </div>
       <div class="campaigns-list campaigns-panel-v2" data-reveal>
