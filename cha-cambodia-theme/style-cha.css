@@ -10810,6 +10810,105 @@ img.roster-item-avatar {
   }
 }
 
+/* Donate popup — compact layout on mobile */
+@media (max-width: 640px) {
+  .donate-modal-panel--split {
+    width: calc(100vw - 12px) !important;
+    max-width: calc(100vw - 12px) !important;
+    max-height: calc(100dvh - 12px) !important;
+    margin: 6px auto !important;
+    border-radius: 16px !important;
+  }
+  .donate-modal-panel--split .donate-modal-header {
+    padding: 10px 12px !important;
+  }
+  .donate-modal-logo-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    padding: 3px;
+  }
+  .donate-modal-panel--split .donate-modal-title {
+    font-size: 0.9375rem !important;
+  }
+  .donate-modal-sub {
+    font-size: 0.6875rem;
+    margin-top: 1px;
+  }
+  .donate-modal-panel--split .donate-modal-close {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .donate-split-body {
+    padding: 12px 12px 14px !important;
+    gap: 12px !important;
+  }
+  .donate-split-left .donate-qr-stand {
+    max-width: min(100%, 180px) !important;
+    padding: 6px !important;
+    border-radius: 16px !important;
+  }
+  .donate-modal-badge {
+    font-size: 0.625rem;
+    padding: 3px 8px;
+  }
+  .donate-modal-scan-title {
+    font-size: 1.0625rem !important;
+    margin-bottom: 4px !important;
+  }
+  .donate-modal-scan-desc {
+    font-size: 0.75rem !important;
+    margin-bottom: 10px !important;
+    line-height: 1.45 !important;
+  }
+  .donate-modal-acct-box {
+    padding: 10px 12px !important;
+    margin-bottom: 10px !important;
+    border-radius: 12px !important;
+  }
+  .donate-modal-acct-label {
+    font-size: 0.625rem;
+    margin-bottom: 2px;
+  }
+  .donate-modal-acct-name {
+    font-size: 0.75rem !important;
+    margin-bottom: 8px !important;
+  }
+  .donate-modal-acct-row {
+    padding: 6px 10px !important;
+    gap: 6px !important;
+  }
+  .donate-modal-acct-num {
+    font-size: 0.875rem !important;
+    letter-spacing: 0.4px !important;
+  }
+  .donate-modal-acct-chip {
+    font-size: 0.625rem;
+    padding: 2px 6px;
+  }
+  .donate-modal-acct-row .donate-copy-account-btn {
+    padding: 4px 8px !important;
+    font-size: 0.6875rem !important;
+  }
+  .donate-modal-actions {
+    margin-bottom: 8px !important;
+  }
+  .donate-save-qr-btn {
+    padding: 10px 16px !important;
+    font-size: 0.8125rem !important;
+    border-radius: 100px !important;
+  }
+  .donate-modal-trust {
+    font-size: 0.6875rem !important;
+    gap: 5px !important;
+    padding-top: 0 !important;
+  }
+  .donate-modal-trust svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
 /* Donation & Campaigns — center on mobile */
 @media (max-width: 768px) {
   .donation-wrap {
