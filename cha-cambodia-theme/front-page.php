@@ -310,47 +310,92 @@
       <div class="tab-panel is-active" data-tab-panel="csr-donate" style="padding-top:0">
       <div class="donation-wrap">
       <div class="donation-form donate-showcase-card" data-reveal>
-        <div style="text-align:center;margin-bottom:var(--s-5)">
-          <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#E31E24,#0B1D6D);display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <!-- Top: Header Section -->
+        <div>
+          <div class="donate-card-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #FFFFFF; border: 1.5px solid #E2E8F0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(11, 29, 109, 0.08); flex-shrink: 0; padding: 4px; overflow: hidden;">
+                <img src="<?php echo esc_url(get_template_directory_uri() . '/logo-icon-cha.png'); ?>" alt="CHA Logo Icon" style="width: 100%; height: 100%; object-fit: contain; display: block;">
+              </div>
+              <div>
+                <h3 data-i18n="donate_heading" style="font-size: 1.35rem; font-weight: 800; color: #0B1D6D; margin: 0 0 2px; letter-spacing: -0.02em; line-height: 1.2;">Make a Donation</h3>
+                <span style="font-size: 0.75rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Cambodian Haemophilia Association</span>
+              </div>
+            </div>
+            <span data-i18n="donate_khqr_badge" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #E31E24; background: rgba(227,30,36,0.08); padding: 5px 12px; border-radius: 100px; border: 1px solid rgba(227,30,36,0.18); flex-shrink: 0;">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #E31E24; display: inline-block;"></span>
+              KHQR National Pay
+            </span>
           </div>
-          <h3 data-i18n="donate_heading" style="font-size:1.35rem;font-weight:800;color:var(--c-blue);margin:0 0 6px">Make a Donation</h3>
-          <p class="text-muted" style="font-size:0.875rem;max-width:380px;margin:0 auto">Your support helps us provide treatment, education, and hope to people with bleeding disorders in Cambodia.</p>
+
+          <!-- Middle Split: QR Stand on Left + Controls on Right -->
+          <div class="donate-card-split">
+            <!-- Left: QR Code Card Stand -->
+            <div class="donate-qr-frame">
+              <img src="<?php echo esc_url(get_template_directory_uri() . '/aba-pay-qr.jpeg'); ?>" alt="ABA Pay KHQR Code - CHA Cambodia" style="width: 100%; height: auto; display: block; border-radius: 14px; object-fit: contain;">
+            </div>
+
+            <!-- Right: Instructions, Beneficiary Details, Copy & Save Action -->
+            <div class="donate-controls-col">
+              <div>
+                <h4 data-i18n="donate_scan_title" style="font-size: 1.3rem; font-weight: 800; color: #0B1D6D; margin: 0 0 10px; letter-spacing: -0.02em; line-height: 1.25;">Scan &amp; Support</h4>
+                <p data-i18n="donate_scan_desc" style="font-size: 0.8125rem; color: #64748B; margin: 0 0 16px; line-height: 1.6;">Directly transfer your donation using <strong>ABA Mobile, Bakong, Wing, ACLEDA, Canadia</strong>, or banking apps across Cambodia.</p>
+
+                <!-- Beneficiary Account Box (Clean, Spacious & Premium) -->
+                <div style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);">
+                  <div data-i18n="donate_account_name_lbl" style="font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; color: #64748B; letter-spacing: 0.6px; margin-bottom: 4px;">Account Name</div>
+                  <div style="font-size: 0.875rem; font-weight: 800; color: #0B1D6D; margin-bottom: 10px; line-height: 1.35; letter-spacing: 0.2px;">CAMBODIA HEMOPHILIA ASSOCIATION</div>
+
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 10px; background: #ffffff; border: 1.5px solid #CBD5E1; border-radius: 12px; padding: 10px 16px; box-shadow: 0 2px 6px rgba(11,29,109,0.04);">
+                    <span style="font-size: 0.6875rem; font-weight: 900; background: #0B1D6D; color: #ffffff; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px;">ABA</span>
+                    <span style="font-size: 1.15rem; font-weight: 800; color: #0B1D6D; letter-spacing: 1.2px; white-space: nowrap;">000 283 539</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons: Copy Account on Top + Save QR Image -->
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button type="button" class="donate-copy-account-btn" onclick="navigator.clipboard.writeText('000283539'); this.querySelector('.copy-btn-text').innerText=(window.chaCurrentLang==='km'?'បានចម្លង!':'Copied to Clipboard!'); setTimeout(()=>this.querySelector('.copy-btn-text').innerText=(window.chaCurrentLang==='km'?'ចម្លងលេខគណនី':'Copy Account Number'),2000)" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 16px; background: #F4F6FC; border: 1.5px solid #CBD5E1; border-radius: 100px; color: #0B1D6D; font-size: 0.8125rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  <span class="copy-btn-text" data-i18n="donate_copy_btn">Copy Account Number</span>
+                </button>
+
+                <a href="<?php echo esc_url(get_template_directory_uri() . '/aba-pay-qr.jpeg'); ?>" download="CHA-Cambodia-Donation-QR.jpeg" class="donate-save-qr-btn" style="padding: 12px 20px !important; font-size: 0.875rem !important;">
+                  <svg class="save-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span data-i18n="donate_save_qr_btn">Save QR Image</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Micro-Feature Steps -->
+          <div class="donate-steps-strip">
+            <div class="donate-step-item">
+              <div class="donate-step-num donate-step-num--1">1</div>
+              <span data-i18n="donate_step1_title" class="donate-step-title">Open Banking App</span>
+              <span data-i18n="donate_step1_desc" class="donate-step-desc">ABA, Bakong, etc.</span>
+            </div>
+            <div class="donate-step-item donate-step-item--mid">
+              <div class="donate-step-num donate-step-num--2">2</div>
+              <span data-i18n="donate_step2_title" class="donate-step-title">Scan KHQR Code</span>
+              <span data-i18n="donate_step2_desc" class="donate-step-desc">Point camera at QR</span>
+            </div>
+            <div class="donate-step-item">
+              <div class="donate-step-num donate-step-num--3">3</div>
+              <span data-i18n="donate_step3_title" class="donate-step-title">Enter Amount</span>
+              <span data-i18n="donate_step3_desc" class="donate-step-desc">Directly support patients</span>
+            </div>
+          </div>
         </div>
 
-        <form id="donate-form-submit" novalidate>
-          <div class="form-group">
-            <label class="form-label"><span data-i18n="donate_amount_label">Donation Amount</span> <span class="req">*</span></label>
-            <div class="amount-chips" style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--s-3);margin-bottom:var(--s-3)">
-              <button type="button" class="amount-chip is-active" data-amount="10">$10</button>
-              <button type="button" class="amount-chip" data-amount="25">$25</button>
-              <button type="button" class="amount-chip" data-amount="50">$50</button>
-              <button type="button" class="amount-chip" data-amount="100">$100</button>
-              <button type="button" class="amount-chip" data-amount="other" data-i18n="donate_other">Other</button>
-            </div>
-            <input class="form-input" type="number" placeholder="Enter amount in USD" data-amount-other min="1" style="display:none">
-          </div>
-          <div class="form-group">
-            <label class="form-label" data-i18n="donate_name_label">Full name (optional)</label>
-            <input class="form-input" type="text" id="doname-home" placeholder="Enter your name">
-          </div>
-          <div class="form-group">
-            <label class="form-label" data-i18n="donate_email_label">Email (optional)</label>
-            <input class="form-input" type="email" id="doemail-home" placeholder="Enter your email">
-          </div>
-          <div class="form-group">
-            <label class="form-label" data-i18n="donate_phone_label">Phone (optional)</label>
-            <input class="form-input" type="tel" id="dophone-home" placeholder="Enter your phone">
-          </div>
-          <div class="modal-btn-row">
-            <button type="submit" class="btn btn-primary btn-block" data-i18n="donate_btn"><?php echo esc_html(cha_get_option('donate_btn', 'Donate Now')); ?></button>
-          </div>
-        </form>
-        <p class="secure-note" style="margin-top:var(--s-4);text-align:center;font-size:0.8125rem;color:var(--c-muted);display:flex;align-items:center;justify-content:center;gap:6px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:#22C55E"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-          Secure &amp; encrypted via PayWay (ABA Bank)
-        </p>
-        <div class="form-success" data-form-success hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><h3>Thank You!</h3><p>Your generous donation will help change lives across Cambodia.</p></div>
+        <!-- Trust Footer -->
+        <div class="donate-trust-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; color: #16A34A; flex-shrink: 0;">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+          <span data-i18n="donate_trust_note">Instant Direct Settlement · Zero Processing Fee</span>
+        </div>
       </div>
       <div class="campaigns-list campaigns-panel-v2" data-reveal>
         <div class="campaigns-header-row">
