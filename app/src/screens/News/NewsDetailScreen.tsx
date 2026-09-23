@@ -1,5 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Linking, Platform } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  Linking,
+} from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -10,51 +17,47 @@ type Props = {
   route: { params?: { url?: string; title?: string } };
 };
 
-const BROWSER_UA =
-  'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36';
-
-const LOAD_TIMEOUT_MS = 20000;
-
 export default function NewsDetailScreen({ navigation, route }: Props) {
   const { t } = useTranslation();
   const url = route?.params?.url || '';
   const title = route?.params?.title || '';
+  const [html, setHtml] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
-  const [webKey, setWebKey] = useState(0);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const clearLoadTimeout = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  };
-
-  useEffect(() => () => clearLoadTimeout(), []);
-
-  const startLoad = () => {
-    setFailed(false);
-    setLoading(true);
-    clearLoadTimeout();
-    timeoutRef.current = setTimeout(() => {
-      setLoading((still) => {
-        if (still) setFailed(true);
-        return false;
-      });
-    }, LOAD_TIMEOUT_MS);
-  };
-
-  useEffect(() => {
-    if (url) startLoad();
-    return () => clearLoadTimeout();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, webKey]);
+  const [attempt, setAttempt] = useState(0);
 
   const openExternally = () => {
     if (!url) return;
     Linking.openURL(url).catch(() => {});
   };
+
+  const loadArticle = useCallback(async () => {
+    if (!url) return;
+    setLoading(true);
+    setFailed(false);
+    setHtml(null);
+    try {
+      const res = await fetch(url, {
+        headers: {
+          Accept: 'text/html,application/xhtml+xml',
+          'User-Agent':
+            'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+        },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const body = await res.text();
+      if (!body || body.length < 100) throw new Error('empty');
+      setHtml(body);
+      setLoading(false);
+    } catch {
+      setFailed(true);
+      setLoading(false);
+    }
+  }, [url]);
+
+  useEffect(() => {
+    loadArticle();
+  }, [loadArticle, attempt]);
 
   if (!url) {
     return (
@@ -75,10 +78,7 @@ export default function NewsDetailScreen({ navigation, route }: Props) {
         <View style={styles.centerBox}>
           <Ionicons name="cloud-offline-outline" size={40} color={Colors.textMuted} />
           <Text style={styles.errorText}>{t('news.error', 'Could not load news. Please try again.')}</Text>
-          <TouchableOpacity
-            style={styles.retryBtn}
-            onPress={() => setWebKey((k) => k + 1)}
-          >
+          <TouchableOpacity style={styles.retryBtn} onPress={() => setAttempt((a) => a + 1)}>
             <Text style={styles.retryText}>{t('common.retry', 'Retry')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.externalBtn} onPress={openExternally}>
@@ -86,43 +86,26 @@ export default function NewsDetailScreen({ navigation, route }: Props) {
             <Text style={styles.externalText}>{t('news.openArticle', 'Open article on website')}</Text>
           </TouchableOpacity>
         </View>
-      ) : (
-        <View style={styles.webWrap}>
-          <WebView
-            key={webKey}
-            source={{ uri: url }}
-            style={styles.webview}
-            originWhitelist={['*']}
-            userAgent={BROWSER_UA}
-            sharedCookiesEnabled
-            allowsBackForwardNavigationGestures
-            onLoadStart={startLoad}
-            onLoadEnd={() => {
-              clearLoadTimeout();
-              setLoading(false);
-              setFailed(false);
-            }}
-            onError={() => {
-              clearLoadTimeout();
-              setFailed(true);
-              setLoading(false);
-            }}
-            onHttpError={() => {
-              clearLoadTimeout();
-              setFailed(true);
-              setLoading(false);
-            }}
-            allowsInlineMediaPlayback
-            mediaPlaybackRequiresUserAction={false}
-            decelerationRate="normal"
-            androidLayerType={Platform.OS === 'android' ? 'hardware' : undefined}
-          />
-          {loading && !failed && (
-            <View style={styles.loadingOverlay} pointerEvents="none">
+      ) : html ? (
+        <WebView
+          originWhitelist={['*']}
+          source={{ html, baseUrl: url }}
+          style={styles.webview}
+          allowsBackForwardNavigationGestures
+          allowsInlineMediaPlayback
+          mediaPlaybackRequiresUserAction={false}
+          decelerationRate="normal"
+          startInLoadingState
+          renderLoading={() => (
+            <View style={styles.webLoading} pointerEvents="none">
               <ActivityIndicator size="large" color={Colors.secondary} />
-              <Text style={styles.loadingText}>{t('news.loading', 'Loading article…')}</Text>
             </View>
           )}
+        />
+      ) : (
+        <View style={styles.centerBox}>
+          <ActivityIndicator size="large" color={Colors.secondary} />
+          <Text style={styles.loadingLabel}>{t('news.loading', 'Loading article…')}</Text>
         </View>
       )}
     </View>
@@ -177,17 +160,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: { width: 40 },
-  webWrap: { flex: 1, backgroundColor: '#FFFFFF' },
   webview: { flex: 1, backgroundColor: '#FFFFFF' },
-  loadingOverlay: {
+  webLoading: {
     ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
     backgroundColor: '#FFFFFF',
   },
-  loadingText: { fontSize: 13, color: Colors.textSecondary, fontWeight: '600' },
   centerBox: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
+  loadingLabel: { fontSize: 13, color: Colors.textSecondary, fontWeight: '600' },
   errorText: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22 },
   retryBtn: {
     marginTop: 4,
