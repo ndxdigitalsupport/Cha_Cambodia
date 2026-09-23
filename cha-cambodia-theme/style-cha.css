@@ -771,15 +771,21 @@ hr {
   position: fixed;
   inset: 0;
   z-index: 1100;
-  display: none;
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 320ms;
 }
-.mobile-drawer.is-open { display: block; }
+.mobile-drawer.is-open {
+  visibility: visible;
+  pointer-events: auto;
+  transition: visibility 0s linear 0s;
+}
 .mobile-drawer .backdrop {
   position: absolute;
   inset: 0;
   background: rgba(15, 23, 42, 0.5);
   opacity: 0;
-  transition: opacity var(--t-base) var(--ease);
+  transition: opacity 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .mobile-drawer.is-open .backdrop { opacity: 1; }
 .mobile-drawer .panel {
@@ -794,7 +800,7 @@ hr {
   flex-direction: column;
   gap: var(--s-5);
   transform: translateX(100%);
-  transition: transform var(--t-base) var(--ease);
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
   overflow-y: auto;
   box-shadow: -8px 0 32px rgba(11, 29, 109, 0.12);
 }
@@ -1438,7 +1444,10 @@ hr {
 }
 
 /* ---------- 09. How We Help ---------- */
-/* ---------- 09b. How We Help cards (improved) ---------- */
+/* How We Help */
+#help {
+  background: #ffffff;
+}
 #help .grid.grid-4 { gap: var(--s-8); }
 @media (max-width: 900px) { #help .grid.grid-4 { gap: var(--s-6); } }
 

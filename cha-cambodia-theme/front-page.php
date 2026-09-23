@@ -47,7 +47,7 @@
     </div></div></section>
 
     <!-- How We Help -->
-    <section class="section section-blue-soft" id="help"><div class="container">
+    <section class="section" id="help"><div class="container">
       <div class="section-heading" data-reveal><h2 data-i18n="help_heading"><?php echo esc_html(cha_get_option('help_heading', 'How We Help')); ?></h2><p data-i18n="help_sub"><?php echo esc_html(cha_get_option('help_sub', 'Four core areas where CHA makes a difference for patients and families across Cambodia.')); ?></p></div>
       <div class="grid grid-4 grid-stagger-cards">
         <div class="help-card card-stagger-1" data-reveal><div class="icon icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><h3 data-i18n="help_patient_support"><?php echo esc_html(cha_get_option('help_card_1_title', 'Patient Support')); ?></h3><p data-i18n="help_patient_support_desc"><?php echo esc_html(cha_get_option('help_card_1_desc', 'Emotional support, guidance and community for patients and families.')); ?></p><a class="card-link" href="<?php echo home_url('/about'); ?>" data-i18n="help_learn_more">Learn More <span class="arrow">→</span></a></div>
