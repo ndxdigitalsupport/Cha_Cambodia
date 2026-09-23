@@ -201,7 +201,7 @@ function cha_register_news_cpt() {
 }
 add_action('init', 'cha_register_news_cpt');
 
-define('CHA_CPT_VERSION', '1.5');
+define('CHA_CPT_VERSION', '1.6');
 
 function cha_flush_rewrite_on_upgrade() {
     $stored = get_option('cha_cpt_version', '0');
@@ -228,6 +228,16 @@ function cha_flush_rewrite_on_upgrade() {
     }
 }
 add_action('init', 'cha_flush_rewrite_on_upgrade', 99);
+
+// Also flush once when the theme is (re)activated or updated
+add_action('after_switch_theme', function () {
+    cha_register_news_cpt();
+    if (function_exists('cha_register_campaigns_cpt')) {
+        cha_register_campaigns_cpt();
+    }
+    flush_rewrite_rules();
+    update_option('cha_cpt_version', CHA_CPT_VERSION);
+});
 
 function cha_news_meta_boxes() {
     add_meta_box('cha_news_details', 'Article Details', 'cha_news_details_cb', 'cha_news', 'side', 'high');

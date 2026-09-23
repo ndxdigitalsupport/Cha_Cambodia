@@ -5604,15 +5604,18 @@ img.roster-item-avatar {
     margin: 0 auto !important;
   }
   .donate-split-left .donate-qr-stand {
-    max-width: min(100%, 340px) !important;
+    max-width: min(100%, 240px) !important;
     width: 100% !important;
     margin: 0 auto !important;
-    padding: 10px !important;
+    padding: 8px !important;
   }
   .donate-split-right {
     flex: 0 0 auto !important;
     max-width: 100% !important;
     width: 100% !important;
+  }
+  .donate-modal-scan-title {
+    font-size: 1.25rem !important;
   }
 }
 
@@ -6513,9 +6516,9 @@ img.roster-item-avatar {
     margin: 0 auto !important;
   }
   .donate-split-left .donate-qr-stand {
-    max-width: min(100%, 340px) !important;
+    max-width: min(100%, 240px) !important;
     width: 100% !important;
-    padding: 10px !important;
+    padding: 8px !important;
   }
   .donate-modal-panel--split {
     width: calc(100vw - 16px) !important;
