@@ -1310,6 +1310,15 @@ hr {
 .badge-workshop { background: var(--c-purple); }
 
 /* ---------- 08. Stat Strip ---------- */
+.stat-strip-wrap {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: var(--container);
+  margin: -80px auto 0;
+  padding: 0 var(--s-6);
+  box-sizing: border-box;
+}
 .stat-strip {
   background:
     radial-gradient(circle at 10% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
@@ -1318,7 +1327,6 @@ hr {
   color: var(--c-white);
   border-radius: var(--r-xl);
   padding: var(--s-10) var(--s-8);
-  margin-top: calc(var(--s-20) * -1);
   position: relative;
   z-index: 2;
   box-shadow:
@@ -1326,6 +1334,7 @@ hr {
     0 8px 24px rgba(11, 29, 109, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   overflow: hidden;
+  box-sizing: border-box;
 }
 .stat-strip::before {
   content: "";
@@ -1363,7 +1372,7 @@ hr {
 }
 .stat-strip-light .stat-text .value { color: var(--c-blue); }
 .stat-strip-light .stat-text .label { color: var(--c-muted); }
-.stat-strip .container {
+.stat-strip .stat-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--s-8);
@@ -1371,7 +1380,7 @@ hr {
   z-index: 1;
 }
 @media (max-width: 720px) {
-  .stat-strip .container { grid-template-columns: 1fr; gap: var(--s-5); }
+  .stat-strip .stat-grid { grid-template-columns: 1fr; gap: var(--s-4); }
 }
 
 .stat {
@@ -11277,4 +11286,331 @@ img.roster-item-avatar {
   }
 }
 
+/* ============================================
+   MOBILE RESPONSIVE PASS — any device
+   Keep this block at the end of the file.
+   ============================================ */
+
+/* Prevent horizontal page scroll everywhere */
+html, body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+img, video, svg, iframe, embed, object {
+  max-width: 100%;
+  height: auto;
+}
+img {
+  display: block;
+}
+table {
+  max-width: 100%;
+}
+
+/* Safer sticky header height on short/small screens */
+@media (max-width: 480px) {
+  :root {
+    --header-h: 64px;
+  }
+}
+
+/* ---------- Header / actions ---------- */
+@media (max-width: 1180px) {
+  .header-inner {
+    gap: var(--s-2);
+  }
+  .header-actions {
+    gap: 6px;
+    margin-right: 0;
+    padding-right: 0;
+    min-width: 0;
+  }
+}
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--s-4);
+  }
+  .brand-logo {
+    height: 40px;
+    max-width: 148px;
+  }
+  .header-actions .btn-member {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.8125rem;
+  }
+  .nav-toggle {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 420px) {
+  .brand-logo {
+    height: 36px;
+    max-width: 120px;
+  }
+  .header-actions .btn-member {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.75rem;
+  }
+  .nav-toggle {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* ---------- Hero ---------- */
+@media (max-width: 900px) {
+  .hero {
+    min-height: auto;
+    padding-top: var(--s-6);
+    padding-bottom: calc(var(--s-16) + 24px);
+  }
+  .hero .hero-content {
+    padding: var(--s-6) 0 var(--s-8);
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 8vw, 2.75rem);
+    max-width: 100%;
+    margin-bottom: var(--s-4);
+  }
+  .hero .lead {
+    font-size: 1rem;
+    max-width: 100%;
+    margin-bottom: var(--s-6);
+  }
+  .hero .cta-row {
+    gap: var(--s-3);
+  }
+  .hero .cta-row .btn {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9375rem;
+  }
+  /* Stronger scrim so text stays readable over the photo */
+  .hero .hero-overlay {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(250, 251, 254, 0.97) 0%,
+        rgba(240, 244, 251, 0.92) 45%,
+        rgba(232, 238, 248, 0.78) 100%
+      );
+  }
+  .hero .hero-bg {
+    opacity: 0.55;
+    object-position: 65% center;
+  }
+}
+@media (max-width: 480px) {
+  .hero {
+    padding-bottom: calc(var(--s-16) + 16px);
+  }
+  .hero h1 {
+    font-size: clamp(1.75rem, 8.5vw, 2.25rem);
+    line-height: 1.1;
+  }
+  .hero .cta-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero .cta-row .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* ---------- Stat strip ---------- */
+@media (max-width: 768px) {
+  .stat-strip-wrap {
+    margin-top: -48px;
+    padding: 0 var(--s-4);
+  }
+  .stat-strip {
+    padding: var(--s-6) var(--s-5);
+    border-radius: 20px;
+  }
+  .stat-strip .stat-grid {
+    grid-template-columns: 1fr;
+    gap: var(--s-3);
+  }
+  .stat {
+    gap: var(--s-4);
+    padding: 10px 8px !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .stat:last-child {
+    border-bottom: none !important;
+  }
+  .stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+  }
+  .stat-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+  .stat-text .value {
+    font-size: 1.75rem;
+  }
+  .stat-text .label {
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    line-height: 1.35;
+  }
+}
+@media (max-width: 360px) {
+  .stat-strip-wrap {
+    margin-top: -36px;
+  }
+  .stat-icon {
+    width: 46px;
+    height: 46px;
+  }
+  .stat-text .value {
+    font-size: 1.5rem;
+  }
+}
+
+/* ---------- Sections / headings ---------- */
+@media (max-width: 768px) {
+  .section {
+    padding: var(--s-12) 0;
+  }
+  .section-sm {
+    padding: var(--s-8) 0;
+  }
+  .section-heading {
+    margin-bottom: var(--s-6);
+  }
+  .section-heading h2 {
+    font-size: clamp(1.5rem, 6vw, 1.875rem);
+  }
+  .section-heading p {
+    font-size: 0.9375rem;
+  }
+  .help-card {
+    padding: var(--s-8) var(--s-5) var(--s-6);
+  }
+  .cta-banner {
+    padding: var(--s-8) var(--s-5);
+    gap: var(--s-5);
+    border-radius: 20px;
+  }
+  .cta-banner h2 {
+    font-size: 1.5rem;
+  }
+  .cta-banner p {
+    font-size: 0.9375rem;
+  }
+}
+
+/* ---------- Tabs (Membership / Donate) ---------- */
+@media (max-width: 600px) {
+  .tabs-nav,
+  .csr-tabs {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs-nav::-webkit-scrollbar,
+  .csr-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .csr-tabs .tab-btn {
+    flex: 1 1 auto;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+  }
+}
+
+/* ---------- Cards / grids touch comfort ---------- */
+@media (max-width: 600px) {
+  .grid {
+    gap: var(--s-4);
+  }
+  .card,
+  .news-card,
+  .campaign-card-v2,
+  .membership-benefit-card,
+  .impact-card,
+  .type-card {
+    min-width: 0;
+  }
+  .card-link,
+  .btn {
+    min-height: 44px;
+  }
+}
+
+/* ---------- Forms ---------- */
+@media (max-width: 600px) {
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .form-input,
+  .form-select,
+  .form-textarea {
+    width: 100%;
+    max-width: 100%;
+    font-size: 16px; /* prevents iOS zoom on focus */
+    box-sizing: border-box;
+  }
+}
+
+/* ---------- Footer ---------- */
+@media (max-width: 768px) {
+  .site-footer {
+    padding-top: var(--s-12);
+  }
+  .footer-brand img {
+    height: 44px;
+    max-width: 168px;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-3);
+    text-align: left;
+  }
+}
+
+/* ---------- Mobile drawer usability ---------- */
+@media (max-width: 480px) {
+  .mobile-drawer .panel {
+    width: min(340px, 92vw);
+    padding: var(--s-4) var(--s-4) var(--s-6);
+  }
+  .mobile-drawer .panel nav a,
+  .drawer-sub-trigger {
+    min-height: 44px;
+    font-size: 1rem;
+  }
+}
+
+/* ---------- Modal safety on small screens ---------- */
+@media (max-width: 480px) {
+  .donate-modal-panel {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+}
+
+/* ---------- Safe area (notched phones) ---------- */
+@supports (padding: max(0px)) {
+  .site-header .header-inner {
+    padding-left: max(var(--s-4), env(safe-area-inset-left));
+    padding-right: max(var(--s-4), env(safe-area-inset-right));
+  }
+  .site-footer {
+    padding-bottom: max(var(--s-8), env(safe-area-inset-bottom));
+  }
+}
 
