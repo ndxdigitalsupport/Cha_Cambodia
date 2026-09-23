@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
   heroLead: { fontSize: 13, color: 'rgba(255,255,255,0.9)', lineHeight: 20, textAlign: 'center', maxWidth: 300 },
 
   scrollView: { flex: 1, zIndex: 2 },
-  scrollContent: { paddingTop: 312 },
+  scrollContent: { paddingTop: 296 },
   contentWrapper: {
     width: '100%',
     alignSelf: 'stretch',
