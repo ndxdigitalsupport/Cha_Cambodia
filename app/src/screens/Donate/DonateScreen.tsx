@@ -206,13 +206,13 @@ export default function DonateScreen({ navigation }: any) {
         <View style={styles.contentWrapper}>
           {/* Website-style donation card */}
           <View style={styles.donateCard}>
-            {/* Header */}
+            {/* Header — logo + title, badge on next line like website mobile */}
             <View style={styles.cardHeader}>
               <View style={styles.headerLeft}>
                 <View style={styles.logoBox}>
                   <Image source={logoIcon} style={styles.logoImg} resizeMode="contain" />
                 </View>
-                <View>
+                <View style={styles.headerTitles}>
                   <Text style={styles.cardTitle}>{t('donate.makeDonation', 'Make a Donation')}</Text>
                   <Text style={styles.cardSub}>{t('donate.orgSub', 'Cambodian Haemophilia Association')}</Text>
                 </View>
@@ -238,25 +238,11 @@ export default function DonateScreen({ navigation }: any) {
             <View style={styles.accountBox}>
               <Text style={styles.accountLabel}>{t('donate.accountName', 'Account Name')}</Text>
               <Text style={styles.accountOrg}>{t('donate.accountOrg', 'CAMBODIA HEMOPHILIA ASSOCIATION')}</Text>
-              <View style={styles.accountRow}>
-                <View style={styles.accountNumWrap}>
-                  <View style={styles.abaChip}>
-                    <Text style={styles.abaChipText}>ABA</Text>
-                  </View>
-                  <Text style={styles.accountNumber}>{t('donate.accountNumber', '000 283 539')}</Text>
+              <View style={styles.accountNumWrap}>
+                <View style={styles.abaChip}>
+                  <Text style={styles.abaChipText}>ABA</Text>
                 </View>
-                <TouchableOpacity
-                  style={[styles.copyBtn, copied && styles.copyBtnCopied]}
-                  onPress={handleCopy}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name="copy-outline" size={14} color={copied ? '#166534' : '#0B1D6D'} />
-                  <Text style={[styles.copyBtnText, copied && styles.copyBtnTextCopied]}>
-                    {copied
-                      ? t('donate.copied', 'Copied!')
-                      : t('donate.copyShort', 'Copy')}
-                  </Text>
-                </TouchableOpacity>
+                <Text style={styles.accountNumber}>{t('donate.accountNumber', '000 283 539')}</Text>
               </View>
             </View>
 
@@ -437,11 +423,8 @@ const styles = StyleSheet.create({
     ...Shadows.md,
   },
   cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    gap: 10,
+    alignItems: 'flex-start',
+    gap: 12,
     paddingBottom: 16,
     marginBottom: 18,
     borderBottomWidth: 1,
@@ -451,8 +434,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    width: '100%',
+  },
+  headerTitles: {
     flex: 1,
-    minWidth: 160,
+    minWidth: 0,
   },
   logoBox: {
     width: 44,
@@ -474,14 +460,14 @@ const styles = StyleSheet.create({
   },
   logoImg: { width: '100%', height: '100%' },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 21,
     fontWeight: '800',
     color: '#0B1D6D',
     letterSpacing: -0.02,
-    lineHeight: 22,
+    lineHeight: 26,
   },
   cardSub: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     color: '#64748B',
     textTransform: 'uppercase',
@@ -491,14 +477,14 @@ const styles = StyleSheet.create({
   khqrBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'flex-start',
     gap: 5,
     backgroundColor: 'rgba(227,30,36,0.08)',
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 100,
     borderWidth: 1,
     borderColor: 'rgba(227,30,36,0.18)',
-    flexShrink: 0,
   },
   khqrDot: {
     width: 6,
@@ -532,7 +518,6 @@ const styles = StyleSheet.create({
   qrImage: {
     width: '100%',
     aspectRatio: 1,
-    maxHeight: 300,
     borderRadius: 14,
   },
 
@@ -575,13 +560,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: 0.2,
   },
-  accountRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   accountNumWrap: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -591,8 +570,13 @@ const styles = StyleSheet.create({
     borderColor: '#CBD5E1',
     borderRadius: 12,
     paddingVertical: 10,
-    paddingHorizontal: 12,
-    minWidth: 0,
+    paddingHorizontal: 16,
+    width: '100%',
+    shadowColor: '#0B1D6D',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 1,
   },
   abaChip: {
     backgroundColor: '#0B1D6D',
@@ -601,41 +585,17 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   abaChipText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '900',
     color: '#FFFFFF',
     letterSpacing: 0.5,
   },
   accountNumber: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
     color: '#0B1D6D',
     letterSpacing: 1.2,
     flexShrink: 1,
-  },
-  copyBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: '#F4F6FC',
-    borderWidth: 1.5,
-    borderColor: '#CBD5E1',
-    borderRadius: 100,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    flexShrink: 0,
-  },
-  copyBtnCopied: {
-    backgroundColor: '#DCFCE7',
-    borderColor: '#86EFAC',
-  },
-  copyBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#0B1D6D',
-  },
-  copyBtnTextCopied: {
-    color: '#166534',
   },
 
   copyAccountBtn: {
