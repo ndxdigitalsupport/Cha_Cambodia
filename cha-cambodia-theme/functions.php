@@ -139,8 +139,9 @@ if (!function_exists('cha_customizer_km_data')) {
             'contact_form_btn', 'contact_form_success',
             /* Legal pages */
             'legal_last_updated', 'legal_privacy_title', 'legal_privacy_lead',
-            'legal_disclaimer_title', 'legal_disclaimer_lead',
-            'legal_terms_title', 'legal_terms_lead',
+            'legal_privacy_eyebrow',
+            'legal_disclaimer_title', 'legal_disclaimer_lead', 'legal_disclaimer_eyebrow',
+            'legal_terms_title', 'legal_terms_lead', 'legal_terms_eyebrow',
         );
         $map = array();
         foreach ($en_fields as $f) {
@@ -243,6 +244,95 @@ function cha_news_meta_boxes() {
     add_meta_box('cha_news_details', 'Article Details', 'cha_news_details_cb', 'cha_news', 'side', 'high');
 }
 add_action('add_meta_boxes', 'cha_news_meta_boxes');
+
+/* ---- Legal pages: editable EN/KM bodies ---- */
+function cha_legal_template_map() {
+    return array(
+        'privacy'   => array('template' => 'page-privacy.php',   'eyebrow' => 'legal_privacy_eyebrow',   'default_eyebrow' => 'Privacy Policy'),
+        'disclaimer'=> array('template' => 'page-disclaimer.php','eyebrow' => 'legal_disclaimer_eyebrow','default_eyebrow' => 'Disclaimer'),
+        'terms'     => array('template' => 'page-terms.php',     'eyebrow' => 'legal_terms_eyebrow',     'default_eyebrow' => 'Terms of Service'),
+    );
+}
+
+function cha_legal_page_key($post_id) {
+    $slug = get_page_template_slug($post_id);
+    foreach (cha_legal_template_map() as $key => $cfg) {
+        if ($slug === $cfg['template']) {
+            return $key;
+        }
+    }
+    return '';
+}
+
+function cha_legal_shortcodes() {
+    add_shortcode('cha_email', function () {
+        return esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com'));
+    });
+    add_shortcode('cha_phone', function () {
+        return esc_html(cha_get_option('contact_phone', '+855 96 260 5335'));
+    });
+    add_shortcode('cha_address', function () {
+        return esc_html(cha_get_option('contact_address', '#100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia'));
+    });
+}
+add_action('init', 'cha_legal_shortcodes');
+
+function cha_legal_meta_boxes() {
+    $screen = get_current_screen();
+    if (!$screen || $screen->post_type !== 'page') {
+        return;
+    }
+    add_meta_box(
+        'cha_legal_body',
+        'Legal Page Body (Khmer)',
+        'cha_legal_body_cb',
+        'page',
+        'normal',
+        'high'
+    );
+}
+add_action('add_meta_boxes', 'cha_legal_meta_boxes');
+
+function cha_legal_body_cb($post) {
+    $key = cha_legal_page_key($post->ID);
+    if (!$key) {
+        echo '<p style="margin:0"><em>This box is for CHA legal pages only. Set Page Attributes → Template to “CHA Privacy Page”, “CHA Disclaimer Page”, or “CHA Terms Page”, then update/save the page to edit the Khmer body here.</em></p>';
+        return;
+    }
+    wp_nonce_field('cha_legal_body', 'cha_legal_body_nonce');
+    $km = get_post_meta($post->ID, '_cha_legal_body_km', true);
+    ?>
+    <p style="margin-top:0">
+        <strong>English body:</strong> edit in the main page editor above (normal WordPress content box).
+        If that box is empty, the built-in English text is shown on the site.
+    </p>
+    <p>
+        <strong>Khmer body (ខ្មែរ):</strong> paste HTML below. If empty, the built-in Khmer text is shown.
+        Live contact shortcodes: <code>[cha_email]</code> <code>[cha_phone]</code> <code>[cha_address]</code><br>
+        Eyebrow / title / intro / last-updated: <strong>Appearance → Customize → Footer &amp; Modals → Legal Pages</strong>
+    </p>
+    <label for="cha_legal_body_km"><strong>Khmer section HTML</strong></label>
+    <textarea id="cha_legal_body_km" name="cha_legal_body_km" rows="18" style="width:100%;font-family:Consolas,Monaco,monospace;font-size:12px;box-sizing:border-box;"><?php echo esc_textarea($km); ?></textarea>
+    <p class="description">Leave empty to keep the default Khmer copy. Click Update/Publish to save.</p>
+    <?php
+}
+
+function cha_save_legal_body($post_id) {
+    if (!isset($_POST['cha_legal_body_nonce']) || !wp_verify_nonce($_POST['cha_legal_body_nonce'], 'cha_legal_body')) {
+        return;
+    }
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+    if (isset($_POST['cha_legal_body_km'])) {
+        $html = wp_unslash($_POST['cha_legal_body_km']);
+        update_post_meta($post_id, '_cha_legal_body_km', $html);
+    }
+}
+add_action('save_post', 'cha_save_legal_body');
 
 function cha_news_details_cb($post) {
     wp_nonce_field('cha_news_details', 'cha_news_nonce');

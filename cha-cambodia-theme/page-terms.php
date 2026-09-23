@@ -6,7 +6,7 @@ get_header(); ?>
 
 <section class="page-hero page-hero-legal" id="terms"><div class="container">
   <div data-reveal>
-    <span class="eyebrow">Terms of Service</span>
+    <span class="eyebrow"><?php echo esc_html(cha_get_option('legal_terms_eyebrow', 'Terms of Service')); ?></span>
     <h1><?php echo esc_html(cha_get_option('legal_terms_title', 'Terms of Service')); ?></h1>
     <p class="lead"><?php echo esc_html(cha_get_option('legal_terms_lead', 'The terms that govern your use of the CHA website, mobile app, and membership services.')); ?></p>
     <p class="text-muted" style="font-size:0.875rem"><?php echo esc_html(cha_get_option('legal_last_updated', 'Last updated: August 2026')); ?></p>
@@ -21,8 +21,16 @@ get_header(); ?>
       <p>The English version of these terms takes precedence in case of any discrepancy with the Khmer translation. ក្នុងករណីមានភាពមិនស្របគ្នារវាងអត្ថបទភាសាអង់គ្លេស និងការបកប្រែជាភាសាខ្មែរ អត្ថបទភាសាអង់គ្លេសត្រូវបានយកជាអាទិភាព។</p>
     </div>
 
+    <?php
+    $en_custom = trim((string) get_post_field('post_content', get_the_ID()));
+    $km_custom = trim((string) get_post_meta(get_the_ID(), '_cha_legal_body_km', true));
+    ?>
+
     <!-- ================= ENGLISH ================= -->
     <section class="legal-section lang-en" data-reveal>
+      <?php if ($en_custom !== '') : ?>
+        <?php echo do_shortcode($en_custom); ?>
+      <?php else : ?>
       <h2>1. Acceptance of terms</h2>
       <p>By creating an account, downloading the CHA mobile app, using our website, or making a donation, you agree to be bound by these Terms of Service. If you do not agree, please do not use our services.</p>
 
@@ -50,7 +58,7 @@ get_header(); ?>
       <ul>
         <li>Donations are voluntary and paid securely by scanning the CHA KHQR code with ABA Mobile, Bakong, or any other KHQR-supported banking app.</li>
         <li>Payments are processed by your banking app under that app's own terms and security conditions. CHA does not collect or store card numbers on this website or app.</li>
-        <li><strong>Refund & Cancellation Policy:</strong> If you believe a donation was made in error or wish to request a refund for an unauthorized transaction, contact CHA within thirty (30) calendar days of the transaction date at <a href="mailto:choryee.hun@gmail.com">choryee.hun@gmail.com</a> or +855 96 260 5335. Approved refunds will be returned by bank transfer to the account used for the donation (or another arrangement agreed with CHA) within 30 days. Refunds will not be provided in cash.</li>
+        <li><strong>Refund & Cancellation Policy:</strong> If you believe a donation was made in error or wish to request a refund for an unauthorized transaction, contact CHA within thirty (30) calendar days of the transaction date at <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a> or <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?>. Approved refunds will be returned by bank transfer to the account used for the donation (or another arrangement agreed with CHA) within 30 days. Refunds will not be provided in cash.</li>
         <li><strong>Customer Support Notice:</strong> Please contact CHA Cambodia directly for all questions, transaction inquiries, or refund requests related to donations made through this website or app. Do not contact ABA Bank directly for website support or donation-related inquiries.</li>
       </ul>
 
@@ -79,10 +87,14 @@ get_header(); ?>
         <li>Phone: <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?></li>
         <li>Address: <?php echo esc_html(cha_get_option('contact_address', '#100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia')); ?></li>
       </ul>
+      <?php endif; ?>
     </section>
 
     <!-- ================= KHMER ================= -->
     <section class="legal-section lang-km" data-reveal>
+      <?php if ($km_custom !== '') : ?>
+        <?php echo do_shortcode($km_custom); ?>
+      <?php else : ?>
       <h2>លក្ខខណ្ឌនៃការប្រើប្រាស់</h2>
 
       <h2>១. ការទទួលយកលក្ខខណ្ឌ</h2>
@@ -110,7 +122,7 @@ get_header(); ?>
       <ul>
         <li>ការបរិច្ចាគគឺស្ម័គ្រចិត្ត និងបង់ដោយសុវត្ថិភាពតាមរយៈការស្កែនកូដ KHQR របស់ CHA តាម ABA Mobile, Bakong ឬកម្មវិធីធនាគារដែលគាំទ្រ KHQR ផ្សេងទៀត។</li>
         <li>ការទូទាត់ដំណើរការដោយកម្មវិធីធនាគាររបស់អ្នក ស្ថិតនៅក្រោមលក្ខខណ្ឌ និងសុវត្ថិភាពរបស់កម្មវិធីនោះ។ CHA មិនប្រមូល ឬរក្សាទុកលេខកាតនៅលើគេហទំព័រ ឬកម្មវិធីនេះទេ។</li>
-        <li><strong>គោលការណ៍បង្វិលសងប្រាក់ និងការលុបចោល៖</strong> ប្រសិនបើអ្នកយល់ថាមានការបរិច្ចាគដោយច្រឡំ ឬសុំបង្វិលសងសម្រាប់ប្រតិបត្តិការដែលមិនបានអនុញ្ញាត សូមទាក់ទងមកកាន់ CHA ក្នុងរយៈពេលសាមសិប (៣០) ថ្ងៃតាមប្រតិទិន គិតចាប់ពីថ្ងៃធ្វើប្រតិបត្តិការ តាមរយៈ <a href="mailto:choryee.hun@gmail.com">choryee.hun@gmail.com</a> ឬទូរស័ព្ទ +855 96 260 5335។ ការបង្វិលសងដែលបានអនុម័ត នឹងត្រូវផ្ញើត្រឡប់តាមការផ្ទេរប្រាក់ធនាគារទៅគណនីដែលបានប្រើសម្រាប់ការបរិច្ចាគ (ឬកិច្ចព្រមព្រៀងផ្សេងដែលយល់ព្រមជាមួយ CHA) ក្នុងរយៈពេល ៣០ ថ្ងៃ។ ការបង្វិលសងជាប្រាក់សុទ្ធមិនត្រូវបានអនុញ្ញាតឡើយ។</li>
+        <li><strong>គោលការណ៍បង្វិលសងប្រាក់ និងការលុបចោល៖</strong> ប្រសិនបើអ្នកយល់ថាមានការបរិច្ចាគដោយច្រឡំ ឬសុំបង្វិលសងសម្រាប់ប្រតិបត្តិការដែលមិនបានអនុញ្ញាត សូមទាក់ទងមកកាន់ CHA ក្នុងរយៈពេលសាមសិប (៣០) ថ្ងៃតាមប្រតិទិន គិតចាប់ពីថ្ងៃធ្វើប្រតិបត្តិការ តាមរយៈ <a href="mailto:<?php echo esc_attr(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?>"><?php echo esc_html(cha_get_option('contact_email', 'choryee.hun@gmail.com')); ?></a> ឬទូរស័ព្ទ <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?>។ ការបង្វិលសងដែលបានអនុម័ត នឹងត្រូវផ្ញើត្រឡប់តាមការផ្ទេរប្រាក់ធនាគារទៅគណនីដែលបានប្រើសម្រាប់ការបរិច្ចាគ (ឬកិច្ចព្រមព្រៀងផ្សេងដែលយល់ព្រមជាមួយ CHA) ក្នុងរយៈពេល ៣០ ថ្ងៃ។ ការបង្វិលសងជាប្រាក់សុទ្ធមិនត្រូវបានអនុញ្ញាតឡើយ។</li>
         <li><strong>សេចក្តីជូនដំណឹងអំពីការគាំទ្រអតិថិជន៖</strong> សូមទាក់ទងមកកាន់សមាគម CHA Cambodia ដោយផ្ទាល់ សម្រាប់រាល់ចម្ងល់ ការសាកសួរប្រតិបត្តិការ ឬសំណើសុំបង្វិលសងប្រាក់ទាក់ទងនឹងការបរិច្ចាគ។ សូមកុំទាក់ទងទៅកាន់ធនាគារ ABA ដោយផ្ទាល់សម្រាប់ការគាំទ្រគេហទំព័រ ឬសំណួរទាក់ទងនឹងការបរិច្ចាគឡើយ។</li>
       </ul>
 
@@ -132,6 +144,7 @@ get_header(); ?>
         <li>ទូរស័ព្ទ: <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?></li>
         <li>អាសយដ្ឋាន: <?php echo esc_html(cha_get_option('contact_address', '#១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី សង្កាត់ទឹកល្អក់១ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ កម្ពុជា')); ?></li>
       </ul>
+      <?php endif; ?>
     </section>
   </div>
 </main>

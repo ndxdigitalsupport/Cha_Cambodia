@@ -937,10 +937,13 @@ function cha_customize_register($wp_customize) {
 
     $legal_texts = array(
         array('legal_last_updated', 'Last updated line', 'កាលបរិច្ឆេទអាប់ដេត'),
+        array('legal_privacy_eyebrow', 'Privacy eyebrow', 'គោលនយោបាយឯកជនភាព'),
         array('legal_privacy_title', 'Privacy title', 'ចំណងជើងគោលនយោបាយឯកជនភាព'),
         array('legal_privacy_lead', 'Privacy intro', 'ការពិពណ៌នាគោលនយោបាយឯកជនភាព'),
+        array('legal_disclaimer_eyebrow', 'Disclaimer eyebrow', 'ការបដិសេធ'),
         array('legal_disclaimer_title', 'Disclaimer title', 'ចំណងជើងការបដិសេធ'),
         array('legal_disclaimer_lead', 'Disclaimer intro', 'ការពិពណ៌នាការបដិសេធ'),
+        array('legal_terms_eyebrow', 'Terms eyebrow', 'លក្ខខណ្ឌនៃការប្រើប្រាស់'),
         array('legal_terms_title', 'Terms title', 'ចំណងជើងលក្ខខណ្ឌ'),
         array('legal_terms_lead', 'Terms intro', 'ការពិពណ៌នាលក្ខខណ្ឌ'),
     );

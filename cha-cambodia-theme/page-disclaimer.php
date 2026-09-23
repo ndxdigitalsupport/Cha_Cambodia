@@ -6,7 +6,7 @@ get_header(); ?>
 
 <section class="page-hero page-hero-legal" id="disclaimer"><div class="container">
   <div data-reveal>
-    <span class="eyebrow">Disclaimer</span>
+    <span class="eyebrow"><?php echo esc_html(cha_get_option('legal_disclaimer_eyebrow', 'Disclaimer')); ?></span>
     <h1><?php echo esc_html(cha_get_option('legal_disclaimer_title', 'Disclaimer')); ?></h1>
     <p class="lead"><?php echo esc_html(cha_get_option('legal_disclaimer_lead', 'Please read this disclaimer carefully before using the CHA website, mobile app, or services.')); ?></p>
     <p class="text-muted" style="font-size:0.875rem"><?php echo esc_html(cha_get_option('legal_last_updated', 'Last updated: August 2026')); ?></p>
@@ -21,8 +21,16 @@ get_header(); ?>
       <p>The English version of this disclaimer takes precedence in case of any discrepancy with the Khmer translation. ក្នុងករណីមានភាពមិនស្របគ្នារវាងអត្ថបទភាសាអង់គ្លេស និងការបកប្រែជាភាសាខ្មែរ អត្ថបទភាសាអង់គ្លេសត្រូវបានយកជាអាទិភាព។</p>
     </div>
 
+    <?php
+    $en_custom = trim((string) get_post_field('post_content', get_the_ID()));
+    $km_custom = trim((string) get_post_meta(get_the_ID(), '_cha_legal_body_km', true));
+    ?>
+
     <!-- ================= ENGLISH ================= -->
     <section class="legal-section lang-en" data-reveal>
+      <?php if ($en_custom !== '') : ?>
+        <?php echo do_shortcode($en_custom); ?>
+      <?php else : ?>
       <h2>1. Medical information</h2>
       <p>The health and medical information on this website and in the CHA mobile app is provided for general educational and support purposes only. It is <strong>not a substitute for professional medical advice, diagnosis, or treatment</strong>.</p>
       <p>Always seek the advice of a qualified healthcare provider with any questions you may have regarding a medical condition. Never disregard professional medical advice or delay in seeking it because of something you have read on this website or in the app.</p>
@@ -62,10 +70,14 @@ get_header(); ?>
         <li>Phone: <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?></li>
         <li>Address: <?php echo esc_html(cha_get_option('contact_address', '#100, Street Russia Blvd, Sangkat Teek Laak 1, Khan Toul Kork, Phnom Penh, Cambodia')); ?></li>
       </ul>
+      <?php endif; ?>
     </section>
 
     <!-- ================= KHMER ================= -->
     <section class="legal-section lang-km" data-reveal>
+      <?php if ($km_custom !== '') : ?>
+        <?php echo do_shortcode($km_custom); ?>
+      <?php else : ?>
       <h2>ការបដិសេធ</h2>
 
       <h2>១. ព័ត៌មានវេជ្ជសាស្ត្រ</h2>
@@ -100,6 +112,7 @@ get_header(); ?>
         <li>ទូរស័ព្ទ: <?php echo esc_html(cha_get_option('contact_phone', '+855 96 260 5335')); ?></li>
         <li>អាសយដ្ឋាន: <?php echo esc_html(cha_get_option('contact_address', '#១០០ មហាវិថីសហព័ន្ធរុស្ស៊ី សង្កាត់ទឹកល្អក់១ ខណ្ឌទួលគោក រាជធានីភ្នំពេញ កម្ពុជា')); ?></li>
       </ul>
+      <?php endif; ?>
     </section>
   </div>
 </main>
